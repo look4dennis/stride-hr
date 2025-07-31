@@ -1,0 +1,75 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: stridehr-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: StridHR@2024!
+      MYSQL_DATABASE: stridehr
+      MYSQL_USER: stridehr_user
+      MYSQL_PASSWORD: StridHR@User2024!
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./scripts/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - stridehr-network
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    container_name: stridehr-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - stridehr-network
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+
+  api:
+    build:
+      context: .
+      dockerfile: src/StrideHR.API/Dockerfile
+    container_name: stridehr-api
+    ports:
+      - "5000:80"
+      - "5001:443"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Server=mysql;Database=stridehr;Uid=stridehr_user;Pwd=StridHR@User2024!;
+      - Redis__ConnectionString=redis:6379
+    depends_on:
+      - mysql
+      - redis
+    networks:
+      - stridehr-network
+    restart: unless-stopped
+    volumes:
+      - ./logs:/app/logs
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: stridehr-frontend
+    ports:
+      - "4200:80"
+    depends_on:
+      - api
+    networks:
+      - stridehr-network
+    restart: unless-stopped
+
+volumes:
+  mysql_data:
+    driver: local
+  redis_data:
+    driver: local
+
+networks:
+  stridehr-network:
+    driver: bridge
