@@ -3,6 +3,7 @@ using FluentAssertions;
 using StrideHR.Core.Entities;
 using StrideHR.Infrastructure.Data;
 using StrideHR.Infrastructure.Repositories;
+using Xunit;
 
 namespace StrideHR.Tests.Infrastructure;
 

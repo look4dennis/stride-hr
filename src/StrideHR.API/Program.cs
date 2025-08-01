@@ -3,6 +3,10 @@ using Serilog;
 using StrideHR.Infrastructure.Data;
 using StrideHR.Core.Interfaces;
 using StrideHR.Infrastructure.Repositories;
+using StrideHR.Infrastructure.Services;
+using StrideHR.Core.Models;
+using StrideHR.API.Extensions;
+using StrideHR.API.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,7 +24,7 @@ builder.Host.UseSerilog();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 
-// Configure Swagger
+// Configure Swagger with JWT support
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
@@ -32,6 +36,31 @@ builder.Services.AddSwaggerGen(c =>
         {
             Name = "Dennis Charles Dcruz",
             Email = "look4dennis@hotmail.com"
+        }
+    });
+
+    // Add JWT authentication to Swagger
+    c.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+    {
+        Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
+        Name = "Authorization",
+        In = Microsoft.OpenApi.Models.ParameterLocation.Header,
+        Type = Microsoft.OpenApi.Models.SecuritySchemeType.ApiKey,
+        Scheme = "Bearer"
+    });
+
+    c.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
+    {
+        {
+            new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+            {
+                Reference = new Microsoft.OpenApi.Models.OpenApiReference
+                {
+                    Type = Microsoft.OpenApi.Models.ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            Array.Empty<string>()
         }
     });
 });
@@ -53,8 +82,45 @@ builder.Services.AddCors(options =>
     });
 });
 
+// Configure Settings
+builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection(JwtSettings.SectionName));
+builder.Services.Configure<SecuritySettings>(builder.Configuration.GetSection(SecuritySettings.SectionName));
+
+// Configure Authentication and Authorization
+builder.Services.AddJwtAuthentication(builder.Configuration);
+builder.Services.AddAuthorizationPolicies();
+
 // Register repositories
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+builder.Services.AddScoped<IOrganizationRepository, OrganizationRepository>();
+builder.Services.AddScoped<IBranchRepository, BranchRepository>();
+builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
+builder.Services.AddScoped<IAttendanceRepository, AttendanceRepository>();
+builder.Services.AddScoped<IBreakRecordRepository, BreakRecordRepository>();
+builder.Services.AddScoped<IAttendanceCorrectionRepository, AttendanceCorrectionRepository>();
+builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
+builder.Services.AddScoped<IProjectTaskRepository, ProjectTaskRepository>();
+builder.Services.AddScoped<IProjectAssignmentRepository, ProjectAssignmentRepository>();
+builder.Services.AddScoped<ITaskAssignmentRepository, TaskAssignmentRepository>();
+
+// Register services
+builder.Services.AddScoped<IJwtService, JwtService>();
+builder.Services.AddScoped<IPasswordService, PasswordService>();
+builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
+builder.Services.AddScoped<IAuditService, AuditService>();
+builder.Services.AddScoped<IRoleService, RoleService>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IEncryptionService, EncryptionService>();
+builder.Services.AddScoped<IOrganizationService, OrganizationService>();
+builder.Services.AddScoped<IBranchService, BranchService>();
+builder.Services.AddScoped<IEmployeeService, EmployeeService>();
+builder.Services.AddScoped<IAttendanceService, AttendanceService>();
+builder.Services.AddScoped<ICurrencyService, CurrencyService>();
+builder.Services.AddScoped<ITimeZoneService, TimeZoneService>();
+builder.Services.AddScoped<IBranchIsolationService, BranchIsolationService>();
+builder.Services.AddScoped<IProjectService, ProjectService>();
 
 // Configure AutoMapper
 builder.Services.AddAutoMapper(typeof(Program));
@@ -77,6 +143,9 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseCors("AllowAngularApp");
+
+// Add custom JWT middleware
+app.UseMiddleware<JwtMiddleware>();
 
 app.UseAuthentication();
 app.UseAuthorization();

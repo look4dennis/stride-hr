@@ -454,25 +454,33 @@ strideHR is a comprehensive full-stack Human Resource Management System designed
 
 9. WHEN employees forget to mark breaks THEN HR Manager SHALL be able to mark break status for employees with break type and duration
 
-### Requirement 22: Modern Bootstrap 5 UI with Professional Design Elements
+### Requirement 22: Modern Bootstrap 5 UI with Professional Design Elements and Angular Implementation
 
-**User Story:** As a user of the system, I want a modern, visually appealing interface with professional design elements, so that I can enjoy an engaging and intuitive user experience while working with the HR system.
+**User Story:** As a user of the system, I want a modern, visually appealing interface with professional design elements built using Angular components with HTML templates and CSS styling, so that I can enjoy an engaging and intuitive user experience while working with the HR system.
 
 #### Acceptance Criteria
 
-1. WHEN accessing the application THEN the system SHALL use Bootstrap 5 framework with modern, decorative design elements including animations, shadows, and gradients
+1. WHEN building the frontend THEN the system SHALL use Angular 17+ framework with component-based architecture using HTML templates and CSS/SCSS styling
 
-2. WHEN interacting with buttons THEN all buttons SHALL have rounded corners with consistent styling and hover effects
+2. WHEN creating UI components THEN each Angular component SHALL have dedicated HTML template files (.html) and CSS/SCSS style files (.css/.scss) for separation of concerns
 
-3. WHEN viewing status information THEN the system SHALL use proper badges with color coding for different statuses (active, pending, approved, rejected)
+3. WHEN accessing the application THEN the system SHALL use Bootstrap 5 framework with modern, decorative design elements including animations, shadows, and gradients
 
-4. WHEN navigating the interface THEN smooth animations SHALL enhance user interactions without impacting performance
+4. WHEN implementing responsive design THEN HTML templates SHALL use Bootstrap 5 grid system and utility classes for consistent responsive behavior
 
-5. WHEN viewing cards and panels THEN they SHALL have appropriate shadows and depth to create visual hierarchy
+5. WHEN interacting with buttons THEN all buttons SHALL have rounded corners with consistent styling and hover effects implemented through CSS classes
 
-6. WHEN using forms THEN input fields SHALL have modern styling with proper validation feedback and visual cues
+6. WHEN viewing status information THEN the system SHALL use proper badges with color coding for different statuses (active, pending, approved, rejected) using Bootstrap 5 badge components
 
-7. WHEN accessing on different devices THEN the Bootstrap 5 responsive design SHALL maintain visual consistency and functionality
+7. WHEN navigating the interface THEN smooth animations SHALL enhance user interactions without impacting performance, implemented through CSS transitions and Angular animations
+
+8. WHEN viewing cards and panels THEN they SHALL have appropriate shadows and depth to create visual hierarchy using Bootstrap 5 card components and custom CSS
+
+9. WHEN using forms THEN input fields SHALL have modern styling with proper validation feedback and visual cues using Bootstrap 5 form components and Angular reactive forms
+
+10. WHEN accessing on different devices THEN the Bootstrap 5 responsive design SHALL maintain visual consistency and functionality across all screen sizes
+
+11. WHEN styling components THEN custom CSS/SCSS SHALL complement Bootstrap 5 classes to achieve the desired professional appearance while maintaining framework consistency
 
 ### Requirement 23: Enhanced Project Management with Kanban and List Views
 

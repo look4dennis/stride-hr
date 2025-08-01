@@ -1,0 +1,19 @@
+{
+  "enabled": true,
+  "name": "Parent Task Build Validation",
+  "description": "Monitors for parent task completion and automatically runs build validation to ensure zero warnings and errors when all subtasks are finished",
+  "version": "1",
+  "when": {
+    "type": "fileEdited",
+    "patterns": [
+      "src/**/*.cs",
+      "frontend/src/**/*.ts",
+      "StrideHR.sln",
+      "frontend/package.json"
+    ]
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "A parent task has been completed (all subtasks finished). Please run a full build validation to check for warnings and errors. Execute 'dotnet build' for the backend solution and 'npm run build' for the frontend. If any warnings or errors are found, analyze and provide specific fixes to achieve zero warnings and zero errors. Report the final build status and confirm all issues have been resolved."
+  }
+}
