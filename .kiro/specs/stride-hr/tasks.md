@@ -4,7 +4,8 @@ Convert the feature design into a series of prompts for a code-generation LLM th
 
 ## Task List
 
-- [x] 1. Project Structure and Core Infrastructure Setup
+- [ ] 1. Project Structure and Core Infrastructure Setup
+
 
   - Create solution structure with separate projects for API, Core, Infrastructure, and Tests
   - Set up Entity Framework Core with MySQL connection
@@ -13,9 +14,9 @@ Convert the feature design into a series of prompts for a code-generation LLM th
   - Set up logging with Serilog and basic error handling
   - _Requirements: All requirements depend on solid foundation_
 
-- [x] 2. Database Schema and Entity Models
+- [ ] 2. Database Schema and Entity Models
 
-  - [x] 2.1 Create core entity models for Organization, Branch, and Employee
+  - [ ] 2.1 Create core entity models for Organization, Branch, and Employee
 
     - Implement Organization entity with logo support and configuration settings
     - Create Branch entity with multi-country and currency support
@@ -23,7 +24,7 @@ Convert the feature design into a series of prompts for a code-generation LLM th
     - Add Entity Framework configurations and relationships
     - _Requirements: 1.1, 1.2, 1.5, 42.1_
 
-  - [x] 2.2 Create authentication and authorization entities
+  - [ ] 2.2 Create authentication and authorization entities
 
     - Implement User, Role, and Permission entities
     - Create RolePermission and EmployeeRole junction tables
@@ -31,7 +32,7 @@ Convert the feature design into a series of prompts for a code-generation LLM th
     - Configure Entity Framework relationships and constraints
     - _Requirements: 8.1, 8.2, 33.1, 33.3_
 
-  - [x] 2.3 Create attendance and time tracking entities
+  - [ ] 2.3 Create attendance and time tracking entities
 
     - Implement AttendanceRecord entity with check-in/out and location tracking
     - Create BreakRecord entity with break types and duration tracking
@@ -39,9 +40,9 @@ Convert the feature design into a series of prompts for a code-generation LLM th
     - Configure timezone and working hours support
     - _Requirements: 4.1, 4.2, 4.9, 24.3, 45.1_
 
-- [x] 3. Authentication and Security Implementation
+- [ ] 3. Authentication and Security Implementation
 
-  - [x] 3.1 Implement JWT authentication service
+  - [ ] 3.1 Implement JWT authentication service
 
     - Create JWT token generation and validation logic
     - Implement refresh token mechanism
@@ -50,8 +51,7 @@ Convert the feature design into a series of prompts for a code-generation LLM th
     - Write unit tests for authentication service
     - _Requirements: 8.1, 16.1, 16.2, 25.1_
 
-
-  - [x] 3.2 Implement role-based authorization system
+  - [ ] 3.2 Implement role-based authorization system
 
     - Create permission-based authorization handlers
     - Implement dynamic role and permission management
@@ -60,7 +60,7 @@ Convert the feature design into a series of prompts for a code-generation LLM th
     - Write unit tests for authorization system
     - _Requirements: 8.2, 33.4, 33.5, 35.2, 35.3_
 
-  - [x] 3.3 Create user management and security services
+  - [ ] 3.3 Create user management and security services
 
     - Implement user registration and profile management
     - Add password reset and change functionality
@@ -69,10 +69,9 @@ Convert the feature design into a series of prompts for a code-generation LLM th
     - Write integration tests for security workflows
     - _Requirements: 16.3, 16.6, 16.7, 8.3_
 
-- [x] 4. Core Business Services Implementation
+- [ ] 4. Core Business Services Implementation
 
-  - [x] 4.1 Employee management service
-
+  - [ ] 4.1 Employee management service
 
     - Create employee CRUD operations with validation
     - Implement employee search and filtering functionality
@@ -81,7 +80,7 @@ Convert the feature design into a series of prompts for a code-generation LLM th
     - Write unit tests for employee service operations
     - _Requirements: 2.4, 2.5, 39.1, 42.1, 42.4_
 
-  - [x] 4.2 Organization and branch management service
+  - [ ] 4.2 Organization and branch management service
 
     - Implement organization configuration and logo upload
     - Create branch management with multi-country support
@@ -90,9 +89,7 @@ Convert the feature design into a series of prompts for a code-generation LLM th
     - Write unit tests for organization services
     - _Requirements: 1.1, 1.3, 24.1, 34.1, 35.1_
 
-  - [x] 4.3 Attendance tracking service
-
-
+  - [ ] 4.3 Attendance tracking service
 
     - Create check-in/check-out functionality with location tracking
     - Implement break management with type selection
@@ -101,13 +98,9 @@ Convert the feature design into a series of prompts for a code-generation LLM th
     - Write unit tests for attendance operations
     - _Requirements: 4.1, 4.2, 4.9, 4.10, 21.8, 21.9_
 
-- [-] 5. Project Management and Task Tracking
+- [ ] 5. Project Management and Task Tracking
 
-
-
-  - [x] 5.1 Project and task management service
-
-
+  - [ ] 5.1 Project and task management service
 
     - Create project creation and configuration functionality
     - Implement task creation and assignment workflows
@@ -116,8 +109,7 @@ Convert the feature design into a series of prompts for a code-generation LLM th
     - Write unit tests for project management operations
     - _Requirements: 11.1, 11.2, 27.3, 27.4, 32.1, 32.2_
 
-  - [-] 5.2 Daily Status Report (DSR) system
-
+  - [ ] 5.2 Daily Status Report (DSR) system
 
     - Implement DSR submission with project and task selection
     - Create DSR review and approval workflows
@@ -127,6 +119,9 @@ Convert the feature design into a series of prompts for a code-generation LLM th
     - _Requirements: 12.1, 12.8, 12.9, 12.10, 31.1, 31.4_
 
   - [ ] 5.3 Project progress monitoring and reporting
+
+
+
     - Create real-time project progress tracking
     - Implement project hours analysis and variance reporting
     - Add team leader dashboard for project oversight
@@ -135,7 +130,16 @@ Convert the feature design into a series of prompts for a code-generation LLM th
     - _Requirements: 31.2, 31.5, 31.7, 31.11, 11.7_
 
 - [ ] 6. Payroll System with Custom Formula Engine
+
+
+
   - [ ] 6.1 Payroll calculation engine
+
+
+
+
+
+
     - Create flexible payroll formula engine with mathematical expressions
     - Implement salary calculation with allowances and deductions
     - Add multi-currency support and exchange rate handling
@@ -144,6 +148,11 @@ Convert the feature design into a series of prompts for a code-generation LLM th
     - _Requirements: 3.1, 3.2, 3.4, 24.8, 34.8_
 
   - [ ] 6.2 Payslip generation and approval workflow
+
+
+
+
+
     - Implement drag-and-drop payslip designer
     - Create payslip generation with organization branding
     - Add multi-level approval workflow (HR → Finance)
@@ -152,6 +161,7 @@ Convert the feature design into a series of prompts for a code-generation LLM th
     - _Requirements: 3.3, 3.6, 3.7, 3.8, 3.9_
 
   - [ ] 6.3 Payroll reporting and compliance
+
     - Create payroll reports with currency conversion
     - Implement statutory compliance reporting
     - Add payroll audit trails and error correction workflows
