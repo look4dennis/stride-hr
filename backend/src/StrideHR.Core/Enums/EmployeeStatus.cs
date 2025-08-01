@@ -34,3 +34,12 @@ public enum ShiftType
     Rotating = 3,
     Flexible = 4
 }
+
+public enum HolidayType
+{
+    National = 1,
+    Regional = 2,
+    Religious = 3,
+    Company = 4,
+    Optional = 5
+}

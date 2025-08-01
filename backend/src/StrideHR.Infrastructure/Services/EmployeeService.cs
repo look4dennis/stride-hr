@@ -1,3 +1,4 @@
+using System.Linq;
 using StrideHR.Core.Entities;
 using StrideHR.Core.Interfaces;
 using StrideHR.Core.Interfaces.Services;
@@ -15,22 +16,24 @@ public class EmployeeService : IEmployeeService
 
     public async Task<Employee?> GetByIdAsync(int id)
     {
-        return await _unitOfWork.Employees.GetByIdAsync(id, e => e.Branch, e => e.ReportingManager);
+        var employee = await _unitOfWork.Employees.GetByIdAsync(id, e => e.Branch, e => e.ReportingManager);
+        return employee;
     }
 
     public async Task<Employee?> GetByEmployeeIdAsync(string employeeId)
     {
-        return await _unitOfWork.Employees.FirstOrDefaultAsync(
+        var employee = await _unitOfWork.Employees.FirstOrDefaultAsync(
             e => e.EmployeeId == employeeId,
             e => e.Branch,
             e => e.ReportingManager
         );
+        return employee;
     }
 
     public async Task<IEnumerable<Employee>> GetAllAsync()
     {
         var employees = await _unitOfWork.Employees.GetAllAsync(e => e.Branch, e => e.ReportingManager);
-        return employees ?? new List<Employee>();
+        return employees ?? Enumerable.Empty<Employee>();
     }
 
     public async Task<IEnumerable<Employee>> GetByBranchAsync(int branchId)
@@ -40,7 +43,7 @@ public class EmployeeService : IEmployeeService
             e => e.Branch,
             e => e.ReportingManager
         );
-        return employees ?? new List<Employee>();
+        return employees ?? Enumerable.Empty<Employee>();
     }
 
     public async Task<Employee> CreateAsync(Employee employee)

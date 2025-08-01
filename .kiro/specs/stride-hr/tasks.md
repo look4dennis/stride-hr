@@ -6,11 +6,6 @@ Convert the feature design into a series of prompts for a code-generation LLM th
 
 - [x] 1. Project Structure and Core Infrastructure Setup
 
-
-
-
-
-
   - Create solution structure with separate projects for API, Core, Infrastructure, and Tests
   - Set up Entity Framework Core with MySQL connection
   - Configure dependency injection container and basic middleware
@@ -18,9 +13,14 @@ Convert the feature design into a series of prompts for a code-generation LLM th
   - Set up logging with Serilog and basic error handling
   - _Requirements: All requirements depend on solid foundation_
 
-- [ ] 2. Database Schema and Entity Models
+- [x] 2. Database Schema and Entity Models
 
-  - [ ] 2.1 Create core entity models for Organization, Branch, and Employee
+
+
+
+
+
+  - [x] 2.1 Create core entity models for Organization, Branch, and Employee
 
     - Implement Organization entity with logo support and configuration settings
     - Create Branch entity with multi-country and currency support
@@ -28,15 +28,21 @@ Convert the feature design into a series of prompts for a code-generation LLM th
     - Add Entity Framework configurations and relationships
     - _Requirements: 1.1, 1.2, 1.5, 42.1_
 
-  - [ ] 2.2 Create authentication and authorization entities
+
+
+  - [x] 2.2 Create authentication and authorization entities
+
 
     - Implement User, Role, and Permission entities
     - Create RolePermission and EmployeeRole junction tables
     - Add JWT token and refresh token entities
     - Configure Entity Framework relationships and constraints
+
     - _Requirements: 8.1, 8.2, 33.1, 33.3_
 
-  - [ ] 2.3 Create attendance and time tracking entities
+  - [x] 2.3 Create attendance and time tracking entities
+
+
 
     - Implement AttendanceRecord entity with check-in/out and location tracking
     - Create BreakRecord entity with break types and duration tracking

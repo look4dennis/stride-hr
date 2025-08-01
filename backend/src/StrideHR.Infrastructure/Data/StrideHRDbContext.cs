@@ -14,6 +14,9 @@ public class StrideHRDbContext : DbContext
     public DbSet<Organization> Organizations { get; set; }
     public DbSet<Branch> Branches { get; set; }
     public DbSet<Employee> Employees { get; set; }
+    public DbSet<User> Users { get; set; }
+    public DbSet<RefreshToken> RefreshTokens { get; set; }
+    public DbSet<UserSession> UserSessions { get; set; }
     public DbSet<AttendanceRecord> AttendanceRecords { get; set; }
     public DbSet<BreakRecord> BreakRecords { get; set; }
     public DbSet<Role> Roles { get; set; }
@@ -22,6 +25,9 @@ public class StrideHRDbContext : DbContext
     public DbSet<EmployeeRole> EmployeeRoles { get; set; }
     public DbSet<Shift> Shifts { get; set; }
     public DbSet<ShiftAssignment> ShiftAssignments { get; set; }
+    public DbSet<WorkingHours> WorkingHours { get; set; }
+    public DbSet<Holiday> Holidays { get; set; }
+    public DbSet<AttendancePolicy> AttendancePolicies { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

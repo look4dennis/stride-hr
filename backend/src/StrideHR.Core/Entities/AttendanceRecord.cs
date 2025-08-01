@@ -13,10 +13,30 @@ public class AttendanceRecord : BaseEntity
     public TimeSpan? OvertimeHours { get; set; }
     public AttendanceStatus Status { get; set; } = AttendanceStatus.Absent;
     public string? Location { get; set; }
+    public string? CheckInLocation { get; set; }
+    public string? CheckOutLocation { get; set; }
+    public double? CheckInLatitude { get; set; }
+    public double? CheckInLongitude { get; set; }
+    public double? CheckOutLatitude { get; set; }
+    public double? CheckOutLongitude { get; set; }
+    public string? CheckInTimeZone { get; set; }
+    public string? CheckOutTimeZone { get; set; }
+    public string? DeviceInfo { get; set; }
+    public string? IpAddress { get; set; }
+    public bool IsLate { get; set; } = false;
+    public TimeSpan? LateBy { get; set; }
+    public bool IsEarlyOut { get; set; } = false;
+    public TimeSpan? EarlyOutBy { get; set; }
+    public int? ShiftId { get; set; }
     public string? Notes { get; set; }
+    public string? CorrectionReason { get; set; }
+    public int? CorrectedBy { get; set; }
+    public DateTime? CorrectedAt { get; set; }
     
     // Navigation Properties
     public virtual Employee Employee { get; set; } = null!;
+    public virtual Shift? Shift { get; set; }
+    public virtual Employee? CorrectedByEmployee { get; set; }
     public virtual ICollection<BreakRecord> BreakRecords { get; set; } = new List<BreakRecord>();
 }
 
@@ -27,6 +47,12 @@ public class BreakRecord : BaseEntity
     public DateTime StartTime { get; set; }
     public DateTime? EndTime { get; set; }
     public TimeSpan? Duration { get; set; }
+    public string? Location { get; set; }
+    public double? Latitude { get; set; }
+    public double? Longitude { get; set; }
+    public string? TimeZone { get; set; }
+    public string? Notes { get; set; }
+    public bool IsActive { get; set; } = true;
     
     // Navigation Properties
     public virtual AttendanceRecord AttendanceRecord { get; set; } = null!;

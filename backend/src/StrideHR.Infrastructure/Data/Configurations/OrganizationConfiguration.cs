@@ -27,8 +27,20 @@ public class OrganizationConfiguration : IEntityTypeConfiguration<Organization>
         builder.Property(o => o.Logo)
             .HasMaxLength(500);
 
+        builder.Property(o => o.Website)
+            .HasMaxLength(200);
+
+        builder.Property(o => o.TaxId)
+            .HasMaxLength(50);
+
+        builder.Property(o => o.RegistrationNumber)
+            .HasMaxLength(50);
+
         builder.Property(o => o.OvertimeRate)
             .HasPrecision(5, 2);
+
+        builder.Property(o => o.ConfigurationSettings)
+            .HasColumnType("json");
 
         // Relationships
         builder.HasMany(o => o.Branches)

@@ -34,6 +34,9 @@ public class EmployeeConfiguration : IEntityTypeConfiguration<Employee>
             
         builder.Property(e => e.Phone)
             .HasMaxLength(20);
+
+        builder.Property(e => e.AlternatePhone)
+            .HasMaxLength(20);
             
         builder.Property(e => e.ProfilePhoto)
             .HasMaxLength(500);
@@ -44,8 +47,35 @@ public class EmployeeConfiguration : IEntityTypeConfiguration<Employee>
         builder.Property(e => e.Department)
             .HasMaxLength(100);
 
+        builder.Property(e => e.Address)
+            .HasMaxLength(500);
+
+        builder.Property(e => e.EmergencyContactName)
+            .HasMaxLength(100);
+
+        builder.Property(e => e.EmergencyContactPhone)
+            .HasMaxLength(20);
+
+        builder.Property(e => e.BloodGroup)
+            .HasMaxLength(10);
+
+        builder.Property(e => e.NationalId)
+            .HasMaxLength(50);
+
+        builder.Property(e => e.PassportNumber)
+            .HasMaxLength(50);
+
+        builder.Property(e => e.VisaStatus)
+            .HasMaxLength(100);
+
         builder.Property(e => e.BasicSalary)
             .HasPrecision(18, 2);
+
+        builder.Property(e => e.Notes)
+            .HasMaxLength(1000);
+
+        // Ignore computed property
+        builder.Ignore(e => e.FullName);
 
         // Relationships
         builder.HasOne(e => e.Branch)
