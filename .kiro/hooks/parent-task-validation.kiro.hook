@@ -1,5 +1,5 @@
 {
-  "enabled": true,
+  "enabled": false,
   "name": "Parent Task Build Validation",
   "description": "Monitors for parent task completion and automatically runs build validation to ensure zero warnings and errors when all subtasks are finished",
   "version": "1",

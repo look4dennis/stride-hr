@@ -1,0 +1,50 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{2A3BAF08-BA07-4928-8E98-3FBE34E4D6B0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StrideHR.Core", "src\StrideHR.Core\StrideHR.Core.csproj", "{7B6AA3DF-4BCA-43D6-9B4C-494D9C095852}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StrideHR.Infrastructure", "src\StrideHR.Infrastructure\StrideHR.Infrastructure.csproj", "{A90F8AFB-24D8-4501-AD1B-FEE2472788D2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StrideHR.API", "src\StrideHR.API\StrideHR.API.csproj", "{0557E3FA-5128-4283-B952-BE21BB0B6E39}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{060A827E-252B-4300-A9E8-F37A8421B34E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StrideHR.Tests", "tests\StrideHR.Tests\StrideHR.Tests.csproj", "{67D54C7A-A351-489A-B18E-95145B9D43E5}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7B6AA3DF-4BCA-43D6-9B4C-494D9C095852}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7B6AA3DF-4BCA-43D6-9B4C-494D9C095852}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7B6AA3DF-4BCA-43D6-9B4C-494D9C095852}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7B6AA3DF-4BCA-43D6-9B4C-494D9C095852}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A90F8AFB-24D8-4501-AD1B-FEE2472788D2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A90F8AFB-24D8-4501-AD1B-FEE2472788D2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A90F8AFB-24D8-4501-AD1B-FEE2472788D2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A90F8AFB-24D8-4501-AD1B-FEE2472788D2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0557E3FA-5128-4283-B952-BE21BB0B6E39}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0557E3FA-5128-4283-B952-BE21BB0B6E39}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0557E3FA-5128-4283-B952-BE21BB0B6E39}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0557E3FA-5128-4283-B952-BE21BB0B6E39}.Release|Any CPU.Build.0 = Release|Any CPU
+		{67D54C7A-A351-489A-B18E-95145B9D43E5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{67D54C7A-A351-489A-B18E-95145B9D43E5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{67D54C7A-A351-489A-B18E-95145B9D43E5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{67D54C7A-A351-489A-B18E-95145B9D43E5}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{7B6AA3DF-4BCA-43D6-9B4C-494D9C095852} = {2A3BAF08-BA07-4928-8E98-3FBE34E4D6B0}
+		{A90F8AFB-24D8-4501-AD1B-FEE2472788D2} = {2A3BAF08-BA07-4928-8E98-3FBE34E4D6B0}
+		{0557E3FA-5128-4283-B952-BE21BB0B6E39} = {2A3BAF08-BA07-4928-8E98-3FBE34E4D6B0}
+		{67D54C7A-A351-489A-B18E-95145B9D43E5} = {060A827E-252B-4300-A9E8-F37A8421B34E}
+	EndGlobalSection
+EndGlobal
