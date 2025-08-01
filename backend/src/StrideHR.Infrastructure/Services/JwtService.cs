@@ -29,9 +29,9 @@ public class JwtService : IJwtService
 
         var claims = new List<Claim>
         {
-            new(ClaimTypes.NameIdentifier, user.Id.ToString()),
-            new(ClaimTypes.Name, user.Username),
-            new(ClaimTypes.Email, user.Email),
+            new(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
+            new(JwtRegisteredClaimNames.UniqueName, user.Username),
+            new(JwtRegisteredClaimNames.Email, user.Email),
             new("EmployeeId", employee.Id.ToString()),
             new("EmployeeCode", employee.EmployeeId),
             new("FullName", $"{employee.FirstName} {employee.LastName}"),
@@ -48,7 +48,7 @@ public class JwtService : IJwtService
         // Add roles
         foreach (var role in roles)
         {
-            claims.Add(new Claim(ClaimTypes.Role, role));
+            claims.Add(new Claim("role", role));
         }
 
         // Add permissions
@@ -154,7 +154,7 @@ public class JwtService : IJwtService
         if (principal == null)
             return null;
 
-        var userIdClaim = principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        var userIdClaim = principal.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
         if (!int.TryParse(userIdClaim, out var userId))
             return null;
 
@@ -170,11 +170,11 @@ public class JwtService : IJwtService
         {
             Id = userId,
             EmployeeId = employeeId,
-            Username = principal.FindFirst(ClaimTypes.Name)?.Value ?? string.Empty,
-            Email = principal.FindFirst(ClaimTypes.Email)?.Value ?? string.Empty,
+            Username = principal.FindFirst(JwtRegisteredClaimNames.UniqueName)?.Value ?? string.Empty,
+            Email = principal.FindFirst(JwtRegisteredClaimNames.Email)?.Value ?? string.Empty,
             FullName = principal.FindFirst("FullName")?.Value ?? string.Empty,
             BranchId = branchId,
-            Roles = principal.FindAll(ClaimTypes.Role).Select(c => c.Value).ToList(),
+            Roles = principal.FindAll("role").Select(c => c.Value).ToList(),
             Permissions = principal.FindAll("permission").Select(c => c.Value).ToList(),
             IsFirstLogin = bool.TryParse(principal.FindFirst("IsFirstLogin")?.Value, out var isFirstLogin) && isFirstLogin,
             ForcePasswordChange = bool.TryParse(principal.FindFirst("ForcePasswordChange")?.Value, out var forcePasswordChange) && forcePasswordChange,

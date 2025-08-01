@@ -77,14 +77,28 @@ public class JwtServiceTests
         Assert.True(jwtToken.ValidTo > DateTime.UtcNow);
 
         // Verify claims
-        Assert.Equal(user.Id.ToString(), jwtToken.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value);
-        Assert.Equal(user.Username, jwtToken.Claims.First(c => c.Type == ClaimTypes.Name).Value);
-        Assert.Equal(user.Email, jwtToken.Claims.First(c => c.Type == ClaimTypes.Email).Value);
-        Assert.Equal(employee.Id.ToString(), jwtToken.Claims.First(c => c.Type == "EmployeeId").Value);
-        Assert.Equal(employee.EmployeeId, jwtToken.Claims.First(c => c.Type == "EmployeeCode").Value);
+        var nameIdentifierClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.Sub);
+        Assert.NotNull(nameIdentifierClaim);
+        Assert.Equal(user.Id.ToString(), nameIdentifierClaim.Value);
+        
+        var nameClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.UniqueName);
+        Assert.NotNull(nameClaim);
+        Assert.Equal(user.Username, nameClaim.Value);
+        
+        var emailClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.Email);
+        Assert.NotNull(emailClaim);
+        Assert.Equal(user.Email, emailClaim.Value);
+        
+        var employeeIdClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == "EmployeeId");
+        Assert.NotNull(employeeIdClaim);
+        Assert.Equal(employee.Id.ToString(), employeeIdClaim.Value);
+        
+        var employeeCodeClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == "EmployeeCode");
+        Assert.NotNull(employeeCodeClaim);
+        Assert.Equal(employee.EmployeeId, employeeCodeClaim.Value);
 
         // Verify roles
-        var roleClaims = jwtToken.Claims.Where(c => c.Type == ClaimTypes.Role).Select(c => c.Value).ToList();
+        var roleClaims = jwtToken.Claims.Where(c => c.Type == "role").Select(c => c.Value).ToList();
         Assert.Equal(roles.Count, roleClaims.Count);
         Assert.Contains("Employee", roleClaims);
         Assert.Contains("Developer", roleClaims);
@@ -283,11 +297,11 @@ public class JwtServiceTests
         // Act
         var expiration = _jwtService.GetTokenExpiration(token);
 
-        // Assert
-        var expectedMinExpiration = beforeGeneration.AddHours(_jwtSettings.ExpirationHours);
-        var expectedMaxExpiration = afterGeneration.AddHours(_jwtSettings.ExpirationHours);
+        // Assert - Add small buffer for timing precision
+        var expectedMinExpiration = beforeGeneration.AddHours(_jwtSettings.ExpirationHours).AddSeconds(-1);
+        var expectedMaxExpiration = afterGeneration.AddHours(_jwtSettings.ExpirationHours).AddSeconds(1);
 
-        Assert.True(expiration >= expectedMinExpiration);
-        Assert.True(expiration <= expectedMaxExpiration);
+        Assert.True(expiration >= expectedMinExpiration, $"Expiration {expiration} should be >= {expectedMinExpiration}");
+        Assert.True(expiration <= expectedMaxExpiration, $"Expiration {expiration} should be <= {expectedMaxExpiration}");
     }
 }
