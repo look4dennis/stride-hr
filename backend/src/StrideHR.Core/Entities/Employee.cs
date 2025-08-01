@@ -38,4 +38,12 @@ public class Employee : BaseEntity
     public virtual ICollection<Employee> Subordinates { get; set; } = new List<Employee>();
     public virtual ICollection<AttendanceRecord> AttendanceRecords { get; set; } = new List<AttendanceRecord>();
     public virtual ICollection<EmployeeRole> EmployeeRoles { get; set; } = new List<EmployeeRole>();
+    
+    // Project-related Navigation Properties
+    public virtual ICollection<Project> CreatedProjects { get; set; } = new List<Project>();
+    public virtual ICollection<ProjectAssignment> ProjectAssignments { get; set; } = new List<ProjectAssignment>();
+    public virtual ICollection<ProjectTask> AssignedTasks { get; set; } = new List<ProjectTask>();
+    public virtual ICollection<TaskAssignment> TaskAssignments { get; set; } = new List<TaskAssignment>();
+    public virtual ICollection<DSR> DSRs { get; set; } = new List<DSR>();
+    public virtual ICollection<DSR> ReviewedDSRs { get; set; } = new List<DSR>();
 }

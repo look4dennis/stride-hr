@@ -29,6 +29,13 @@ public class StrideHRDbContext : DbContext
     public DbSet<Holiday> Holidays { get; set; }
     public DbSet<AttendancePolicy> AttendancePolicies { get; set; }
     public DbSet<AuditLog> AuditLogs { get; set; }
+    
+    // Project Management DbSets
+    public DbSet<Project> Projects { get; set; }
+    public DbSet<ProjectTask> ProjectTasks { get; set; }
+    public DbSet<ProjectAssignment> ProjectAssignments { get; set; }
+    public DbSet<TaskAssignment> TaskAssignments { get; set; }
+    public DbSet<DSR> DSRs { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
