@@ -54,6 +54,7 @@ try
     app.UseCors("AllowAll");
 
     app.UseAuthentication();
+    app.UseMiddleware<JwtMiddleware>();
     app.UseAuthorization();
 
     app.MapControllers();
@@ -74,3 +75,6 @@ finally
 {
     Log.CloseAndFlush();
 }
+
+// Make Program class accessible for testing
+public partial class Program { }

@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using StrideHR.API.Middleware;
+using StrideHR.API.Models;
 
 namespace StrideHR.API.Controllers;
 

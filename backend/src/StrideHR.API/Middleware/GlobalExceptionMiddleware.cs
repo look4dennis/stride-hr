@@ -22,19 +22,19 @@ public class GlobalExceptionMiddleware
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "An unhandled exception occurred: {Message}", ex.Message);
+            _logger.LogError(ex, "An unhandled exception occurred");
             await HandleExceptionAsync(context, ex);
         }
     }
 
     private static async Task HandleExceptionAsync(HttpContext context, Exception exception)
     {
-        var response = new ApiResponse<object>
+        var response = new ApiErrorResponse
         {
             Success = false,
             Message = GetErrorMessage(exception),
-            Data = null,
-            Errors = GetErrorDetails(exception)
+            Errors = GetErrorDetails(exception),
+            TraceId = context.TraceIdentifier
         };
 
         context.Response.ContentType = "application/json";
@@ -52,41 +52,50 @@ public class GlobalExceptionMiddleware
     {
         return exception switch
         {
-            InvalidOperationException => exception.Message,
-            ArgumentException => exception.Message,
             UnauthorizedAccessException => "Unauthorized access",
-            _ => "An internal server error occurred"
-        };
-    }
-
-    private static int GetStatusCode(Exception exception)
-    {
-        return exception switch
-        {
-            InvalidOperationException => (int)HttpStatusCode.BadRequest,
-            ArgumentException => (int)HttpStatusCode.BadRequest,
-            UnauthorizedAccessException => (int)HttpStatusCode.Unauthorized,
-            _ => (int)HttpStatusCode.InternalServerError
+            ArgumentException => "Invalid argument provided",
+            KeyNotFoundException => "Resource not found",
+            InvalidOperationException => "Invalid operation",
+            _ => "An error occurred while processing your request"
         };
     }
 
     private static List<string> GetErrorDetails(Exception exception)
     {
         var errors = new List<string>();
-        
-        if (exception.InnerException != null)
+
+        if (exception is AggregateException aggregateException)
         {
-            errors.Add(exception.InnerException.Message);
+            foreach (var innerException in aggregateException.InnerExceptions)
+            {
+                errors.Add(innerException.Message);
+            }
         }
-        
+        else
+        {
+            errors.Add(exception.Message);
+        }
+
         return errors;
+    }
+
+    private static int GetStatusCode(Exception exception)
+    {
+        return exception switch
+        {
+            UnauthorizedAccessException => (int)HttpStatusCode.Unauthorized,
+            ArgumentException => (int)HttpStatusCode.BadRequest,
+            KeyNotFoundException => (int)HttpStatusCode.NotFound,
+            InvalidOperationException => (int)HttpStatusCode.BadRequest,
+            _ => (int)HttpStatusCode.InternalServerError
+        };
     }
 }
 
-public class ApiResponse<T>
+public class ApiErrorResponse
 {
     public bool Success { get; set; }
     public string Message { get; set; } = string.Empty;
-    public T? Data { get; set; }
     public List<string> Errors { get; set; } = new();
+    public string? TraceId { get; set; }
 }

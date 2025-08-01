@@ -28,6 +28,7 @@ public class StrideHRDbContext : DbContext
     public DbSet<WorkingHours> WorkingHours { get; set; }
     public DbSet<Holiday> Holidays { get; set; }
     public DbSet<AttendancePolicy> AttendancePolicies { get; set; }
+    public DbSet<AuditLog> AuditLogs { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

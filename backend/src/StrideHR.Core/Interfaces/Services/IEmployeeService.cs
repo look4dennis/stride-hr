@@ -13,4 +13,5 @@ public interface IEmployeeService
     Task DeleteAsync(int id);
     Task<bool> ExistsAsync(int id);
     Task<bool> ExistsByEmployeeIdAsync(string employeeId);
+    Task<Employee?> GetEmployeeByIdAsync(int id);
 }

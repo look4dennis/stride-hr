@@ -1,42 +1,233 @@
+using FluentValidation.AspNetCore;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
-using StrideHR.API.Configuration;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using StrideHR.Core.Interfaces;
+using StrideHR.Core.Interfaces.Repositories;
 using StrideHR.Core.Interfaces.Services;
+using StrideHR.Core.Models.Authorization;
+using StrideHR.Core.Models.Configuration;
+using StrideHR.Infrastructure.Authorization;
 using StrideHR.Infrastructure.Data;
 using StrideHR.Infrastructure.Repositories;
 using StrideHR.Infrastructure.Services;
+using System.Text;
 
 namespace StrideHR.API.Extensions;
 
 public static class ServiceCollectionExtensions
 {
+    public static IServiceCollection AddJwtAuthentication(this IServiceCollection services, IConfiguration configuration)
+    {
+        var jwtSettings = configuration.GetSection(JwtSettings.SectionName).Get<JwtSettings>();
+        if (jwtSettings == null)
+        {
+            throw new InvalidOperationException("JWT settings not found in configuration");
+        }
+
+        services.Configure<JwtSettings>(configuration.GetSection(JwtSettings.SectionName));
+        
+        // Configure encryption settings
+        services.Configure<EncryptionSettings>(configuration.GetSection(EncryptionSettings.SectionName));
+
+        var key = Encoding.ASCII.GetBytes(jwtSettings.SecretKey);
+
+        services.AddAuthentication(options =>
+        {
+            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+        })
+        .AddJwtBearer(options =>
+        {
+            options.RequireHttpsMetadata = false; // Set to true in production
+            options.SaveToken = true;
+            options.TokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuer = jwtSettings.ValidateIssuer,
+                ValidateAudience = jwtSettings.ValidateAudience,
+                ValidateLifetime = jwtSettings.ValidateLifetime,
+                ValidateIssuerSigningKey = jwtSettings.ValidateIssuerSigningKey,
+                ValidIssuer = jwtSettings.Issuer,
+                ValidAudience = jwtSettings.Audience,
+                IssuerSigningKey = new SymmetricSecurityKey(key),
+                ClockSkew = TimeSpan.FromMinutes(jwtSettings.ClockSkewMinutes)
+            };
+
+            // Handle SignalR connections
+            options.Events = new JwtBearerEvents
+            {
+                OnMessageReceived = context =>
+                {
+                    var accessToken = context.Request.Query["access_token"];
+                    var path = context.HttpContext.Request.Path;
+                    
+                    if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/hubs"))
+                    {
+                        context.Token = accessToken;
+                    }
+                    
+                    return Task.CompletedTask;
+                },
+                OnAuthenticationFailed = context =>
+                {
+                    if (context.Exception.GetType() == typeof(SecurityTokenExpiredException))
+                    {
+                        context.Response.Headers["Token-Expired"] = "true";
+                    }
+                    return Task.CompletedTask;
+                }
+            };
+        });
+
+        return services;
+    }
+
+    public static IServiceCollection AddAuthorizationPolicies(this IServiceCollection services)
+    {
+        services.AddAuthorization(options =>
+        {
+            // Basic role-based policies
+            options.AddPolicy("SuperAdmin", policy => policy.RequireRole("SuperAdmin"));
+            options.AddPolicy("HRManager", policy => policy.RequireRole("SuperAdmin", "HRManager"));
+            options.AddPolicy("Manager", policy => policy.RequireRole("SuperAdmin", "HRManager", "Manager"));
+            options.AddPolicy("Employee", policy => policy.RequireRole("SuperAdmin", "HRManager", "Manager", "Employee"));
+
+            // Permission-based policies using custom authorization handlers
+            options.AddPolicy("CanManageEmployees", policy => 
+                policy.Requirements.Add(new PermissionRequirement("Employee.Manage")));
+            
+            options.AddPolicy("CanViewReports", policy => 
+                policy.Requirements.Add(new PermissionRequirement("Report.View")));
+            
+            options.AddPolicy("CanManagePayroll", policy => 
+                policy.Requirements.Add(new PermissionRequirement("Payroll.Manage")));
+
+            // Branch-based policies using custom authorization handlers
+            options.AddPolicy("BranchAccess", policy => 
+                policy.Requirements.Add(new BranchAccessRequirement()));
+
+            options.AddPolicy("SameBranch", policy => 
+                policy.Requirements.Add(new BranchAccessRequirement(true)));
+
+            // Role hierarchy policies
+            options.AddPolicy("ManagerLevel", policy => 
+                policy.Requirements.Add(new RoleHierarchyRequirement(3)));
+
+            options.AddPolicy("HRLevel", policy => 
+                policy.Requirements.Add(new RoleHierarchyRequirement(4)));
+
+            options.AddPolicy("AdminLevel", policy => 
+                policy.Requirements.Add(new RoleHierarchyRequirement(5)));
+
+            // Dynamic permission policies
+            options.AddPolicy("Permission:Employee.View", policy => 
+                policy.Requirements.Add(new PermissionRequirement("Employee.View")));
+            options.AddPolicy("Permission:Employee.Create", policy => 
+                policy.Requirements.Add(new PermissionRequirement("Employee.Create")));
+            options.AddPolicy("Permission:Employee.Update", policy => 
+                policy.Requirements.Add(new PermissionRequirement("Employee.Update")));
+            options.AddPolicy("Permission:Employee.Delete", policy => 
+                policy.Requirements.Add(new PermissionRequirement("Employee.Delete")));
+
+            options.AddPolicy("Permission:Role.View", policy => 
+                policy.Requirements.Add(new PermissionRequirement("Role.View")));
+            options.AddPolicy("Permission:Role.Create", policy => 
+                policy.Requirements.Add(new PermissionRequirement("Role.Create")));
+            options.AddPolicy("Permission:Role.Update", policy => 
+                policy.Requirements.Add(new PermissionRequirement("Role.Update")));
+            options.AddPolicy("Permission:Role.Delete", policy => 
+                policy.Requirements.Add(new PermissionRequirement("Role.Delete")));
+            options.AddPolicy("Permission:Role.Assign", policy => 
+                policy.Requirements.Add(new PermissionRequirement("Role.Assign")));
+
+            options.AddPolicy("Permission:Payroll.View", policy => 
+                policy.Requirements.Add(new PermissionRequirement("Payroll.View")));
+            options.AddPolicy("Permission:Payroll.Create", policy => 
+                policy.Requirements.Add(new PermissionRequirement("Payroll.Create")));
+            options.AddPolicy("Permission:Payroll.Process", policy => 
+                policy.Requirements.Add(new PermissionRequirement("Payroll.Process")));
+
+            options.AddPolicy("Permission:Report.View", policy => 
+                policy.Requirements.Add(new PermissionRequirement("Report.View")));
+            options.AddPolicy("Permission:Report.Create", policy => 
+                policy.Requirements.Add(new PermissionRequirement("Report.Create")));
+
+            // User management policies
+            options.AddPolicy("Permission:User.View", policy => 
+                policy.Requirements.Add(new PermissionRequirement("User.View")));
+            options.AddPolicy("Permission:User.Create", policy => 
+                policy.Requirements.Add(new PermissionRequirement("User.Create")));
+            options.AddPolicy("Permission:User.Update", policy => 
+                policy.Requirements.Add(new PermissionRequirement("User.Update")));
+            options.AddPolicy("Permission:User.Deactivate", policy => 
+                policy.Requirements.Add(new PermissionRequirement("User.Deactivate")));
+            options.AddPolicy("Permission:User.Activate", policy => 
+                policy.Requirements.Add(new PermissionRequirement("User.Activate")));
+            options.AddPolicy("Permission:User.ForcePasswordChange", policy => 
+                policy.Requirements.Add(new PermissionRequirement("User.ForcePasswordChange")));
+            options.AddPolicy("Permission:User.Unlock", policy => 
+                policy.Requirements.Add(new PermissionRequirement("User.Unlock")));
+            options.AddPolicy("Permission:User.ViewSessions", policy => 
+                policy.Requirements.Add(new PermissionRequirement("User.ViewSessions")));
+            options.AddPolicy("Permission:User.TerminateSession", policy => 
+                policy.Requirements.Add(new PermissionRequirement("User.TerminateSession")));
+
+            // Audit log policies
+            options.AddPolicy("Permission:AuditLog.View", policy => 
+                policy.Requirements.Add(new PermissionRequirement("AuditLog.View")));
+            options.AddPolicy("Permission:AuditLog.ViewSecurity", policy => 
+                policy.Requirements.Add(new PermissionRequirement("AuditLog.ViewSecurity")));
+        });
+
+        return services;
+    }
+
     public static IServiceCollection AddApplicationServices(this IServiceCollection services, IConfiguration configuration)
     {
-        // Database
+        // Add Entity Framework
         services.AddDbContext<StrideHRDbContext>(options =>
             options.UseMySql(
                 configuration.GetConnectionString("DefaultConnection"),
-                ServerVersion.AutoDetect(configuration.GetConnectionString("DefaultConnection")),
-                mySqlOptions =>
-                {
-                    mySqlOptions.EnableRetryOnFailure(
-                        maxRetryCount: 3,
-                        maxRetryDelay: TimeSpan.FromSeconds(30),
-                        errorNumbersToAdd: null);
-                }));
+                ServerVersion.AutoDetect(configuration.GetConnectionString("DefaultConnection"))));
 
-        // Unit of Work and Repository Pattern
-        services.AddScoped<IUnitOfWork, UnitOfWork>();
+        // Add JWT Authentication
+        services.AddJwtAuthentication(configuration);
+        
+        // Add Authorization Policies
+        services.AddAuthorizationPolicies();
 
-        // Services
-        services.AddScoped<IEmployeeService, EmployeeService>();
-        services.AddScoped<IAttendanceService, AttendanceService>();
+        // Register repositories
+        services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+        services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<IRoleRepository, RoleRepository>();
+        services.AddScoped<IPermissionRepository, PermissionRepository>();
+        services.AddScoped<IAuditLogRepository, AuditLogRepository>();
 
-        // AutoMapper
+        // Register services
+        services.AddScoped<IAuthenticationService, AuthenticationService>();
+        services.AddScoped<IJwtService, JwtService>();
+        services.AddScoped<IPasswordService, PasswordService>();
+        services.AddScoped<IRoleService, RoleService>();
+        services.AddScoped<IUserManagementService, UserManagementService>();
+        services.AddScoped<IAuditLogService, AuditLogService>();
+        services.AddScoped<IDataEncryptionService, DataEncryptionService>();
+
+        // Register authorization handlers
+        services.AddScoped<IAuthorizationHandler, PermissionAuthorizationHandler>();
+        services.AddScoped<IAuthorizationHandler, BranchAccessAuthorizationHandler>();
+        services.AddScoped<IAuthorizationHandler, RoleHierarchyAuthorizationHandler>();
+
+        // Add HttpContextAccessor for authorization handlers
+        services.AddHttpContextAccessor();
+
+        // Add AutoMapper
         services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
-        // Configuration
-        services.Configure<JwtSettings>(configuration.GetSection("JwtSettings"));
+        // Add FluentValidation
+        services.AddFluentValidationAutoValidation();
 
         return services;
     }
@@ -46,12 +237,12 @@ public static class ServiceCollectionExtensions
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen(c =>
         {
-            c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
+            c.SwaggerDoc("v1", new OpenApiInfo
             {
                 Title = "StrideHR API",
                 Version = "v1",
                 Description = "A comprehensive Human Resource Management System API",
-                Contact = new Microsoft.OpenApi.Models.OpenApiContact
+                Contact = new OpenApiContact
                 {
                     Name = "StrideHR Team",
                     Email = "support@stridehr.com"
@@ -59,29 +250,37 @@ public static class ServiceCollectionExtensions
             });
 
             // Add JWT Authentication to Swagger
-            c.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+            c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
             {
-                Description = "JWT Authorization header using the Bearer scheme. Enter 'Bearer' [space] and then your token in the text input below.",
+                Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
                 Name = "Authorization",
-                In = Microsoft.OpenApi.Models.ParameterLocation.Header,
-                Type = Microsoft.OpenApi.Models.SecuritySchemeType.ApiKey,
+                In = ParameterLocation.Header,
+                Type = SecuritySchemeType.ApiKey,
                 Scheme = "Bearer"
             });
 
-            c.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
+            c.AddSecurityRequirement(new OpenApiSecurityRequirement
             {
                 {
-                    new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+                    new OpenApiSecurityScheme
                     {
-                        Reference = new Microsoft.OpenApi.Models.OpenApiReference
+                        Reference = new OpenApiReference
                         {
-                            Type = Microsoft.OpenApi.Models.ReferenceType.SecurityScheme,
+                            Type = ReferenceType.SecurityScheme,
                             Id = "Bearer"
                         }
                     },
                     Array.Empty<string>()
                 }
             });
+
+            // Include XML comments if available
+            var xmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
+            var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+            if (File.Exists(xmlPath))
+            {
+                c.IncludeXmlComments(xmlPath);
+            }
         });
 
         return services;

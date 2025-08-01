@@ -74,4 +74,9 @@ public class EmployeeService : IEmployeeService
     {
         return await _unitOfWork.Employees.AnyAsync(e => e.EmployeeId == employeeId);
     }
+
+    public async Task<Employee?> GetEmployeeByIdAsync(int id)
+    {
+        return await GetByIdAsync(id);
+    }
 }
