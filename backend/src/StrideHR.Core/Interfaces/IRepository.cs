@@ -23,4 +23,5 @@ public interface IRepository<T> where T : BaseEntity
     Task DeleteAsync(int id);
     Task DeleteRangeAsync(IEnumerable<T> entities);
     Task<bool> SaveChangesAsync();
+    IQueryable<T> GetQueryable();
 }

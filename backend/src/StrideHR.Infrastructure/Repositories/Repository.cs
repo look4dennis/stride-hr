@@ -144,4 +144,9 @@ public class Repository<T> : IRepository<T> where T : BaseEntity
     {
         return await _context.SaveChangesAsync() > 0;
     }
+
+    public virtual IQueryable<T> GetQueryable()
+    {
+        return _dbSet.AsQueryable();
+    }
 }

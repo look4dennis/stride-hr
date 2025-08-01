@@ -201,9 +201,9 @@ public static class ServiceCollectionExtensions
 
         // Register repositories
         services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IRoleRepository, RoleRepository>();
-        services.AddScoped<IPermissionRepository, PermissionRepository>();
         services.AddScoped<IAuditLogRepository, AuditLogRepository>();
 
         // Register services
@@ -214,6 +214,11 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IUserManagementService, UserManagementService>();
         services.AddScoped<IAuditLogService, AuditLogService>();
         services.AddScoped<IDataEncryptionService, DataEncryptionService>();
+        services.AddScoped<IEmployeeService, EmployeeService>();
+        services.AddScoped<IOrganizationService, OrganizationService>();
+        services.AddScoped<IBranchService, BranchService>();
+        services.AddScoped<IFileStorageService, FileStorageService>();
+        services.AddScoped<IAttendanceService, AttendanceService>();
 
         // Register authorization handlers
         services.AddScoped<IAuthorizationHandler, PermissionAuthorizationHandler>();

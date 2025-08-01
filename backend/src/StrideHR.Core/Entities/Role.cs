@@ -18,6 +18,8 @@ public class Permission : BaseEntity
     public string Module { get; set; } = string.Empty;
     public string Action { get; set; } = string.Empty;
     public string Resource { get; set; } = string.Empty;
+    public string Description { get; set; } = string.Empty;
+    public bool IsActive { get; set; } = true;
     
     // Navigation Properties
     public virtual ICollection<RolePermission> RolePermissions { get; set; } = new List<RolePermission>();
@@ -27,6 +29,8 @@ public class RolePermission : BaseEntity
 {
     public int RoleId { get; set; }
     public int PermissionId { get; set; }
+    public bool IsGranted { get; set; } = true;
+    public DateTime? ExpiresAt { get; set; }
     
     // Navigation Properties
     public virtual Role Role { get; set; } = null!;

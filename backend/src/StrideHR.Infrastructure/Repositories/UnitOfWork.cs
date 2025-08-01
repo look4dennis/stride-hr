@@ -15,6 +15,7 @@ public class UnitOfWork : IUnitOfWork
     private IRepository<Organization>? _organizations;
     private IRepository<Branch>? _branches;
     private IRepository<Employee>? _employees;
+    private IRepository<User>? _users;
     private IRepository<AttendanceRecord>? _attendanceRecords;
     private IRepository<BreakRecord>? _breakRecords;
     private IRepository<Role>? _roles;
@@ -23,6 +24,10 @@ public class UnitOfWork : IUnitOfWork
     private IRepository<EmployeeRole>? _employeeRoles;
     private IRepository<Shift>? _shifts;
     private IRepository<ShiftAssignment>? _shiftAssignments;
+    private IRepository<EmployeeOnboarding>? _employeeOnboardings;
+    private IRepository<EmployeeOnboardingTask>? _employeeOnboardingTasks;
+    private IRepository<EmployeeExit>? _employeeExits;
+    private IRepository<EmployeeExitTask>? _employeeExitTasks;
 
     public UnitOfWork(StrideHRDbContext context)
     {
@@ -37,6 +42,9 @@ public class UnitOfWork : IUnitOfWork
 
     public IRepository<Employee> Employees =>
         _employees ??= new Repository<Employee>(_context);
+
+    public IRepository<User> Users =>
+        _users ??= new Repository<User>(_context);
 
     public IRepository<AttendanceRecord> AttendanceRecords =>
         _attendanceRecords ??= new Repository<AttendanceRecord>(_context);
@@ -61,6 +69,18 @@ public class UnitOfWork : IUnitOfWork
 
     public IRepository<ShiftAssignment> ShiftAssignments =>
         _shiftAssignments ??= new Repository<ShiftAssignment>(_context);
+
+    public IRepository<EmployeeOnboarding> EmployeeOnboardings =>
+        _employeeOnboardings ??= new Repository<EmployeeOnboarding>(_context);
+
+    public IRepository<EmployeeOnboardingTask> EmployeeOnboardingTasks =>
+        _employeeOnboardingTasks ??= new Repository<EmployeeOnboardingTask>(_context);
+
+    public IRepository<EmployeeExit> EmployeeExits =>
+        _employeeExits ??= new Repository<EmployeeExit>(_context);
+
+    public IRepository<EmployeeExitTask> EmployeeExitTasks =>
+        _employeeExitTasks ??= new Repository<EmployeeExitTask>(_context);
 
     public async Task<int> SaveChangesAsync()
     {

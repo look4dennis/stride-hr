@@ -114,9 +114,22 @@ public class PasswordService : IPasswordService
 
     public bool ValidatePasswordResetToken(string token)
     {
+        if (string.IsNullOrWhiteSpace(token))
+            return false;
+
         try
         {
-            var tokenBytes = Convert.FromBase64String(token.Replace("-", "+").Replace("_", "/") + "==");
+            // Restore the original Base64 format
+            var base64Token = token.Replace("-", "+").Replace("_", "/");
+            
+            // Add proper padding
+            var padding = 4 - (base64Token.Length % 4);
+            if (padding != 4)
+            {
+                base64Token += new string('=', padding);
+            }
+            
+            var tokenBytes = Convert.FromBase64String(base64Token);
             return tokenBytes.Length == 32;
         }
         catch

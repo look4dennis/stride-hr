@@ -34,7 +34,7 @@ public class JwtService : IJwtService
             new(ClaimTypes.Email, user.Email),
             new("EmployeeId", employee.Id.ToString()),
             new("EmployeeCode", employee.EmployeeId),
-            new("FullName", employee.FullName),
+            new("FullName", $"{employee.FirstName} {employee.LastName}"),
             new("BranchId", employee.BranchId.ToString()),
             new("Department", employee.Department),
             new("Designation", employee.Designation),
@@ -57,10 +57,21 @@ public class JwtService : IJwtService
             claims.Add(new Claim("permission", permission));
         }
 
+        var now = DateTime.UtcNow;
+        var expires = now.AddHours(_jwtSettings.ExpirationHours);
+        
+        // Handle edge case for expired tokens in tests
+        if (expires <= now)
+        {
+            now = expires.AddMinutes(-1);
+        }
+        
         var tokenDescriptor = new SecurityTokenDescriptor
         {
             Subject = new ClaimsIdentity(claims),
-            Expires = DateTime.UtcNow.AddHours(_jwtSettings.ExpirationHours),
+            NotBefore = now,
+            Expires = expires,
+            IssuedAt = now,
             Issuer = _jwtSettings.Issuer,
             Audience = _jwtSettings.Audience,
             SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)

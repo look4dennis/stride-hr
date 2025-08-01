@@ -7,6 +7,7 @@ public interface IUnitOfWork : IDisposable
     IRepository<Organization> Organizations { get; }
     IRepository<Branch> Branches { get; }
     IRepository<Employee> Employees { get; }
+    IRepository<User> Users { get; }
     IRepository<AttendanceRecord> AttendanceRecords { get; }
     IRepository<BreakRecord> BreakRecords { get; }
     IRepository<Role> Roles { get; }
@@ -15,6 +16,10 @@ public interface IUnitOfWork : IDisposable
     IRepository<EmployeeRole> EmployeeRoles { get; }
     IRepository<Shift> Shifts { get; }
     IRepository<ShiftAssignment> ShiftAssignments { get; }
+    IRepository<EmployeeOnboarding> EmployeeOnboardings { get; }
+    IRepository<EmployeeOnboardingTask> EmployeeOnboardingTasks { get; }
+    IRepository<EmployeeExit> EmployeeExits { get; }
+    IRepository<EmployeeExitTask> EmployeeExitTasks { get; }
     
     Task<int> SaveChangesAsync();
     Task BeginTransactionAsync();
