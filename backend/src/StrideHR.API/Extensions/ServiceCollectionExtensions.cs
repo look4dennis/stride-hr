@@ -283,6 +283,12 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ILeaveAccrualRepository, LeaveAccrualRepository>();
         services.AddScoped<ILeaveEncashmentRepository, LeaveEncashmentRepository>();
         services.AddScoped<ILeaveAccrualRuleRepository, LeaveAccrualRuleRepository>();
+        
+        // Register email management repositories
+        services.AddScoped<IEmailTemplateRepository, EmailTemplateRepository>();
+        services.AddScoped<IEmailLogRepository, EmailLogRepository>();
+        services.AddScoped<IEmailCampaignRepository, EmailCampaignRepository>();
+        services.AddScoped<IBranchRepository, BranchRepository>();
 
         // Register services
         services.AddScoped<IAuthenticationService, AuthenticationService>();
@@ -362,6 +368,10 @@ public static class ServiceCollectionExtensions
         // Register notification services
         services.AddScoped<INotificationService, NotificationService>();
         services.AddScoped<IRealTimeNotificationService, StrideHR.API.Services.SignalRNotificationService>();
+        
+        // Register email management services
+        services.AddScoped<IEmailService, EmailService>();
+        services.AddScoped<IEmailTemplateService, EmailTemplateService>();
         
         // Register chatbot repositories
         services.AddScoped<IChatbotConversationRepository, ChatbotConversationRepository>();

@@ -100,6 +100,11 @@ public class StrideHRDbContext : DbContext
     public DbSet<ChatbotKnowledgeBase> ChatbotKnowledgeBases { get; set; }
     public DbSet<ChatbotKnowledgeBaseFeedback> ChatbotKnowledgeBaseFeedbacks { get; set; }
     public DbSet<ChatbotLearningData> ChatbotLearningData { get; set; }
+    
+    // Email Management DbSets
+    public DbSet<EmailTemplate> EmailTemplates { get; set; }
+    public DbSet<EmailLog> EmailLogs { get; set; }
+    public DbSet<EmailCampaign> EmailCampaigns { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

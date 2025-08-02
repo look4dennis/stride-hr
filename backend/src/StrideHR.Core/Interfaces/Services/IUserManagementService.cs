@@ -24,7 +24,7 @@ public interface IUserManagementService
 
 public class CreateUserRequest
 {
-    public int EmployeeId { get; set; }
+    public string EmployeeId { get; set; } = string.Empty;
     public string Username { get; set; } = string.Empty;
     public string Email { get; set; } = string.Empty;
     public string? TemporaryPassword { get; set; }

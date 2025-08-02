@@ -8,6 +8,11 @@ public class RequirePermissionAttribute : AuthorizeAttribute
     {
         Policy = $"Permission:{permission}";
     }
+
+    public RequirePermissionAttribute(string resource, string action)
+    {
+        Policy = $"Permission:{resource}.{action}";
+    }
 }
 
 public class RequireBranchAccessAttribute : AuthorizeAttribute

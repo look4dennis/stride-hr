@@ -41,6 +41,11 @@ public interface IUnitOfWork : IDisposable
     IRepository<PIPGoal> PIPGoals { get; }
     IRepository<PIPReview> PIPReviews { get; }
     
+    // Email Management Repositories
+    IEmailTemplateRepository EmailTemplates { get; }
+    IEmailLogRepository EmailLogs { get; }
+    IEmailCampaignRepository EmailCampaigns { get; }
+    
     Task<int> SaveChangesAsync();
     Task BeginTransactionAsync();
     Task CommitTransactionAsync();

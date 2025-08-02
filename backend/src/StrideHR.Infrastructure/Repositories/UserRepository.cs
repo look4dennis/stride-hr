@@ -23,10 +23,11 @@ public class UserRepository : Repository<User>, IUserRepository
             .FirstOrDefaultAsync(u => u.Username.ToLower() == username.ToLower() && !u.IsDeleted);
     }
 
-    public async Task<User?> GetByEmployeeIdAsync(int employeeId)
+    public async Task<User?> GetByEmployeeIdAsync(string employeeId)
     {
         return await _context.Users
-            .FirstOrDefaultAsync(u => u.EmployeeId == employeeId && !u.IsDeleted);
+            .Include(u => u.Employee)
+            .FirstOrDefaultAsync(u => u.Employee != null && u.Employee.EmployeeId == employeeId && !u.IsDeleted);
     }
 
     public async Task<User?> GetWithEmployeeAsync(int userId)
@@ -210,5 +211,48 @@ public class UserRepository : Repository<User>, IUserRepository
     {
         await _context.RefreshTokens.AddAsync(refreshToken);
         return refreshToken;
+    }
+
+    public async Task<List<User>> GetByBranchIdAsync(int branchId)
+    {
+        return await _context.Users
+            .Include(u => u.Employee)
+            .Where(u => u.Employee != null && u.Employee.BranchId == branchId && !u.IsDeleted)
+            .ToListAsync();
+    }
+
+    public async Task<List<User>> GetByRoleAsync(string role)
+    {
+        return await _context.Users
+            .Include(u => u.Employee)
+            .ThenInclude(e => e.EmployeeRoles)
+            .ThenInclude(er => er.Role)
+            .Where(u => u.Employee != null && 
+                       u.Employee.EmployeeRoles.Any(er => er.Role.Name == role && er.IsActive) && 
+                       !u.IsDeleted)
+            .ToListAsync();
+    }
+
+    public async Task<bool> ExistsAsync(string email, int? excludeId = null)
+    {
+        var query = _context.Users.Where(u => u.Email.ToLower() == email.ToLower() && !u.IsDeleted);
+        
+        if (excludeId.HasValue)
+        {
+            query = query.Where(u => u.Id != excludeId.Value);
+        }
+        
+        return await query.AnyAsync();
+    }
+
+    public async Task<User?> ValidateCredentialsAsync(string email, string password)
+    {
+        var user = await GetByEmailAsync(email);
+        if (user == null || !user.IsActive)
+            return null;
+
+        // Here you would verify the password hash
+        // For now, returning the user if found
+        return user;
     }
 }

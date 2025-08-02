@@ -48,6 +48,11 @@ public class UnitOfWork : IUnitOfWork
     private IPerformanceImprovementPlanRepository? _performanceImprovementPlans;
     private IRepository<PIPGoal>? _pipGoals;
     private IRepository<PIPReview>? _pipReviews;
+    
+    // Email Management Repositories
+    private IEmailTemplateRepository? _emailTemplates;
+    private IEmailLogRepository? _emailLogs;
+    private IEmailCampaignRepository? _emailCampaigns;
 
     public UnitOfWork(StrideHRDbContext context)
     {
@@ -148,6 +153,16 @@ public class UnitOfWork : IUnitOfWork
 
     public IRepository<PIPReview> PIPReviews =>
         _pipReviews ??= new Repository<PIPReview>(_context);
+
+    // Email Management Repository Properties
+    public IEmailTemplateRepository EmailTemplates =>
+        _emailTemplates ??= new EmailTemplateRepository(_context);
+
+    public IEmailLogRepository EmailLogs =>
+        _emailLogs ??= new EmailLogRepository(_context);
+
+    public IEmailCampaignRepository EmailCampaigns =>
+        _emailCampaigns ??= new EmailCampaignRepository(_context);
 
     public async Task<int> SaveChangesAsync()
     {

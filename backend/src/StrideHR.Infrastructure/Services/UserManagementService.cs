@@ -34,7 +34,7 @@ public class UserManagementService : IUserManagementService
     public async Task<User> CreateUserAsync(CreateUserRequest request)
     {
         // Validate employee exists
-        var employee = await _employeeService.GetEmployeeByIdAsync(request.EmployeeId);
+        var employee = await _employeeService.GetByEmployeeIdAsync(request.EmployeeId);
         if (employee == null)
         {
             throw new InvalidOperationException($"Employee with ID {request.EmployeeId} not found");
@@ -65,7 +65,7 @@ public class UserManagementService : IUserManagementService
 
         var user = new User
         {
-            EmployeeId = request.EmployeeId,
+            EmployeeId = employee.Id,
             Username = request.Username,
             Email = request.Email,
             PasswordHash = passwordHash,
@@ -83,7 +83,7 @@ public class UserManagementService : IUserManagementService
         {
             foreach (var roleId in request.RoleIds)
             {
-                await _roleService.AssignRoleToEmployeeAsync(request.EmployeeId, roleId);
+                await _roleService.AssignRoleToEmployeeAsync(employee.Id, roleId);
             }
         }
 
