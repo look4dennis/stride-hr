@@ -257,7 +257,13 @@ Convert the feature design into a series of prompts for a code-generation LLM th
     - Write unit tests for reporting engine
     - _Requirements: 7.2, 17.5, 41.2, 41.9_
 
-  - [ ] 11.2 AI-powered analytics and insights
+  - [x] 11.2 AI-powered analytics and insights
+
+
+
+
+
+
     - Implement predictive analytics for workforce planning
     - Create sentiment analysis for employee feedback
     - Add performance forecasting and trend analysis

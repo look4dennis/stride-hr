@@ -385,6 +385,9 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IChatbotKnowledgeBaseService, ChatbotKnowledgeBaseService>();
         services.AddScoped<IChatbotLearningService, ChatbotLearningService>();
         
+        // Register AI Analytics service
+        services.AddScoped<IAIAnalyticsService, AIAnalyticsService>();
+        
         // Add SignalR
         services.AddSignalR();
         
