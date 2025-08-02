@@ -29,9 +29,10 @@ try
     {
         options.AddPolicy("AllowAll", policy =>
         {
-            policy.AllowAnyOrigin()
+            policy.WithOrigins("http://localhost:4200", "https://localhost:4200")
                   .AllowAnyMethod()
-                  .AllowAnyHeader();
+                  .AllowAnyHeader()
+                  .AllowCredentials(); // Required for SignalR
         });
     });
 
@@ -58,6 +59,9 @@ try
     app.UseAuthorization();
 
     app.MapControllers();
+    
+    // Map SignalR hubs
+    app.MapHub<StrideHR.API.Hubs.NotificationHub>("/hubs/notification");
 
     // Health check endpoint
     app.MapGet("/health", () => new { Status = "Healthy", Timestamp = DateTime.UtcNow })

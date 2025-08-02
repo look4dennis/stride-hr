@@ -198,7 +198,7 @@ Convert the feature design into a series of prompts for a code-generation LLM th
     - Write unit tests for training system
     - _Requirements: 36.1, 36.2, 36.6, 36.12, 36.15_
 
-- [ ] 9. Asset Management and IT Support
+- [x] 9. Asset Management and IT Support
   - [x] 9.1 Asset tracking and management
 
     - Create asset registration and tracking system
@@ -219,7 +219,9 @@ Convert the feature design into a series of prompts for a code-generation LLM th
     - _Requirements: 13.3, 13.4, 13.7_
 
 - [ ] 10. Communication and Notification System
-  - [ ] 10.1 Real-time notification service with SignalR
+  - [x] 10.1 Real-time notification service with SignalR
+
+
     - Implement SignalR hubs for real-time communication
     - Create notification delivery service with multiple channels
     - Add birthday notifications and celebration features

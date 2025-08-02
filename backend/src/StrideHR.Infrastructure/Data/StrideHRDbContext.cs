@@ -88,6 +88,11 @@ public class StrideHRDbContext : DbContext
     public DbSet<SupportTicket> SupportTickets { get; set; }
     public DbSet<SupportTicketComment> SupportTicketComments { get; set; }
     public DbSet<SupportTicketStatusHistory> SupportTicketStatusHistories { get; set; }
+    
+    // Notification DbSets
+    public DbSet<Notification> Notifications { get; set; }
+    public DbSet<NotificationTemplate> NotificationTemplates { get; set; }
+    public DbSet<UserNotificationPreference> UserNotificationPreferences { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

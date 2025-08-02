@@ -354,6 +354,21 @@ public static class ServiceCollectionExtensions
         // Register support ticket services
         services.AddScoped<ISupportTicketService, SupportTicketService>();
         
+        // Register notification repositories
+        services.AddScoped<INotificationRepository, NotificationRepository>();
+        services.AddScoped<INotificationTemplateRepository, NotificationTemplateRepository>();
+        services.AddScoped<IUserNotificationPreferenceRepository, UserNotificationPreferenceRepository>();
+        
+        // Register notification services
+        services.AddScoped<INotificationService, NotificationService>();
+        services.AddScoped<IRealTimeNotificationService, StrideHR.API.Services.SignalRNotificationService>();
+        
+        // Add SignalR
+        services.AddSignalR();
+        
+        // Add background services
+        services.AddHostedService<StrideHR.API.Services.NotificationBackgroundService>();
+        
         // Register employee repository (generic)
         services.AddScoped<IRepository<Employee>, Repository<Employee>>();
 
