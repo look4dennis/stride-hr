@@ -290,6 +290,16 @@ public static class ServiceCollectionExtensions
         
         // Register leave management services
         services.AddScoped<ILeaveManagementService, LeaveManagementService>();
+        
+        // Register performance management repositories
+        services.AddScoped<IPerformanceGoalRepository, PerformanceGoalRepository>();
+        services.AddScoped<IPerformanceReviewRepository, PerformanceReviewRepository>();
+        services.AddScoped<IPerformanceFeedbackRepository, PerformanceFeedbackRepository>();
+        services.AddScoped<IPerformanceImprovementPlanRepository, PerformanceImprovementPlanRepository>();
+        
+        // Register performance management services
+        services.AddScoped<IPerformanceManagementService, PerformanceManagementService>();
+        services.AddScoped<IPIPManagementService, PIPManagementService>();
 
         // Register authorization handlers
         services.AddScoped<IAuthorizationHandler, PermissionAuthorizationHandler>();

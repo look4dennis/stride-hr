@@ -32,6 +32,15 @@ public interface IUnitOfWork : IDisposable
     ILeaveEncashmentRepository LeaveEncashments { get; }
     ILeaveAccrualRuleRepository LeaveAccrualRules { get; }
     
+    // Performance Management Repositories
+    IPerformanceGoalRepository PerformanceGoals { get; }
+    IRepository<PerformanceGoalCheckIn> PerformanceGoalCheckIns { get; }
+    IPerformanceReviewRepository PerformanceReviews { get; }
+    IPerformanceFeedbackRepository PerformanceFeedbacks { get; }
+    IPerformanceImprovementPlanRepository PerformanceImprovementPlans { get; }
+    IRepository<PIPGoal> PIPGoals { get; }
+    IRepository<PIPReview> PIPReviews { get; }
+    
     Task<int> SaveChangesAsync();
     Task BeginTransactionAsync();
     Task CommitTransactionAsync();

@@ -39,6 +39,15 @@ public class UnitOfWork : IUnitOfWork
     private ILeaveAccrualRepository? _leaveAccruals;
     private ILeaveEncashmentRepository? _leaveEncashments;
     private ILeaveAccrualRuleRepository? _leaveAccrualRules;
+    
+    // Performance Management Repositories
+    private IPerformanceGoalRepository? _performanceGoals;
+    private IRepository<PerformanceGoalCheckIn>? _performanceGoalCheckIns;
+    private IPerformanceReviewRepository? _performanceReviews;
+    private IPerformanceFeedbackRepository? _performanceFeedbacks;
+    private IPerformanceImprovementPlanRepository? _performanceImprovementPlans;
+    private IRepository<PIPGoal>? _pipGoals;
+    private IRepository<PIPReview>? _pipReviews;
 
     public UnitOfWork(StrideHRDbContext context)
     {
@@ -117,6 +126,28 @@ public class UnitOfWork : IUnitOfWork
 
     public ILeaveAccrualRuleRepository LeaveAccrualRules =>
         _leaveAccrualRules ??= new LeaveAccrualRuleRepository(_context);
+
+    // Performance Management Repositories
+    public IPerformanceGoalRepository PerformanceGoals =>
+        _performanceGoals ??= new PerformanceGoalRepository(_context);
+
+    public IRepository<PerformanceGoalCheckIn> PerformanceGoalCheckIns =>
+        _performanceGoalCheckIns ??= new Repository<PerformanceGoalCheckIn>(_context);
+
+    public IPerformanceReviewRepository PerformanceReviews =>
+        _performanceReviews ??= new PerformanceReviewRepository(_context);
+
+    public IPerformanceFeedbackRepository PerformanceFeedbacks =>
+        _performanceFeedbacks ??= new PerformanceFeedbackRepository(_context);
+
+    public IPerformanceImprovementPlanRepository PerformanceImprovementPlans =>
+        _performanceImprovementPlans ??= new PerformanceImprovementPlanRepository(_context);
+
+    public IRepository<PIPGoal> PIPGoals =>
+        _pipGoals ??= new Repository<PIPGoal>(_context);
+
+    public IRepository<PIPReview> PIPReviews =>
+        _pipReviews ??= new Repository<PIPReview>(_context);
 
     public async Task<int> SaveChangesAsync()
     {

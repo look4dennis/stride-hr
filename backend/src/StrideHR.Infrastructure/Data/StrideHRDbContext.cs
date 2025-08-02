@@ -58,6 +58,15 @@ public class StrideHRDbContext : DbContext
     public DbSet<LeaveAccrual> LeaveAccruals { get; set; }
     public DbSet<LeaveEncashment> LeaveEncashments { get; set; }
     public DbSet<LeaveAccrualRule> LeaveAccrualRules { get; set; }
+    
+    // Performance Management DbSets
+    public DbSet<PerformanceGoal> PerformanceGoals { get; set; }
+    public DbSet<PerformanceGoalCheckIn> PerformanceGoalCheckIns { get; set; }
+    public DbSet<PerformanceReview> PerformanceReviews { get; set; }
+    public DbSet<PerformanceFeedback> PerformanceFeedbacks { get; set; }
+    public DbSet<PerformanceImprovementPlan> PerformanceImprovementPlans { get; set; }
+    public DbSet<PIPGoal> PIPGoals { get; set; }
+    public DbSet<PIPReview> PIPReviews { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

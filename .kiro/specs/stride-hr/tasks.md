@@ -176,11 +176,7 @@ Convert the feature design into a series of prompts for a code-generation LLM th
     - Write unit tests for leave management
     - _Requirements: 4.6, 4.5, 37.1_
 
-  - [ ] 7.2 Leave balance tracking and reporting
-
-
-
-
+  - [x] 7.2 Leave balance tracking and reporting
 
     - Implement leave balance calculation and tracking
     - Create leave accrual rules and policy management
@@ -190,7 +186,12 @@ Convert the feature design into a series of prompts for a code-generation LLM th
     - _Requirements: 4.6, 39.4_
 
 - [ ] 8. Performance Management and Training System
-  - [ ] 8.1 Performance review and PIP management
+  - [x] 8.1 Performance review and PIP management
+
+
+
+
+
     - Create performance goal setting and tracking
     - Implement 360-degree feedback system
     - Add Performance Improvement Plan (PIP) workflows
