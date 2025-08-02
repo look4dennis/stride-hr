@@ -67,6 +67,16 @@ public class StrideHRDbContext : DbContext
     public DbSet<PerformanceImprovementPlan> PerformanceImprovementPlans { get; set; }
     public DbSet<PIPGoal> PIPGoals { get; set; }
     public DbSet<PIPReview> PIPReviews { get; set; }
+    
+    // Training Management DbSets
+    public DbSet<TrainingModule> TrainingModules { get; set; }
+    public DbSet<TrainingAssignment> TrainingAssignments { get; set; }
+    public DbSet<TrainingProgress> TrainingProgresses { get; set; }
+    public DbSet<Assessment> Assessments { get; set; }
+    public DbSet<AssessmentQuestion> AssessmentQuestions { get; set; }
+    public DbSet<AssessmentAnswer> AssessmentAnswers { get; set; }
+    public DbSet<AssessmentAttempt> AssessmentAttempts { get; set; }
+    public DbSet<Certification> Certifications { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

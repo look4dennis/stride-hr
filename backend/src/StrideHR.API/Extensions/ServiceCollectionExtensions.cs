@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using StrideHR.Core.Entities;
 using StrideHR.Core.Interfaces;
 using StrideHR.Core.Interfaces.Repositories;
 using StrideHR.Core.Interfaces.Services;
@@ -209,6 +210,16 @@ public static class ServiceCollectionExtensions
                 policy.Requirements.Add(new PermissionRequirement("AuditLog.View")));
             options.AddPolicy("Permission:AuditLog.ViewSecurity", policy => 
                 policy.Requirements.Add(new PermissionRequirement("AuditLog.ViewSecurity")));
+
+            // Training management policies
+            options.AddPolicy("CanManageTraining", policy => 
+                policy.Requirements.Add(new PermissionRequirement("Training.Manage")));
+            options.AddPolicy("CanAssignTraining", policy => 
+                policy.Requirements.Add(new PermissionRequirement("Training.Assign")));
+            options.AddPolicy("CanViewTrainingReports", policy => 
+                policy.Requirements.Add(new PermissionRequirement("Training.ViewReports")));
+            options.AddPolicy("CanIssueCertifications", policy => 
+                policy.Requirements.Add(new PermissionRequirement("Training.IssueCertifications")));
         });
 
         return services;
@@ -300,6 +311,19 @@ public static class ServiceCollectionExtensions
         // Register performance management services
         services.AddScoped<IPerformanceManagementService, PerformanceManagementService>();
         services.AddScoped<IPIPManagementService, PIPManagementService>();
+        
+        // Register training repositories
+        services.AddScoped<ITrainingModuleRepository, TrainingModuleRepository>();
+        services.AddScoped<ITrainingAssignmentRepository, TrainingAssignmentRepository>();
+        services.AddScoped<IAssessmentRepository, AssessmentRepository>();
+        services.AddScoped<IAssessmentAttemptRepository, AssessmentAttemptRepository>();
+        services.AddScoped<ICertificationRepository, CertificationRepository>();
+        
+        // Register training services
+        services.AddScoped<ITrainingService, TrainingService>();
+        
+        // Register employee repository (generic)
+        services.AddScoped<IRepository<Employee>, Repository<Employee>>();
 
         // Register authorization handlers
         services.AddScoped<IAuthorizationHandler, PermissionAuthorizationHandler>();
