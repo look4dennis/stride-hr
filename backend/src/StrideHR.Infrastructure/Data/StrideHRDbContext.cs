@@ -37,6 +37,12 @@ public class StrideHRDbContext : DbContext
     public DbSet<TaskAssignment> TaskAssignments { get; set; }
     public DbSet<DSR> DSRs { get; set; }
     public DbSet<ProjectAlert> ProjectAlerts { get; set; }
+    
+    // Payroll Management DbSets
+    public DbSet<PayrollRecord> PayrollRecords { get; set; }
+    public DbSet<PayrollFormula> PayrollFormulas { get; set; }
+    public DbSet<PayrollAdjustment> PayrollAdjustments { get; set; }
+    public DbSet<ExchangeRate> ExchangeRates { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

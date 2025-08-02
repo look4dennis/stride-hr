@@ -115,8 +115,6 @@ Convert the feature design into a series of prompts for a code-generation LLM th
 
   - [x] 5.2 Daily Status Report (DSR) system
 
-
-
     - Implement DSR submission with project and task selection
     - Create DSR review and approval workflows
     - Add productivity tracking and idle time calculation
@@ -125,11 +123,6 @@ Convert the feature design into a series of prompts for a code-generation LLM th
     - _Requirements: 12.1, 12.8, 12.9, 12.10, 31.1, 31.4_
 
   - [x] 5.3 Project progress monitoring and reporting
-
-
-
-
-
 
     - Create real-time project progress tracking
     - Implement project hours analysis and variance reporting
@@ -140,7 +133,15 @@ Convert the feature design into a series of prompts for a code-generation LLM th
 
 - [ ] 6. Payroll System with Custom Formula Engine
 
-  - [ ] 6.1 Payroll calculation engine
+
+
+
+  - [x] 6.1 Payroll calculation engine
+
+
+
+
+
 
     - Create flexible payroll formula engine with mathematical expressions
     - Implement salary calculation with allowances and deductions
