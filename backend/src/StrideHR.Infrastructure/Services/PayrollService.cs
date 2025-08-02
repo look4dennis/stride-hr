@@ -119,6 +119,10 @@ public class PayrollService : IPayrollService
             // Calculate gross and net salary
             result.GrossSalary = result.BasicSalary + result.TotalAllowances + result.OvertimeAmount;
             result.NetSalary = result.GrossSalary - result.TotalDeductions;
+            
+            // Set payroll period information
+            result.PayrollMonth = request.PayrollPeriodStart.Month;
+            result.PayrollYear = request.PayrollPeriodStart.Year;
 
             // Handle currency conversion if needed
             if (employee.Branch.Currency != "USD")

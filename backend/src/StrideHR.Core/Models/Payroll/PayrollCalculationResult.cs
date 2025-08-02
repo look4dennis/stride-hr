@@ -12,6 +12,8 @@ public class PayrollCalculationResult
     public decimal OvertimeAmount { get; set; }
     public string Currency { get; set; } = string.Empty;
     public decimal ExchangeRate { get; set; } = 1.0m;
+    public int PayrollMonth { get; set; }
+    public int PayrollYear { get; set; }
     public Dictionary<string, decimal> AllowanceBreakdown { get; set; } = new();
     public Dictionary<string, decimal> DeductionBreakdown { get; set; } = new();
     public Dictionary<string, decimal> CustomCalculations { get; set; } = new();

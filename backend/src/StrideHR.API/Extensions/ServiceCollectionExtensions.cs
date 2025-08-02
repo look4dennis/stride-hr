@@ -149,6 +149,35 @@ public static class ServiceCollectionExtensions
                 policy.Requirements.Add(new PermissionRequirement("Payroll.Create")));
             options.AddPolicy("Permission:Payroll.Process", policy => 
                 policy.Requirements.Add(new PermissionRequirement("Payroll.Process")));
+            options.AddPolicy("Permission:Payroll.Calculate", policy => 
+                policy.Requirements.Add(new PermissionRequirement("Payroll.Calculate")));
+            options.AddPolicy("Permission:Payroll.Approve", policy => 
+                policy.Requirements.Add(new PermissionRequirement("Payroll.Approve")));
+            
+            // Payslip policies
+            options.AddPolicy("Permission:Payroll.Templates.View", policy => 
+                policy.Requirements.Add(new PermissionRequirement("Payroll.Templates.View")));
+            options.AddPolicy("Permission:Payroll.Templates.Create", policy => 
+                policy.Requirements.Add(new PermissionRequirement("Payroll.Templates.Create")));
+            options.AddPolicy("Permission:Payroll.Templates.Update", policy => 
+                policy.Requirements.Add(new PermissionRequirement("Payroll.Templates.Update")));
+            options.AddPolicy("Permission:Payroll.Templates.Delete", policy => 
+                policy.Requirements.Add(new PermissionRequirement("Payroll.Templates.Delete")));
+            options.AddPolicy("Permission:Payroll.Templates.Manage", policy => 
+                policy.Requirements.Add(new PermissionRequirement("Payroll.Templates.Manage")));
+            
+            options.AddPolicy("Permission:Payroll.Payslips.View", policy => 
+                policy.Requirements.Add(new PermissionRequirement("Payroll.Payslips.View")));
+            options.AddPolicy("Permission:Payroll.Payslips.Generate", policy => 
+                policy.Requirements.Add(new PermissionRequirement("Payroll.Payslips.Generate")));
+            options.AddPolicy("Permission:Payroll.Payslips.Approve", policy => 
+                policy.Requirements.Add(new PermissionRequirement("Payroll.Payslips.Approve")));
+            options.AddPolicy("Permission:Payroll.Payslips.Release", policy => 
+                policy.Requirements.Add(new PermissionRequirement("Payroll.Payslips.Release")));
+            options.AddPolicy("Permission:Payroll.Payslips.Download", policy => 
+                policy.Requirements.Add(new PermissionRequirement("Payroll.Payslips.Download")));
+            options.AddPolicy("Permission:Payroll.Payslips.Regenerate", policy => 
+                policy.Requirements.Add(new PermissionRequirement("Payroll.Payslips.Regenerate")));
 
             options.AddPolicy("Permission:Report.View", policy => 
                 policy.Requirements.Add(new PermissionRequirement("Report.View")));
@@ -213,6 +242,13 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ITaskAssignmentRepository, TaskAssignmentRepository>();
         services.AddScoped<IDSRRepository, DSRRepository>();
         services.AddScoped<IProjectAlertRepository, ProjectAlertRepository>();
+        
+        // Register payroll repositories
+        services.AddScoped<IPayrollRepository, PayrollRepository>();
+        services.AddScoped<IPayrollFormulaRepository, PayrollFormulaRepository>();
+        services.AddScoped<IPayslipTemplateRepository, PayslipTemplateRepository>();
+        services.AddScoped<IPayslipGenerationRepository, PayslipGenerationRepository>();
+        services.AddScoped<IExchangeRateRepository, ExchangeRateRepository>();
 
         // Register services
         services.AddScoped<IAuthenticationService, AuthenticationService>();
@@ -232,6 +268,15 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IProjectService, ProjectService>();
         services.AddScoped<IDSRService, DSRService>();
         services.AddScoped<IProjectMonitoringService, ProjectMonitoringService>();
+        
+        // Register payroll services
+        services.AddScoped<IPayrollService, PayrollService>();
+        services.AddScoped<IPayrollFormulaEngine, PayrollFormulaEngine>();
+        services.AddScoped<IPayslipTemplateService, PayslipTemplateService>();
+        services.AddScoped<IPayslipGenerationService, PayslipGenerationService>();
+        services.AddScoped<IPayslipDesignerService, PayslipDesignerService>();
+        services.AddScoped<ICurrencyService, CurrencyService>();
+        services.AddScoped<ITimeZoneService, TimeZoneService>();
 
         // Register authorization handlers
         services.AddScoped<IAuthorizationHandler, PermissionAuthorizationHandler>();

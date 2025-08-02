@@ -43,6 +43,11 @@ public class StrideHRDbContext : DbContext
     public DbSet<PayrollFormula> PayrollFormulas { get; set; }
     public DbSet<PayrollAdjustment> PayrollAdjustments { get; set; }
     public DbSet<ExchangeRate> ExchangeRates { get; set; }
+    
+    // Payslip Management DbSets
+    public DbSet<PayslipTemplate> PayslipTemplates { get; set; }
+    public DbSet<PayslipGeneration> PayslipGenerations { get; set; }
+    public DbSet<PayslipApprovalHistory> PayslipApprovalHistories { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
