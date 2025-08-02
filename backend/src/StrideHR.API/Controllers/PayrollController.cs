@@ -18,15 +18,21 @@ public class PayrollController : BaseController
     private readonly IPayrollService _payrollService;
     private readonly IPayslipGenerationService _payslipGenerationService;
     private readonly IPayslipTemplateService _payslipTemplateService;
+    private readonly IPayrollReportingService _payrollReportingService;
+    private readonly IPayrollErrorCorrectionService _payrollErrorCorrectionService;
 
     public PayrollController(
         IPayrollService payrollService,
         IPayslipGenerationService payslipGenerationService,
-        IPayslipTemplateService payslipTemplateService)
+        IPayslipTemplateService payslipTemplateService,
+        IPayrollReportingService payrollReportingService,
+        IPayrollErrorCorrectionService payrollErrorCorrectionService)
     {
         _payrollService = payrollService;
         _payslipGenerationService = payslipGenerationService;
         _payslipTemplateService = payslipTemplateService;
+        _payrollReportingService = payrollReportingService;
+        _payrollErrorCorrectionService = payrollErrorCorrectionService;
     }
 
     private int GetCurrentUserId()
@@ -381,9 +387,284 @@ public class PayrollController : BaseController
     }
 
     #endregion
+
+    #region Payroll Reporting
+
+    [HttpPost("reports/generate")]
+    [RequirePermission("payroll.reports.generate")]
+    public async Task<IActionResult> GeneratePayrollReport(
+        [FromBody] PayrollReportRequest request)
+    {
+        try
+        {
+            var result = await _payrollReportingService.GeneratePayrollReportAsync(request);
+            return Success(result);
+        }
+        catch (Exception ex)
+        {
+            return Error(ex.Message);
+        }
+    }
+
+    [HttpPost("reports/compliance")]
+    [RequirePermission("payroll.reports.compliance")]
+    public async Task<IActionResult> GenerateComplianceReport(
+        [FromBody] ComplianceReportRequest request)
+    {
+        try
+        {
+            var result = await _payrollReportingService.GenerateComplianceReportAsync(request);
+            return Success(result);
+        }
+        catch (Exception ex)
+        {
+            return Error(ex.Message);
+        }
+    }
+
+    [HttpPost("reports/analytics")]
+    [RequirePermission("payroll.reports.analytics")]
+    public async Task<IActionResult> GenerateAnalyticsReport(
+        [FromBody] PayrollAnalyticsRequest request)
+    {
+        try
+        {
+            var result = await _payrollReportingService.GenerateAnalyticsReportAsync(request);
+            return Success(result);
+        }
+        catch (Exception ex)
+        {
+            return Error(ex.Message);
+        }
+    }
+
+    [HttpPost("reports/budget-variance")]
+    [RequirePermission("payroll.reports.budget")]
+    public async Task<IActionResult> GenerateBudgetVarianceReport(
+        [FromBody] BudgetVarianceRequest request)
+    {
+        try
+        {
+            var result = await _payrollReportingService.GenerateBudgetVarianceReportAsync(request);
+            return Success(result);
+        }
+        catch (Exception ex)
+        {
+            return Error(ex.Message);
+        }
+    }
+
+    [HttpGet("audit-trail")]
+    [RequirePermission("payroll.audit.view")]
+    public async Task<IActionResult> GetPayrollAuditTrail(
+        [FromQuery] PayrollAuditTrailRequest request)
+    {
+        try
+        {
+            var result = await _payrollReportingService.GetPayrollAuditTrailAsync(request);
+            return Success(result);
+        }
+        catch (Exception ex)
+        {
+            return Error(ex.Message);
+        }
+    }
+
+    [HttpPost("reports/export")]
+    [RequirePermission("payroll.reports.export")]
+    public async Task<IActionResult> ExportReport(
+        [FromBody] object reportResult, [FromQuery] string format = "pdf")
+    {
+        try
+        {
+            var fileContent = await _payrollReportingService.ExportReportAsync(reportResult, format);
+            var contentType = format.ToLower() switch
+            {
+                "pdf" => "application/pdf",
+                "excel" => "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                "csv" => "text/csv",
+                _ => "application/octet-stream"
+            };
+            
+            return File(fileContent, contentType, $"payroll-report.{format}");
+        }
+        catch (Exception ex)
+        {
+            return Error(ex.Message);
+        }
+    }
+
+    [HttpGet("compliance/validate")]
+    [RequirePermission("payroll.compliance.validate")]
+    public async Task<IActionResult> ValidateCompliance(
+        [FromQuery] int branchId, [FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
+    {
+        try
+        {
+            var violations = await _payrollReportingService.ValidateComplianceAsync(branchId, startDate, endDate);
+            return Success(violations);
+        }
+        catch (Exception ex)
+        {
+            return Error(ex.Message);
+        }
+    }
+
+    #endregion
+
+    #region Error Correction
+
+    [HttpPost("error-corrections")]
+    [RequirePermission("payroll.corrections.create")]
+    public async Task<IActionResult> CreateErrorCorrection(
+        [FromBody] PayrollErrorCorrectionRequest request)
+    {
+        try
+        {
+            request.RequestedBy = GetCurrentUserId();
+            var result = await _payrollErrorCorrectionService.CreateErrorCorrectionAsync(request);
+            return Success(result);
+        }
+        catch (Exception ex)
+        {
+            return Error(ex.Message);
+        }
+    }
+
+    [HttpPost("error-corrections/{correctionId}/approve")]
+    [RequirePermission("payroll.corrections.approve")]
+    public async Task<IActionResult> ApproveErrorCorrection(
+        int correctionId, [FromBody] ApprovalRequest request)
+    {
+        try
+        {
+            var result = await _payrollErrorCorrectionService.ApproveErrorCorrectionAsync(
+                correctionId, GetCurrentUserId(), request.Notes);
+            return Success(result);
+        }
+        catch (Exception ex)
+        {
+            return Error(ex.Message);
+        }
+    }
+
+    [HttpPost("error-corrections/{correctionId}/reject")]
+    [RequirePermission("payroll.corrections.approve")]
+    public async Task<IActionResult> RejectErrorCorrection(
+        int correctionId, [FromBody] RejectionRequest request)
+    {
+        try
+        {
+            var result = await _payrollErrorCorrectionService.RejectErrorCorrectionAsync(
+                correctionId, GetCurrentUserId(), request.Reason);
+            return Success(result);
+        }
+        catch (Exception ex)
+        {
+            return Error(ex.Message);
+        }
+    }
+
+    [HttpPost("error-corrections/{correctionId}/process")]
+    [RequirePermission("payroll.corrections.process")]
+    public async Task<IActionResult> ProcessErrorCorrection(int correctionId)
+    {
+        try
+        {
+            var result = await _payrollErrorCorrectionService.ProcessErrorCorrectionAsync(
+                correctionId, GetCurrentUserId());
+            return Success(result);
+        }
+        catch (Exception ex)
+        {
+            return Error(ex.Message);
+        }
+    }
+
+    [HttpGet("error-corrections/{correctionId}")]
+    [RequirePermission("payroll.corrections.view")]
+    public async Task<IActionResult> GetErrorCorrection(int correctionId)
+    {
+        try
+        {
+            var result = await _payrollErrorCorrectionService.GetErrorCorrectionAsync(correctionId);
+            if (result == null)
+                return NotFound();
+
+            return Success(result);
+        }
+        catch (Exception ex)
+        {
+            return Error(ex.Message);
+        }
+    }
+
+    [HttpGet("error-corrections/payroll/{payrollRecordId}")]
+    [RequirePermission("payroll.corrections.view")]
+    public async Task<IActionResult> GetPayrollErrorCorrections(int payrollRecordId)
+    {
+        try
+        {
+            var result = await _payrollErrorCorrectionService.GetPayrollErrorCorrectionsAsync(payrollRecordId);
+            return Success(result);
+        }
+        catch (Exception ex)
+        {
+            return Error(ex.Message);
+        }
+    }
+
+    [HttpGet("error-corrections/pending")]
+    [RequirePermission("payroll.corrections.approve")]
+    public async Task<IActionResult> GetPendingErrorCorrections([FromQuery] int? branchId = null)
+    {
+        try
+        {
+            var result = await _payrollErrorCorrectionService.GetPendingErrorCorrectionsAsync(branchId);
+            return Success(result);
+        }
+        catch (Exception ex)
+        {
+            return Error(ex.Message);
+        }
+    }
+
+    [HttpPost("error-corrections/{correctionId}/cancel")]
+    [RequirePermission("payroll.corrections.cancel")]
+    public async Task<IActionResult> CancelErrorCorrection(
+        int correctionId, [FromBody] CancellationRequest request)
+    {
+        try
+        {
+            var result = await _payrollErrorCorrectionService.CancelErrorCorrectionAsync(
+                correctionId, GetCurrentUserId(), request.Reason);
+            return Success(result);
+        }
+        catch (Exception ex)
+        {
+            return Error(ex.Message);
+        }
+    }
+
+    #endregion
 }
 
 public class RegeneratePayslipRequest
+{
+    public string Reason { get; set; } = string.Empty;
+}
+
+public class ApprovalRequest
+{
+    public string? Notes { get; set; }
+}
+
+public class RejectionRequest
+{
+    public string Reason { get; set; } = string.Empty;
+}
+
+public class CancellationRequest
 {
     public string Reason { get; set; } = string.Empty;
 }

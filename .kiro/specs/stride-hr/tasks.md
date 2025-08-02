@@ -131,17 +131,9 @@ Convert the feature design into a series of prompts for a code-generation LLM th
     - Write unit tests for project monitoring features
     - _Requirements: 31.2, 31.5, 31.7, 31.11, 11.7_
 
-- [ ] 6. Payroll System with Custom Formula Engine
-
-
-
+- [x] 6. Payroll System with Custom Formula Engine
 
   - [x] 6.1 Payroll calculation engine
-
-
-
-
-
 
     - Create flexible payroll formula engine with mathematical expressions
     - Implement salary calculation with allowances and deductions
@@ -152,11 +144,6 @@ Convert the feature design into a series of prompts for a code-generation LLM th
 
   - [x] 6.2 Payslip generation and approval workflow
 
-
-
-
-
-
     - Implement drag-and-drop payslip designer
     - Create payslip generation with organization branding
     - Add multi-level approval workflow (HR → Finance)
@@ -164,7 +151,9 @@ Convert the feature design into a series of prompts for a code-generation LLM th
     - Write unit tests for payslip generation
     - _Requirements: 3.3, 3.6, 3.7, 3.8, 3.9_
 
-  - [ ] 6.3 Payroll reporting and compliance
+  - [x] 6.3 Payroll reporting and compliance
+
+
 
     - Create payroll reports with currency conversion
     - Implement statutory compliance reporting
