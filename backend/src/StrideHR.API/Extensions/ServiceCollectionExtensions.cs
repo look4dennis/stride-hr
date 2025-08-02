@@ -198,6 +198,18 @@ public static class ServiceCollectionExtensions
                 policy.Requirements.Add(new PermissionRequirement("User.Activate")));
             options.AddPolicy("Permission:User.ForcePasswordChange", policy => 
                 policy.Requirements.Add(new PermissionRequirement("User.ForcePasswordChange")));
+
+            // Asset management policies
+            options.AddPolicy("Permission:Asset.View", policy => 
+                policy.Requirements.Add(new PermissionRequirement("Asset.View")));
+            options.AddPolicy("Permission:Asset.Create", policy => 
+                policy.Requirements.Add(new PermissionRequirement("Asset.Create")));
+            options.AddPolicy("Permission:Asset.Update", policy => 
+                policy.Requirements.Add(new PermissionRequirement("Asset.Update")));
+            options.AddPolicy("Permission:Asset.Delete", policy => 
+                policy.Requirements.Add(new PermissionRequirement("Asset.Delete")));
+            options.AddPolicy("Permission:Asset.Read", policy => 
+                policy.Requirements.Add(new PermissionRequirement("Asset.Read")));
             options.AddPolicy("Permission:User.Unlock", policy => 
                 policy.Requirements.Add(new PermissionRequirement("User.Unlock")));
             options.AddPolicy("Permission:User.ViewSessions", policy => 
@@ -321,6 +333,18 @@ public static class ServiceCollectionExtensions
         
         // Register training services
         services.AddScoped<ITrainingService, TrainingService>();
+        
+        // Register asset management repositories
+        services.AddScoped<IAssetRepository, AssetRepository>();
+        services.AddScoped<IAssetAssignmentRepository, AssetAssignmentRepository>();
+        services.AddScoped<IAssetMaintenanceRepository, AssetMaintenanceRepository>();
+        services.AddScoped<IAssetHandoverRepository, AssetHandoverRepository>();
+        
+        // Register asset management services
+        services.AddScoped<IAssetService, AssetService>();
+        services.AddScoped<IAssetAssignmentService, AssetAssignmentService>();
+        services.AddScoped<IAssetMaintenanceService, AssetMaintenanceService>();
+        services.AddScoped<IAssetHandoverService, AssetHandoverService>();
         
         // Register employee repository (generic)
         services.AddScoped<IRepository<Employee>, Repository<Employee>>();

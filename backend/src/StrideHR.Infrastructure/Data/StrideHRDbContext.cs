@@ -77,6 +77,12 @@ public class StrideHRDbContext : DbContext
     public DbSet<AssessmentAnswer> AssessmentAnswers { get; set; }
     public DbSet<AssessmentAttempt> AssessmentAttempts { get; set; }
     public DbSet<Certification> Certifications { get; set; }
+    
+    // Asset Management DbSets
+    public DbSet<Asset> Assets { get; set; }
+    public DbSet<AssetAssignment> AssetAssignments { get; set; }
+    public DbSet<AssetMaintenance> AssetMaintenances { get; set; }
+    public DbSet<AssetHandover> AssetHandovers { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

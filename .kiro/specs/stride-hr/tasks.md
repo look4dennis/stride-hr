@@ -179,7 +179,7 @@ Convert the feature design into a series of prompts for a code-generation LLM th
     - Write unit tests for leave balance operations
     - _Requirements: 4.6, 39.4_
 
-- [ ] 8. Performance Management and Training System
+- [x] 8. Performance Management and Training System
   - [x] 8.1 Performance review and PIP management
 
     - Create performance goal setting and tracking
@@ -191,9 +191,6 @@ Convert the feature design into a series of prompts for a code-generation LLM th
 
   - [x] 8.2 Training and certification system
 
-
-
-
     - Create training module creation with content upload
     - Implement assessment and testing functionality
     - Add certification generation and tracking
@@ -202,7 +199,12 @@ Convert the feature design into a series of prompts for a code-generation LLM th
     - _Requirements: 36.1, 36.2, 36.6, 36.12, 36.15_
 
 - [ ] 9. Asset Management and IT Support
-  - [ ] 9.1 Asset tracking and management
+  - [x] 9.1 Asset tracking and management
+
+
+
+
+
     - Create asset registration and tracking system
     - Implement asset assignment to employees and projects
     - Add asset maintenance scheduling and tracking
