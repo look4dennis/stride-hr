@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore.Storage;
 using StrideHR.Core.Entities;
 using StrideHR.Core.Interfaces;
+using StrideHR.Core.Interfaces.Repositories;
 using StrideHR.Infrastructure.Data;
 
 namespace StrideHR.Infrastructure.Repositories;
@@ -28,6 +29,13 @@ public class UnitOfWork : IUnitOfWork
     private IRepository<EmployeeOnboardingTask>? _employeeOnboardingTasks;
     private IRepository<EmployeeExit>? _employeeExits;
     private IRepository<EmployeeExitTask>? _employeeExitTasks;
+    
+    // Leave Management Repositories
+    private ILeaveRequestRepository? _leaveRequests;
+    private ILeaveBalanceRepository? _leaveBalances;
+    private ILeavePolicyRepository? _leavePolicies;
+    private ILeaveApprovalHistoryRepository? _leaveApprovalHistory;
+    private ILeaveCalendarRepository? _leaveCalendar;
 
     public UnitOfWork(StrideHRDbContext context)
     {
@@ -81,6 +89,22 @@ public class UnitOfWork : IUnitOfWork
 
     public IRepository<EmployeeExitTask> EmployeeExitTasks =>
         _employeeExitTasks ??= new Repository<EmployeeExitTask>(_context);
+
+    // Leave Management Repositories
+    public ILeaveRequestRepository LeaveRequests =>
+        _leaveRequests ??= new LeaveRequestRepository(_context);
+
+    public ILeaveBalanceRepository LeaveBalances =>
+        _leaveBalances ??= new LeaveBalanceRepository(_context);
+
+    public ILeavePolicyRepository LeavePolicies =>
+        _leavePolicies ??= new LeavePolicyRepository(_context);
+
+    public ILeaveApprovalHistoryRepository LeaveApprovalHistory =>
+        _leaveApprovalHistory ??= new LeaveApprovalHistoryRepository(_context);
+
+    public ILeaveCalendarRepository LeaveCalendar =>
+        _leaveCalendar ??= new LeaveCalendarRepository(_context);
 
     public async Task<int> SaveChangesAsync()
     {

@@ -1,4 +1,5 @@
 using StrideHR.Core.Entities;
+using StrideHR.Core.Interfaces.Repositories;
 
 namespace StrideHR.Core.Interfaces;
 
@@ -20,6 +21,13 @@ public interface IUnitOfWork : IDisposable
     IRepository<EmployeeOnboardingTask> EmployeeOnboardingTasks { get; }
     IRepository<EmployeeExit> EmployeeExits { get; }
     IRepository<EmployeeExitTask> EmployeeExitTasks { get; }
+    
+    // Leave Management Repositories
+    ILeaveRequestRepository LeaveRequests { get; }
+    ILeaveBalanceRepository LeaveBalances { get; }
+    ILeavePolicyRepository LeavePolicies { get; }
+    ILeaveApprovalHistoryRepository LeaveApprovalHistory { get; }
+    ILeaveCalendarRepository LeaveCalendar { get; }
     
     Task<int> SaveChangesAsync();
     Task BeginTransactionAsync();

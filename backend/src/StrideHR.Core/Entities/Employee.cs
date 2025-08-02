@@ -46,4 +46,12 @@ public class Employee : BaseEntity
     public virtual ICollection<TaskAssignment> TaskAssignments { get; set; } = new List<TaskAssignment>();
     public virtual ICollection<DSR> DSRs { get; set; } = new List<DSR>();
     public virtual ICollection<DSR> ReviewedDSRs { get; set; } = new List<DSR>();
+    
+    // Leave-related Navigation Properties
+    public virtual ICollection<LeaveBalance> LeaveBalances { get; set; } = new List<LeaveBalance>();
+    public virtual ICollection<LeaveRequest> LeaveRequests { get; set; } = new List<LeaveRequest>();
+    public virtual ICollection<LeaveRequest> ApprovedLeaveRequests { get; set; } = new List<LeaveRequest>();
+    public virtual ICollection<LeaveApprovalHistory> ApprovalHistory { get; set; } = new List<LeaveApprovalHistory>();
+    public virtual ICollection<LeaveApprovalHistory> EscalatedApprovals { get; set; } = new List<LeaveApprovalHistory>();
+    public virtual ICollection<LeaveCalendar> LeaveCalendarEntries { get; set; } = new List<LeaveCalendar>();
 }

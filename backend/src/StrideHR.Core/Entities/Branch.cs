@@ -22,4 +22,5 @@ public class Branch : BaseEntity
     // Navigation Properties
     public virtual Organization Organization { get; set; } = null!;
     public virtual ICollection<Employee> Employees { get; set; } = new List<Employee>();
+    public virtual ICollection<LeavePolicy> LeavePolicies { get; set; } = new List<LeavePolicy>();
 }

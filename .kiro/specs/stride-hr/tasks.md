@@ -163,7 +163,12 @@ Convert the feature design into a series of prompts for a code-generation LLM th
     - _Requirements: 3.10, 1.6, 6.3, 3.7_
 
 - [ ] 7. Leave Management System
-  - [ ] 7.1 Leave request and approval workflow
+  - [x] 7.1 Leave request and approval workflow
+
+
+
+
+
     - Create leave request submission with balance validation
     - Implement multi-level approval workflows
     - Add leave conflict detection and team scheduling

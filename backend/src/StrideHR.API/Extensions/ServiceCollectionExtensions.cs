@@ -249,6 +249,13 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IPayslipTemplateRepository, PayslipTemplateRepository>();
         services.AddScoped<IPayslipGenerationRepository, PayslipGenerationRepository>();
         services.AddScoped<IExchangeRateRepository, ExchangeRateRepository>();
+        
+        // Register leave management repositories
+        services.AddScoped<ILeaveRequestRepository, LeaveRequestRepository>();
+        services.AddScoped<ILeaveBalanceRepository, LeaveBalanceRepository>();
+        services.AddScoped<ILeavePolicyRepository, LeavePolicyRepository>();
+        services.AddScoped<ILeaveApprovalHistoryRepository, LeaveApprovalHistoryRepository>();
+        services.AddScoped<ILeaveCalendarRepository, LeaveCalendarRepository>();
 
         // Register services
         services.AddScoped<IAuthenticationService, AuthenticationService>();
@@ -277,6 +284,9 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IPayslipDesignerService, PayslipDesignerService>();
         services.AddScoped<ICurrencyService, CurrencyService>();
         services.AddScoped<ITimeZoneService, TimeZoneService>();
+        
+        // Register leave management services
+        services.AddScoped<ILeaveManagementService, LeaveManagementService>();
 
         // Register authorization handlers
         services.AddScoped<IAuthorizationHandler, PermissionAuthorizationHandler>();

@@ -48,6 +48,13 @@ public class StrideHRDbContext : DbContext
     public DbSet<PayslipTemplate> PayslipTemplates { get; set; }
     public DbSet<PayslipGeneration> PayslipGenerations { get; set; }
     public DbSet<PayslipApprovalHistory> PayslipApprovalHistories { get; set; }
+    
+    // Leave Management DbSets
+    public DbSet<LeavePolicy> LeavePolicies { get; set; }
+    public DbSet<LeaveBalance> LeaveBalances { get; set; }
+    public DbSet<LeaveRequest> LeaveRequests { get; set; }
+    public DbSet<LeaveApprovalHistory> LeaveApprovalHistories { get; set; }
+    public DbSet<LeaveCalendar> LeaveCalendars { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
