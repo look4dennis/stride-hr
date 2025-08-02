@@ -29,9 +29,8 @@ public class LeaveBalanceConfiguration : IEntityTypeConfiguration<LeaveBalance>
             .IsRequired()
             .HasColumnType("decimal(18,2)");
             
-        // Computed column for RemainingDays
-        builder.Property(lb => lb.RemainingDays)
-            .HasComputedColumnSql("[AllocatedDays] + [CarriedForwardDays] - [UsedDays] - [EncashedDays]");
+        // Ignore computed property - it's calculated in C# code
+        builder.Ignore(lb => lb.RemainingDays);
             
         // Relationships
         builder.HasOne(lb => lb.Employee)

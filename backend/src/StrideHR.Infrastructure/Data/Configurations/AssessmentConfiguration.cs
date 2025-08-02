@@ -53,7 +53,7 @@ public class AssessmentConfiguration : IEntityTypeConfiguration<Assessment>
 
         builder.HasOne(a => a.CreatedByEmployee)
             .WithMany()
-            .HasForeignKey(a => a.CreatedBy)
+            .HasForeignKey(a => a.CreatedByEmployeeId)
             .OnDelete(DeleteBehavior.Restrict);
 
         builder.HasMany(a => a.Questions)
@@ -70,7 +70,7 @@ public class AssessmentConfiguration : IEntityTypeConfiguration<Assessment>
         builder.HasIndex(a => a.TrainingModuleId);
         builder.HasIndex(a => a.Type);
         builder.HasIndex(a => a.IsActive);
-        builder.HasIndex(a => a.CreatedBy);
+        builder.HasIndex(a => a.CreatedByEmployeeId);
         builder.HasIndex(a => a.CreatedAt);
     }
 }

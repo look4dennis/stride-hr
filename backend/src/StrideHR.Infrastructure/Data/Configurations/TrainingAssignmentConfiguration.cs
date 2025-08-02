@@ -39,7 +39,7 @@ public class TrainingAssignmentConfiguration : IEntityTypeConfiguration<Training
             .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasOne(ta => ta.Employee)
-            .WithMany()
+            .WithMany(e => e.TrainingAssignments)
             .HasForeignKey(ta => ta.EmployeeId)
             .OnDelete(DeleteBehavior.Cascade);
 

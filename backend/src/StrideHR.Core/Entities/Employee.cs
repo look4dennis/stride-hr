@@ -54,4 +54,8 @@ public class Employee : BaseEntity
     public virtual ICollection<LeaveApprovalHistory> ApprovalHistory { get; set; } = new List<LeaveApprovalHistory>();
     public virtual ICollection<LeaveApprovalHistory> EscalatedApprovals { get; set; } = new List<LeaveApprovalHistory>();
     public virtual ICollection<LeaveCalendar> LeaveCalendarEntries { get; set; } = new List<LeaveCalendar>();
+    
+    // Training-related Navigation Properties
+    public virtual ICollection<TrainingAssignment> TrainingAssignments { get; set; } = new List<TrainingAssignment>();
+    public virtual ICollection<TrainingProgress> TrainingProgress { get; set; } = new List<TrainingProgress>();
 }

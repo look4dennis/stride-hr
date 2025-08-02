@@ -104,7 +104,7 @@ Fact]
         Assert.Equal(sendEmailDto.Subject, result.Subject);
         Assert.Equal(EmailStatus.Pending, result.Status);
         _mockEmailLogRepository.Verify(r => r.AddAsync(It.IsAny<EmailLog>()), Times.Once);
-        _mockEmailLogRepository.Verify(r => r.SaveChangesAsync(), Times.Once);
+        _mockEmailLogRepository.Verify(r => r.SaveChangesAsync(), Times.Exactly(2)); // Called once after Add and once after Update in SendEmailImmediatelyAsync
     }
    
  [Fact]

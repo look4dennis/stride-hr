@@ -59,7 +59,7 @@ public class TrainingModuleConfiguration : IEntityTypeConfiguration<TrainingModu
         // Relationships
         builder.HasOne(tm => tm.CreatedByEmployee)
             .WithMany()
-            .HasForeignKey(tm => tm.CreatedBy)
+            .HasForeignKey(tm => tm.CreatedByEmployeeId)
             .OnDelete(DeleteBehavior.Restrict);
 
         builder.HasMany(tm => tm.TrainingAssignments)
@@ -88,7 +88,7 @@ public class TrainingModuleConfiguration : IEntityTypeConfiguration<TrainingModu
         builder.HasIndex(tm => tm.Level);
         builder.HasIndex(tm => tm.IsActive);
         builder.HasIndex(tm => tm.IsMandatory);
-        builder.HasIndex(tm => tm.CreatedBy);
+        builder.HasIndex(tm => tm.CreatedByEmployeeId);
         builder.HasIndex(tm => tm.CreatedAt);
     }
 }

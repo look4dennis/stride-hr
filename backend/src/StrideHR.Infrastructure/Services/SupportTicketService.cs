@@ -47,18 +47,6 @@ public class SupportTicketService : ISupportTicketService
         };
 
         await _ticketRepository.AddAsync(ticket);
-
-        // Add status history
-        var statusHistory = new SupportTicketStatusHistory
-        {
-            SupportTicketId = ticket.Id,
-            FromStatus = SupportTicketStatus.Open,
-            ToStatus = SupportTicketStatus.Open,
-            ChangedById = requesterId,
-            ChangedAt = DateTime.UtcNow,
-            Reason = "Ticket created"
-        };
-
         await _unitOfWork.SaveChangesAsync();
 
         // Load the ticket with details for return
@@ -332,7 +320,7 @@ public class SupportTicketService : ISupportTicketService
             Status = ticket.Status,
             StatusName = ticket.Status.ToString(),
             RequesterId = ticket.RequesterId,
-            RequesterName = $"{ticket.Requester?.FirstName} {ticket.Requester?.LastName}".Trim(),
+            RequesterName = ticket.Requester != null ? $"{ticket.Requester.FirstName} {ticket.Requester.LastName}".Trim() : "Unknown",
             RequesterEmail = ticket.Requester?.Email ?? string.Empty,
             AssignedToId = ticket.AssignedToId,
             AssignedToName = ticket.AssignedTo != null ? $"{ticket.AssignedTo.FirstName} {ticket.AssignedTo.LastName}".Trim() : null,

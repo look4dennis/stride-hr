@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using StrideHR.API;
+using StrideHR.Core.Entities;
 using StrideHR.Core.Enums;
 using StrideHR.Core.Models.SupportTicket;
 using System.Net.Http.Json;
@@ -10,6 +11,11 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using StrideHR.Infrastructure.Data;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using System.Security.Claims;
+using System.Text.Encodings.Web;
 
 namespace StrideHR.Tests.Integration;
 
@@ -34,7 +40,7 @@ public class SupportTicketIntegrationTests : IClassFixture<WebApplicationFactory
                 // Add in-memory database for testing
                 services.AddDbContext<StrideHRDbContext>(options =>
                 {
-                    options.UseInMemoryDatabase("TestDatabase");
+                    options.UseInMemoryDatabase($"TestDatabase_{Guid.NewGuid()}");
                 });
 
                 // Replace authorization with a policy that always succeeds for testing
@@ -53,10 +59,112 @@ public class SupportTicketIntegrationTests : IClassFixture<WebApplicationFactory
                         policy.RequireAssertion(_ => true));
                     options.AddPolicy("Permission:SupportTicket.Delete", policy => 
                         policy.RequireAssertion(_ => true));
+                    options.AddPolicy("Permission:SupportTicket.ViewAnalytics", policy => 
+                        policy.RequireAssertion(_ => true));
+                    options.AddPolicy("Permission:SupportTicket.Assign", policy => 
+                        policy.RequireAssertion(_ => true));
+                    options.AddPolicy("Permission:SupportTicket.UpdateStatus", policy => 
+                        policy.RequireAssertion(_ => true));
+                    options.AddPolicy("Permission:SupportTicket.Resolve", policy => 
+                        policy.RequireAssertion(_ => true));
+                    options.AddPolicy("Permission:SupportTicket.Close", policy => 
+                        policy.RequireAssertion(_ => true));
+                    options.AddPolicy("Permission:SupportTicket.Reopen", policy => 
+                        policy.RequireAssertion(_ => true));
+                    options.AddPolicy("Permission:SupportTicket.ViewAssigned", policy => 
+                        policy.RequireAssertion(_ => true));
+                    options.AddPolicy("Permission:SupportTicket.ViewOverdue", policy => 
+                        policy.RequireAssertion(_ => true));
+                    options.AddPolicy("Permission:SupportTicket.Comment", policy => 
+                        policy.RequireAssertion(_ => true));
                 });
+
+                // Add test authentication
+                services.AddAuthentication("Test")
+                    .AddScheme<AuthenticationSchemeOptions, TestAuthenticationHandler>("Test", options => { });
             });
         });
-        _client = _factory.CreateClient();
+        _client = CreateAuthenticatedClient();
+        
+        // Seed test data
+        SeedTestData();
+    }
+
+    private void SeedTestData()
+    {
+        using var scope = _factory.Services.CreateScope();
+        var context = scope.ServiceProvider.GetRequiredService<StrideHRDbContext>();
+        
+        // Ensure database is created
+        context.Database.EnsureCreated();
+        
+        // Add test organization
+        if (!context.Organizations.Any())
+        {
+            var organization = new Organization
+            {
+                Id = 1,
+                Name = "Test Organization",
+                Email = "test@test.com",
+                Phone = "123-456-7890",
+                Address = "Test Address",
+                CreatedAt = DateTime.UtcNow
+            };
+            context.Organizations.Add(organization);
+        }
+
+        // Add test branch
+        if (!context.Branches.Any())
+        {
+            var branch = new Branch
+            {
+                Id = 1,
+                OrganizationId = 1,
+                Name = "Test Branch",
+                Email = "branch@test.com",
+                Phone = "123-456-7890",
+                Address = "Branch Address",
+                City = "Branch City",
+                State = "Branch State",
+                Country = "Branch Country",
+                PostalCode = "12345",
+                TimeZone = "UTC",
+                Currency = "USD",
+                IsActive = true,
+                CreatedAt = DateTime.UtcNow
+            };
+            context.Branches.Add(branch);
+        }
+
+        // Add test employee
+        if (!context.Employees.Any())
+        {
+            var employee = new Employee
+            {
+                Id = 1,
+                BranchId = 1,
+                EmployeeId = "EMP001",
+                FirstName = "Test",
+                LastName = "Employee",
+                Email = "test.employee@test.com",
+                Phone = "123-456-7890",
+                DateOfBirth = new DateTime(1990, 1, 1),
+                Address = "Employee Address",
+                JoiningDate = DateTime.UtcNow.AddYears(-1),
+                Designation = "Test Employee",
+                Department = "IT",
+                Status = EmployeeStatus.Active,
+                CreatedAt = DateTime.UtcNow
+            };
+            context.Employees.Add(employee);
+        }
+
+        context.SaveChanges();
+    }
+
+    private HttpClient CreateAuthenticatedClient()
+    {
+        return _factory.CreateClient();
     }
 
     [Fact]
@@ -71,9 +179,6 @@ public class SupportTicketIntegrationTests : IClassFixture<WebApplicationFactory
             Priority = SupportTicketPriority.Medium,
             RequiresRemoteAccess = false
         };
-
-        // Note: In a real integration test, you would need to authenticate first
-        // This is a simplified example
 
         // Act
         var response = await _client.PostAsJsonAsync("/api/supportticket", createDto);
@@ -115,11 +220,24 @@ public class SupportTicketIntegrationTests : IClassFixture<WebApplicationFactory
         };
 
         var createResponse = await _client.PostAsJsonAsync("/api/supportticket", createDto);
+        
+        // Debug: Check if creation was successful
+        if (!createResponse.IsSuccessStatusCode)
+        {
+            var errorContent = await createResponse.Content.ReadAsStringAsync();
+            throw new Exception($"Ticket creation failed with status {createResponse.StatusCode}: {errorContent}");
+        }
+        
         var createContent = await createResponse.Content.ReadAsStringAsync();
         var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
         var createApiResponse = JsonSerializer.Deserialize<ApiResponse<SupportTicketDto>>(createContent, options);
         
-        var ticketId = createApiResponse!.Data!.Id;
+        if (createApiResponse?.Data == null)
+        {
+            throw new Exception($"Failed to deserialize ticket creation response: {createContent}");
+        }
+        
+        var ticketId = createApiResponse.Data.Id;
 
         // Act
         var response = await _client.GetAsync($"/api/supportticket/{ticketId}");
@@ -179,11 +297,24 @@ public class SupportTicketIntegrationTests : IClassFixture<WebApplicationFactory
         };
 
         var createResponse = await _client.PostAsJsonAsync("/api/supportticket", createDto);
+        
+        // Debug: Check if creation was successful
+        if (!createResponse.IsSuccessStatusCode)
+        {
+            var errorContent = await createResponse.Content.ReadAsStringAsync();
+            throw new Exception($"Ticket creation failed with status {createResponse.StatusCode}: {errorContent}");
+        }
+        
         var createContent = await createResponse.Content.ReadAsStringAsync();
         var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
         var createApiResponse = JsonSerializer.Deserialize<ApiResponse<SupportTicketDto>>(createContent, options);
         
-        var ticketId = createApiResponse!.Data!.Id;
+        if (createApiResponse?.Data == null)
+        {
+            throw new Exception($"Failed to deserialize ticket creation response: {createContent}");
+        }
+        
+        var ticketId = createApiResponse.Data.Id;
 
         var commentDto = new CreateSupportTicketCommentDto
         {
@@ -224,6 +355,31 @@ public class SupportTicketIntegrationTests : IClassFixture<WebApplicationFactory
         Assert.True(apiResponse.Success);
         Assert.NotNull(apiResponse.Data);
         Assert.True(apiResponse.Data.TotalTickets >= 0);
+    }
+}
+
+public class TestAuthenticationHandler : AuthenticationHandler<AuthenticationSchemeOptions>
+{
+    public TestAuthenticationHandler(IOptionsMonitor<AuthenticationSchemeOptions> options,
+        ILoggerFactory logger, UrlEncoder encoder, ISystemClock clock)
+        : base(options, logger, encoder, clock)
+    {
+    }
+
+    protected override Task<AuthenticateResult> HandleAuthenticateAsync()
+    {
+        var claims = new[]
+        {
+            new Claim("EmployeeId", "1"),
+            new Claim(ClaimTypes.Name, "Test Employee"),
+            new Claim(ClaimTypes.Email, "test.employee@test.com")
+        };
+
+        var identity = new ClaimsIdentity(claims, "Test");
+        var principal = new ClaimsPrincipal(identity);
+        var ticket = new AuthenticationTicket(principal, "Test");
+
+        return Task.FromResult(AuthenticateResult.Success(ticket));
     }
 }
 

@@ -25,7 +25,7 @@ public class Assessment : BaseEntity
     
     public bool IsActive { get; set; } = true;
     
-
+    public int CreatedByEmployeeId { get; set; }
     
     // Navigation Properties
     public virtual TrainingModule TrainingModule { get; set; } = null!;

@@ -78,7 +78,7 @@ public class NaturalLanguageProcessingService : INaturalLanguageProcessingServic
             }
         }
 
-        return Math.Min(maxScore + 0.3m, 1.0m); // Add base confidence and cap at 1.0
+        return Math.Min(maxScore + 0.4m, 1.0m); // Add base confidence and cap at 1.0
     }
 
     public async Task<string> GenerateResponseAsync(string intent, Dictionary<string, object>? entities = null, Dictionary<string, object>? context = null)
@@ -121,7 +121,7 @@ public class NaturalLanguageProcessingService : INaturalLanguageProcessingServic
             return true;
 
         // Escalate if message contains escalation keywords
-        var escalationKeywords = new[] { "speak to manager", "human agent", "escalate", "supervisor", "urgent", "emergency" };
+        var escalationKeywords = new[] { "speak to manager", "manager", "human agent", "escalate", "supervisor", "urgent", "emergency" };
         var normalizedMessage = message.ToLowerInvariant();
         
         return escalationKeywords.Any(keyword => normalizedMessage.Contains(keyword));
@@ -159,7 +159,11 @@ public class NaturalLanguageProcessingService : INaturalLanguageProcessingServic
         return new Dictionary<string, List<string>>
         {
             ["greeting"] = new List<string> { @"\b(hi|hello|hey|good morning|good afternoon)\b" },
-            ["leave_request"] = new List<string> { @"\b(leave|vacation|time off|holiday|absent)\b.*\b(request|apply|need)\b" },
+            ["leave_request"] = new List<string> { 
+                @"\b(need|want|apply|request)\b.*\b(leave|vacation|time off|holiday)\b",
+                @"\b(leave|vacation|time off|holiday)\b.*\b(request|apply|need)\b",
+                @"\bi\s+(need|want)\s+to\s+(request|apply)\s+(for\s+)?(leave|vacation)\b"
+            },
             ["leave_balance"] = new List<string> { @"\b(leave|vacation)\b.*\b(balance|remaining|left)\b" },
             ["payroll_inquiry"] = new List<string> { @"\b(salary|payroll|pay|payslip|wages)\b" },
             ["attendance_query"] = new List<string> { @"\b(attendance|check in|check out|working hours)\b" },
@@ -263,6 +267,7 @@ public class NaturalLanguageProcessingService : INaturalLanguageProcessingServic
     {
         var datePatterns = new[]
         {
+            @"\b(\d{4}-\d{1,2}-\d{1,2})\b", // ISO format like 2025-01-15
             @"\b(\d{1,2}[/-]\d{1,2}[/-]\d{2,4})\b",
             @"\b(today|tomorrow|yesterday)\b",
             @"\b(monday|tuesday|wednesday|thursday|friday|saturday|sunday)\b",

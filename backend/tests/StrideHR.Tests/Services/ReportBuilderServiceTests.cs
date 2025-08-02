@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Moq;
 using StrideHR.Core.Entities;
@@ -14,7 +15,7 @@ public class ReportBuilderServiceTests
 {
     private readonly Mock<IReportRepository> _mockReportRepository;
     private readonly Mock<IReportExecutionRepository> _mockExecutionRepository;
-    private readonly Mock<StrideHRDbContext> _mockContext;
+    private readonly StrideHRDbContext _context;
     private readonly Mock<ILogger<ReportBuilderService>> _mockLogger;
     private readonly ReportBuilderService _service;
 
@@ -22,13 +23,19 @@ public class ReportBuilderServiceTests
     {
         _mockReportRepository = new Mock<IReportRepository>();
         _mockExecutionRepository = new Mock<IReportExecutionRepository>();
-        _mockContext = new Mock<StrideHRDbContext>();
+        
+        // Create in-memory database for testing
+        var options = new DbContextOptionsBuilder<StrideHRDbContext>()
+            .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
+            .Options;
+        _context = new StrideHRDbContext(options);
+        
         _mockLogger = new Mock<ILogger<ReportBuilderService>>();
         
         _service = new ReportBuilderService(
             _mockReportRepository.Object,
             _mockExecutionRepository.Object,
-            _mockContext.Object,
+            _context,
             _mockLogger.Object);
     }
 

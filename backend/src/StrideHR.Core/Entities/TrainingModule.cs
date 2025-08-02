@@ -23,7 +23,7 @@ public class TrainingModule : BaseEntity
     
     public bool IsActive { get; set; } = true;
     
-
+    public int CreatedByEmployeeId { get; set; }
     
     // Prerequisites
     public List<int> PrerequisiteModuleIds { get; set; } = new();
