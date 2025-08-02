@@ -533,20 +533,20 @@ public class TrainingService : ITrainingService
 
         switch (question.Type)
         {
-            case QuestionType.MultipleChoice:
-            case QuestionType.TrueFalse:
+            case StrideHR.Core.Enums.QuestionType.MultipleChoice:
+            case StrideHR.Core.Enums.QuestionType.TrueFalse:
                 return answers.Count == 1 && question.CorrectAnswers.Contains(answers[0]);
             
-            case QuestionType.MultipleSelect:
+            case StrideHR.Core.Enums.QuestionType.MultipleSelect:
                 return answers.Count == question.CorrectAnswers.Count && 
                        answers.All(a => question.CorrectAnswers.Contains(a));
             
-            case QuestionType.ShortAnswer:
-            case QuestionType.FillInTheBlank:
+            case StrideHR.Core.Enums.QuestionType.ShortAnswer:
+            case StrideHR.Core.Enums.QuestionType.FillInTheBlank:
                 return question.CorrectAnswers.Any(correct => 
                     string.Equals(correct.Trim(), answers[0]?.Trim(), StringComparison.OrdinalIgnoreCase));
             
-            case QuestionType.Essay:
+            case StrideHR.Core.Enums.QuestionType.Essay:
                 // Essay questions require manual grading
                 return false;
             

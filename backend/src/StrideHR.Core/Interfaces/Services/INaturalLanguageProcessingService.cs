@@ -1,4 +1,5 @@
 using StrideHR.Core.Entities;
+using StrideHR.Core.Enums;
 
 namespace StrideHR.Core.Interfaces.Services;
 
@@ -12,4 +13,9 @@ public interface INaturalLanguageProcessingService
     Task<bool> ShouldEscalateAsync(string message, string intent, decimal confidenceScore);
     Task TrainModelAsync(List<ChatbotLearningData> trainingData);
     Task<bool> IsModelTrainedAsync();
+    
+    // Survey analytics methods
+    Task<SentimentScore> AnalyzeSentimentAsync(string text);
+    Task<List<string>> ExtractKeywordsAsync(string text);
+    Task<List<string>> IdentifyThemesAsync(string text);
 }

@@ -112,6 +112,15 @@ public class StrideHRDbContext : DbContext
     public DbSet<EmailTemplate> EmailTemplates { get; set; }
     public DbSet<EmailLog> EmailLogs { get; set; }
     public DbSet<EmailCampaign> EmailCampaigns { get; set; }
+    
+    // Survey Management DbSets
+    public DbSet<Survey> Surveys { get; set; }
+    public DbSet<SurveyQuestion> SurveyQuestions { get; set; }
+    public DbSet<SurveyQuestionOption> SurveyQuestionOptions { get; set; }
+    public DbSet<SurveyResponse> SurveyResponses { get; set; }
+    public DbSet<SurveyAnswer> SurveyAnswers { get; set; }
+    public DbSet<SurveyDistribution> SurveyDistributions { get; set; }
+    public DbSet<SurveyAnalytics> SurveyAnalytics { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using StrideHR.Core.Enums;
 
 namespace StrideHR.Core.Entities;
 
@@ -26,14 +27,4 @@ public class AssessmentQuestion : BaseEntity
     // Navigation Properties
     public virtual Assessment Assessment { get; set; } = null!;
     public virtual ICollection<AssessmentAnswer> Answers { get; set; } = new List<AssessmentAnswer>();
-}
-
-public enum QuestionType
-{
-    MultipleChoice,
-    MultipleSelect,
-    TrueFalse,
-    ShortAnswer,
-    Essay,
-    FillInTheBlank
 }

@@ -246,7 +246,7 @@ Convert the feature design into a series of prompts for a code-generation LLM th
     - Write unit tests for email services
     - _Requirements: 15.3, 40.4, 40.9_
 
-- [ ] 11. Reporting and Analytics System
+- [x] 11. Reporting and Analytics System
   - [x] 11.1 Report builder and data visualization
 
 
@@ -259,11 +259,6 @@ Convert the feature design into a series of prompts for a code-generation LLM th
 
   - [x] 11.2 AI-powered analytics and insights
 
-
-
-
-
-
     - Implement predictive analytics for workforce planning
     - Create sentiment analysis for employee feedback
     - Add performance forecasting and trend analysis
@@ -272,7 +267,11 @@ Convert the feature design into a series of prompts for a code-generation LLM th
     - _Requirements: 17.1, 17.2, 17.4, 17.7_
 
 - [ ] 12. Survey and Feedback System
-  - [ ] 12.1 Employee survey creation and management
+  - [x] 12.1 Employee survey creation and management
+
+
+
+
     - Create survey builder with multiple question types
     - Implement survey distribution and response collection
     - Add anonymous survey support and privacy controls

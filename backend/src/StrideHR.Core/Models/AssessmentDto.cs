@@ -1,4 +1,5 @@
 using StrideHR.Core.Entities;
+using StrideHR.Core.Enums;
 using System.ComponentModel.DataAnnotations;
 
 namespace StrideHR.Core.Models;

@@ -46,6 +46,15 @@ public interface IUnitOfWork : IDisposable
     IEmailLogRepository EmailLogs { get; }
     IEmailCampaignRepository EmailCampaigns { get; }
     
+    // Survey Management Repositories
+    ISurveyRepository Surveys { get; }
+    ISurveyQuestionRepository SurveyQuestions { get; }
+    IRepository<SurveyQuestionOption> SurveyQuestionOptions { get; }
+    ISurveyResponseRepository SurveyResponses { get; }
+    IRepository<SurveyAnswer> SurveyAnswers { get; }
+    ISurveyDistributionRepository SurveyDistributions { get; }
+    ISurveyAnalyticsRepository SurveyAnalytics { get; }
+    
     Task<int> SaveChangesAsync();
     Task BeginTransactionAsync();
     Task CommitTransactionAsync();

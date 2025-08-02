@@ -388,6 +388,18 @@ public static class ServiceCollectionExtensions
         // Register AI Analytics service
         services.AddScoped<IAIAnalyticsService, AIAnalyticsService>();
         
+        // Register survey management repositories
+        services.AddScoped<ISurveyRepository, SurveyRepository>();
+        services.AddScoped<ISurveyQuestionRepository, SurveyQuestionRepository>();
+        services.AddScoped<ISurveyResponseRepository, SurveyResponseRepository>();
+        services.AddScoped<ISurveyDistributionRepository, SurveyDistributionRepository>();
+        services.AddScoped<ISurveyAnalyticsRepository, SurveyAnalyticsRepository>();
+        
+        // Register survey management services
+        services.AddScoped<ISurveyService, SurveyService>();
+        services.AddScoped<ISurveyResponseService, SurveyResponseService>();
+        services.AddScoped<ISurveyAnalyticsService, SurveyAnalyticsService>();
+        
         // Add SignalR
         services.AddSignalR();
         

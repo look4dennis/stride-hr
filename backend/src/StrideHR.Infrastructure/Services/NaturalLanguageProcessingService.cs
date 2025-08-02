@@ -2,6 +2,7 @@ using System.Text.Json;
 using System.Text.RegularExpressions;
 using StrideHR.Core.Interfaces.Services;
 using StrideHR.Core.Entities;
+using StrideHR.Core.Enums;
 
 namespace StrideHR.Infrastructure.Services;
 
@@ -310,5 +311,83 @@ public class NaturalLanguageProcessingService : INaturalLanguageProcessingServic
         {
             entities["employee_id"] = matches[0].Value;
         }
+    }
+
+    public async Task<SentimentScore> AnalyzeSentimentAsync(string text)
+    {
+        // Placeholder implementation for sentiment analysis
+        // In a real implementation, this would use ML.NET, Azure Cognitive Services, or similar
+        if (string.IsNullOrWhiteSpace(text))
+            return SentimentScore.Neutral;
+
+        var lowerText = text.ToLower();
+        
+        // Simple keyword-based sentiment analysis
+        var positiveWords = new[] { "good", "great", "excellent", "amazing", "love", "like", "happy", "satisfied" };
+        var negativeWords = new[] { "bad", "terrible", "awful", "hate", "dislike", "angry", "disappointed", "frustrated" };
+        
+        var positiveCount = positiveWords.Count(word => lowerText.Contains(word));
+        var negativeCount = negativeWords.Count(word => lowerText.Contains(word));
+        
+        if (positiveCount > negativeCount)
+            return positiveCount > 2 ? SentimentScore.VeryPositive : SentimentScore.Positive;
+        else if (negativeCount > positiveCount)
+            return negativeCount > 2 ? SentimentScore.VeryNegative : SentimentScore.Negative;
+        else
+            return SentimentScore.Neutral;
+    }
+
+    public async Task<List<string>> ExtractKeywordsAsync(string text)
+    {
+        // Placeholder implementation for keyword extraction
+        if (string.IsNullOrWhiteSpace(text))
+            return new List<string>();
+
+        var words = text.ToLower()
+            .Split(new[] { ' ', '\t', '\n', '\r', '.', ',', ';', ':', '!', '?' }, StringSplitOptions.RemoveEmptyEntries)
+            .Where(word => word.Length > 3)
+            .Where(word => !IsStopWord(word))
+            .GroupBy(word => word)
+            .OrderByDescending(group => group.Count())
+            .Take(10)
+            .Select(group => group.Key)
+            .ToList();
+
+        return words;
+    }
+
+    public async Task<List<string>> IdentifyThemesAsync(string text)
+    {
+        // Placeholder implementation for theme identification
+        var keywords = await ExtractKeywordsAsync(text);
+        
+        // Group related keywords into themes (simplified approach)
+        var themes = new List<string>();
+        
+        if (keywords.Any(k => new[] { "work", "job", "career", "position" }.Contains(k)))
+            themes.Add("Work Environment");
+            
+        if (keywords.Any(k => new[] { "team", "colleague", "manager", "supervisor" }.Contains(k)))
+            themes.Add("Team Dynamics");
+            
+        if (keywords.Any(k => new[] { "salary", "pay", "compensation", "benefits" }.Contains(k)))
+            themes.Add("Compensation");
+            
+        if (keywords.Any(k => new[] { "training", "development", "learning", "growth" }.Contains(k)))
+            themes.Add("Professional Development");
+            
+        return themes.Any() ? themes : keywords.Take(3).ToList();
+    }
+
+    private static bool IsStopWord(string word)
+    {
+        var stopWords = new HashSet<string> 
+        { 
+            "the", "and", "or", "but", "in", "on", "at", "to", "for", "of", "with", "by",
+            "is", "are", "was", "were", "be", "been", "have", "has", "had", "do", "does", "did",
+            "will", "would", "could", "should", "may", "might", "can", "this", "that", "these", "those"
+        };
+        
+        return stopWords.Contains(word);
     }
 }

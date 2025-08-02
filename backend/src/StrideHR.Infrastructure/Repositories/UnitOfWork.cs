@@ -53,6 +53,15 @@ public class UnitOfWork : IUnitOfWork
     private IEmailTemplateRepository? _emailTemplates;
     private IEmailLogRepository? _emailLogs;
     private IEmailCampaignRepository? _emailCampaigns;
+    
+    // Survey Management Repositories
+    private ISurveyRepository? _surveys;
+    private ISurveyQuestionRepository? _surveyQuestions;
+    private IRepository<SurveyQuestionOption>? _surveyQuestionOptions;
+    private ISurveyResponseRepository? _surveyResponses;
+    private IRepository<SurveyAnswer>? _surveyAnswers;
+    private ISurveyDistributionRepository? _surveyDistributions;
+    private ISurveyAnalyticsRepository? _surveyAnalytics;
 
     public UnitOfWork(StrideHRDbContext context)
     {
@@ -163,6 +172,28 @@ public class UnitOfWork : IUnitOfWork
 
     public IEmailCampaignRepository EmailCampaigns =>
         _emailCampaigns ??= new EmailCampaignRepository(_context);
+
+    // Survey Management Repository Properties
+    public ISurveyRepository Surveys =>
+        _surveys ??= new SurveyRepository(_context);
+
+    public ISurveyQuestionRepository SurveyQuestions =>
+        _surveyQuestions ??= new SurveyQuestionRepository(_context);
+
+    public IRepository<SurveyQuestionOption> SurveyQuestionOptions =>
+        _surveyQuestionOptions ??= new Repository<SurveyQuestionOption>(_context);
+
+    public ISurveyResponseRepository SurveyResponses =>
+        _surveyResponses ??= new SurveyResponseRepository(_context);
+
+    public IRepository<SurveyAnswer> SurveyAnswers =>
+        _surveyAnswers ??= new Repository<SurveyAnswer>(_context);
+
+    public ISurveyDistributionRepository SurveyDistributions =>
+        _surveyDistributions ??= new SurveyDistributionRepository(_context);
+
+    public ISurveyAnalyticsRepository SurveyAnalytics =>
+        _surveyAnalytics ??= new SurveyAnalyticsRepository(_context);
 
     public async Task<int> SaveChangesAsync()
     {
