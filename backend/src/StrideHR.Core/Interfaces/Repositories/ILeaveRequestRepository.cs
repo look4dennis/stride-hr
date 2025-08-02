@@ -13,4 +13,5 @@ public interface ILeaveRequestRepository : IRepository<LeaveRequest>
     Task<IEnumerable<LeaveRequest>> GetTeamRequestsAsync(int managerId, DateTime startDate, DateTime endDate);
     Task<LeaveRequest?> GetWithDetailsAsync(int id);
     Task<bool> HasOverlappingRequestsAsync(int employeeId, DateTime startDate, DateTime endDate, int? excludeRequestId = null);
+    Task<IEnumerable<LeaveRequest>> GetApprovedRequestsByEmployeeAndPolicyAsync(int employeeId, int leavePolicyId, int year);
 }

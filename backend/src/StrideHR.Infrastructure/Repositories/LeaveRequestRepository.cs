@@ -126,4 +126,18 @@ public class LeaveRequestRepository : Repository<LeaveRequest>, ILeaveRequestRep
 
         return await query.AnyAsync();
     }
+
+    public async Task<IEnumerable<LeaveRequest>> GetApprovedRequestsByEmployeeAndPolicyAsync(int employeeId, int leavePolicyId, int year)
+    {
+        return await _dbSet
+            .Include(lr => lr.Employee)
+            .Include(lr => lr.LeavePolicy)
+            .Where(lr => lr.EmployeeId == employeeId &&
+                        lr.LeavePolicyId == leavePolicyId &&
+                        lr.StartDate.Year == year &&
+                        lr.Status == LeaveStatus.Approved &&
+                        !lr.IsDeleted)
+            .OrderBy(lr => lr.StartDate)
+            .ToListAsync();
+    }
 }

@@ -28,6 +28,9 @@ public interface IUnitOfWork : IDisposable
     ILeavePolicyRepository LeavePolicies { get; }
     ILeaveApprovalHistoryRepository LeaveApprovalHistory { get; }
     ILeaveCalendarRepository LeaveCalendar { get; }
+    ILeaveAccrualRepository LeaveAccruals { get; }
+    ILeaveEncashmentRepository LeaveEncashments { get; }
+    ILeaveAccrualRuleRepository LeaveAccrualRules { get; }
     
     Task<int> SaveChangesAsync();
     Task BeginTransactionAsync();

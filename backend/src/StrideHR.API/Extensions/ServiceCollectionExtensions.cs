@@ -256,6 +256,9 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ILeavePolicyRepository, LeavePolicyRepository>();
         services.AddScoped<ILeaveApprovalHistoryRepository, LeaveApprovalHistoryRepository>();
         services.AddScoped<ILeaveCalendarRepository, LeaveCalendarRepository>();
+        services.AddScoped<ILeaveAccrualRepository, LeaveAccrualRepository>();
+        services.AddScoped<ILeaveEncashmentRepository, LeaveEncashmentRepository>();
+        services.AddScoped<ILeaveAccrualRuleRepository, LeaveAccrualRuleRepository>();
 
         // Register services
         services.AddScoped<IAuthenticationService, AuthenticationService>();

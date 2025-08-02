@@ -36,6 +36,9 @@ public class UnitOfWork : IUnitOfWork
     private ILeavePolicyRepository? _leavePolicies;
     private ILeaveApprovalHistoryRepository? _leaveApprovalHistory;
     private ILeaveCalendarRepository? _leaveCalendar;
+    private ILeaveAccrualRepository? _leaveAccruals;
+    private ILeaveEncashmentRepository? _leaveEncashments;
+    private ILeaveAccrualRuleRepository? _leaveAccrualRules;
 
     public UnitOfWork(StrideHRDbContext context)
     {
@@ -105,6 +108,15 @@ public class UnitOfWork : IUnitOfWork
 
     public ILeaveCalendarRepository LeaveCalendar =>
         _leaveCalendar ??= new LeaveCalendarRepository(_context);
+
+    public ILeaveAccrualRepository LeaveAccruals =>
+        _leaveAccruals ??= new LeaveAccrualRepository(_context);
+
+    public ILeaveEncashmentRepository LeaveEncashments =>
+        _leaveEncashments ??= new LeaveEncashmentRepository(_context);
+
+    public ILeaveAccrualRuleRepository LeaveAccrualRules =>
+        _leaveAccrualRules ??= new LeaveAccrualRuleRepository(_context);
 
     public async Task<int> SaveChangesAsync()
     {

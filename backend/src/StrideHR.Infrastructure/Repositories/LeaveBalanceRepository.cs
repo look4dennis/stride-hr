@@ -21,6 +21,16 @@ public class LeaveBalanceRepository : Repository<LeaveBalance>, ILeaveBalanceRep
             .ToListAsync();
     }
 
+    public async Task<IEnumerable<LeaveBalance>> GetByEmployeeAndYearAsync(int employeeId, int year)
+    {
+        return await _dbSet
+            .Include(lb => lb.Employee)
+            .Include(lb => lb.LeavePolicy)
+            .Where(lb => lb.EmployeeId == employeeId && lb.Year == year && !lb.IsDeleted)
+            .OrderBy(lb => lb.LeavePolicy.LeaveType)
+            .ToListAsync();
+    }
+
     public async Task<LeaveBalance?> GetByEmployeeAndPolicyAsync(int employeeId, int leavePolicyId, int year)
     {
         return await _dbSet

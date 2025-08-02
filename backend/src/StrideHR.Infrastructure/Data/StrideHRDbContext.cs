@@ -55,6 +55,9 @@ public class StrideHRDbContext : DbContext
     public DbSet<LeaveRequest> LeaveRequests { get; set; }
     public DbSet<LeaveApprovalHistory> LeaveApprovalHistories { get; set; }
     public DbSet<LeaveCalendar> LeaveCalendars { get; set; }
+    public DbSet<LeaveAccrual> LeaveAccruals { get; set; }
+    public DbSet<LeaveEncashment> LeaveEncashments { get; set; }
+    public DbSet<LeaveAccrualRule> LeaveAccrualRules { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
