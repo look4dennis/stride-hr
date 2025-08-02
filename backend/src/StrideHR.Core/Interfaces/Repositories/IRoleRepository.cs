@@ -22,4 +22,8 @@ public interface IPermissionRepository : IRepository<Permission>
     Task<List<Permission>> GetByModuleAsync(string module);
     Task<List<Permission>> GetByIdsAsync(List<int> ids);
     Task<bool> ExistsAsync(string name);
+    Task<List<Permission>> GetActivePermissionsAsync();
+    Task<List<Permission>> GetPermissionsByRoleIdAsync(int roleId);
+    Task<bool> HasPermissionAsync(int roleId, string permissionName);
+    Task<List<Permission>> SearchPermissionsAsync(string searchTerm);
 }

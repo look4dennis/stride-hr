@@ -256,6 +256,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IRoleRepository, RoleRepository>();
+        services.AddScoped<IPermissionRepository, PermissionRepository>();
         services.AddScoped<IAuditLogRepository, AuditLogRepository>();
         
         // Register project management repositories
@@ -345,6 +346,13 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IAssetAssignmentService, AssetAssignmentService>();
         services.AddScoped<IAssetMaintenanceService, AssetMaintenanceService>();
         services.AddScoped<IAssetHandoverService, AssetHandoverService>();
+        
+        // Register support ticket repositories
+        services.AddScoped<ISupportTicketRepository, SupportTicketRepository>();
+        services.AddScoped<ISupportTicketCommentRepository, SupportTicketCommentRepository>();
+        
+        // Register support ticket services
+        services.AddScoped<ISupportTicketService, SupportTicketService>();
         
         // Register employee repository (generic)
         services.AddScoped<IRepository<Employee>, Repository<Employee>>();

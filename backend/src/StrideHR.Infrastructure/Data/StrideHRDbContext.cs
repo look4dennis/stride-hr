@@ -83,6 +83,11 @@ public class StrideHRDbContext : DbContext
     public DbSet<AssetAssignment> AssetAssignments { get; set; }
     public DbSet<AssetMaintenance> AssetMaintenances { get; set; }
     public DbSet<AssetHandover> AssetHandovers { get; set; }
+    
+    // Support Ticket DbSets
+    public DbSet<SupportTicket> SupportTickets { get; set; }
+    public DbSet<SupportTicketComment> SupportTicketComments { get; set; }
+    public DbSet<SupportTicketStatusHistory> SupportTicketStatusHistories { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

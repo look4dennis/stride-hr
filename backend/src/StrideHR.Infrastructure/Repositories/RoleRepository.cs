@@ -170,4 +170,46 @@ public class PermissionRepository : Repository<Permission>, IPermissionRepositor
         return await _context.Permissions
             .AnyAsync(p => p.Name.ToLower() == name.ToLower() && !p.IsDeleted);
     }
+
+    public async Task<List<Permission>> GetActivePermissionsAsync()
+    {
+        return await _context.Permissions
+            .Where(p => p.IsActive && !p.IsDeleted)
+            .OrderBy(p => p.Module)
+            .ThenBy(p => p.Name)
+            .ToListAsync();
+    }
+
+    public async Task<List<Permission>> GetPermissionsByRoleIdAsync(int roleId)
+    {
+        return await _context.RolePermissions
+            .Where(rp => rp.RoleId == roleId && rp.IsGranted && !rp.IsDeleted)
+            .Include(rp => rp.Permission)
+            .Select(rp => rp.Permission)
+            .Where(p => p.IsActive && !p.IsDeleted)
+            .ToListAsync();
+    }
+
+    public async Task<bool> HasPermissionAsync(int roleId, string permissionName)
+    {
+        return await _context.RolePermissions
+            .AnyAsync(rp => rp.RoleId == roleId && 
+                           rp.Permission.Name == permissionName && 
+                           rp.IsGranted && 
+                           rp.Permission.IsActive &&
+                           !rp.IsDeleted &&
+                           !rp.Permission.IsDeleted);
+    }
+
+    public async Task<List<Permission>> SearchPermissionsAsync(string searchTerm)
+    {
+        return await _context.Permissions
+            .Where(p => p.IsActive && !p.IsDeleted &&
+                       (p.Name.Contains(searchTerm) || 
+                        p.Description.Contains(searchTerm) || 
+                        p.Module.Contains(searchTerm)))
+            .OrderBy(p => p.Module)
+            .ThenBy(p => p.Name)
+            .ToListAsync();
+    }
 }
