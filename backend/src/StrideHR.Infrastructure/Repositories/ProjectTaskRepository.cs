@@ -40,6 +40,28 @@ public class ProjectTaskRepository : Repository<ProjectTask>, IProjectTaskReposi
             .ToListAsync();
     }
 
+    public async Task<IEnumerable<ProjectTask>> GetTasksByEmployeeAsync(int employeeId, int? projectId)
+    {
+        var query = _dbSet
+            .Where(t => (t.AssignedToEmployeeId == employeeId || 
+                        t.TaskAssignments.Any(ta => ta.EmployeeId == employeeId && ta.CompletedDate == null)) && 
+                        !t.IsDeleted);
+
+        if (projectId.HasValue)
+        {
+            query = query.Where(t => t.ProjectId == projectId.Value);
+        }
+
+        return await query
+            .Include(t => t.Project)
+            .Include(t => t.AssignedToEmployee)
+            .Include(t => t.TaskAssignments)
+                .ThenInclude(ta => ta.Employee)
+            .OrderBy(t => t.DueDate)
+            .ThenByDescending(t => t.Priority)
+            .ToListAsync();
+    }
+
     public async Task<IEnumerable<ProjectTask>> GetTasksByStatusAsync(ProjectTaskStatus status)
     {
         return await _dbSet

@@ -229,6 +229,7 @@ public static class ServiceCollectionExtensions
         
         // Register project management services
         services.AddScoped<IProjectService, ProjectService>();
+        services.AddScoped<IDSRService, DSRService>();
 
         // Register authorization handlers
         services.AddScoped<IAuthorizationHandler, PermissionAuthorizationHandler>();

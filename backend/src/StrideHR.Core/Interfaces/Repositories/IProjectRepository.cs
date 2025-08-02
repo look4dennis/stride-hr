@@ -12,4 +12,6 @@ public interface IProjectRepository : IRepository<Project>
     Task<IEnumerable<Project>> GetProjectsByDateRangeAsync(DateTime startDate, DateTime endDate);
     Task<bool> IsEmployeeAssignedToProjectAsync(int projectId, int employeeId);
     Task<IEnumerable<Project>> GetProjectsByTeamLeadAsync(int teamLeadId);
+    Task<IEnumerable<Project>> GetProjectsByTeamLeaderAsync(int teamLeaderId);
+    Task<int> GetProjectTeamMembersCountAsync(int projectId);
 }

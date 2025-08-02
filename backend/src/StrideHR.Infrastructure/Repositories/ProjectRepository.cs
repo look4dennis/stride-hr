@@ -95,4 +95,15 @@ public class ProjectRepository : Repository<Project>, IProjectRepository
             .OrderByDescending(p => p.CreatedAt)
             .ToListAsync();
     }
+
+    public async Task<IEnumerable<Project>> GetProjectsByTeamLeaderAsync(int teamLeaderId)
+    {
+        return await GetProjectsByTeamLeadAsync(teamLeaderId);
+    }
+
+    public async Task<int> GetProjectTeamMembersCountAsync(int projectId)
+    {
+        return await _context.Set<ProjectAssignment>()
+            .CountAsync(pa => pa.ProjectId == projectId && pa.UnassignedDate == null && !pa.IsDeleted);
+    }
 }
