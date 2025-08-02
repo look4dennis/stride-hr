@@ -14,4 +14,6 @@ public interface IProjectRepository : IRepository<Project>
     Task<IEnumerable<Project>> GetProjectsByTeamLeadAsync(int teamLeadId);
     Task<IEnumerable<Project>> GetProjectsByTeamLeaderAsync(int teamLeaderId);
     Task<int> GetProjectTeamMembersCountAsync(int projectId);
+    Task<IEnumerable<Project>> GetActiveProjectsAsync();
+    Task<Employee?> GetEmployeeAsync(int employeeId);
 }

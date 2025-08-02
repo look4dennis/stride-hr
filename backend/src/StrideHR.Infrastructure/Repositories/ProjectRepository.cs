@@ -106,4 +106,24 @@ public class ProjectRepository : Repository<Project>, IProjectRepository
         return await _context.Set<ProjectAssignment>()
             .CountAsync(pa => pa.ProjectId == projectId && pa.UnassignedDate == null && !pa.IsDeleted);
     }
+
+    public async Task<IEnumerable<Project>> GetActiveProjectsAsync()
+    {
+        return await _dbSet
+            .Where(p => p.Status == ProjectStatus.Active && !p.IsDeleted)
+            .Include(p => p.CreatedByEmployee)
+            .Include(p => p.Branch)
+            .Include(p => p.ProjectAssignments)
+                .ThenInclude(pa => pa.Employee)
+            .Include(p => p.Tasks)
+            .OrderByDescending(p => p.CreatedAt)
+            .ToListAsync();
+    }
+
+    public async Task<Employee?> GetEmployeeAsync(int employeeId)
+    {
+        return await _context.Set<Employee>()
+            .Where(e => e.Id == employeeId && !e.IsDeleted)
+            .FirstOrDefaultAsync();
+    }
 }

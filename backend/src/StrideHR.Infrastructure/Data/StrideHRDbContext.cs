@@ -36,6 +36,7 @@ public class StrideHRDbContext : DbContext
     public DbSet<ProjectAssignment> ProjectAssignments { get; set; }
     public DbSet<TaskAssignment> TaskAssignments { get; set; }
     public DbSet<DSR> DSRs { get; set; }
+    public DbSet<ProjectAlert> ProjectAlerts { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

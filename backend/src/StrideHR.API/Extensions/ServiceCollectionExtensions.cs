@@ -212,6 +212,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IProjectAssignmentRepository, ProjectAssignmentRepository>();
         services.AddScoped<ITaskAssignmentRepository, TaskAssignmentRepository>();
         services.AddScoped<IDSRRepository, DSRRepository>();
+        services.AddScoped<IProjectAlertRepository, ProjectAlertRepository>();
 
         // Register services
         services.AddScoped<IAuthenticationService, AuthenticationService>();
@@ -230,6 +231,7 @@ public static class ServiceCollectionExtensions
         // Register project management services
         services.AddScoped<IProjectService, ProjectService>();
         services.AddScoped<IDSRService, DSRService>();
+        services.AddScoped<IProjectMonitoringService, ProjectMonitoringService>();
 
         // Register authorization handlers
         services.AddScoped<IAuthorizationHandler, PermissionAuthorizationHandler>();

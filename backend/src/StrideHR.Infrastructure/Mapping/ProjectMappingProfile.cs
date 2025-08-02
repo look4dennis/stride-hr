@@ -76,5 +76,22 @@ public class ProjectMappingProfile : Profile
         CreateMap<DSR, DailyHoursDto>()
             .ForMember(dest => dest.TaskTitle, opt => opt.MapFrom(src => 
                 src.Task != null ? src.Task.Title : string.Empty));
+
+        // Project Alert mappings
+        CreateMap<ProjectAlert, ProjectAlertDto>()
+            .ForMember(dest => dest.AlertType, opt => opt.MapFrom(src => src.AlertType.ToString()))
+            .ForMember(dest => dest.Severity, opt => opt.MapFrom(src => src.Severity.ToString()));
+
+        CreateMap<ProjectAlertDto, ProjectAlert>()
+            .ForMember(dest => dest.Id, opt => opt.Ignore())
+            .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
+            .ForMember(dest => dest.UpdatedAt, opt => opt.Ignore())
+            .ForMember(dest => dest.CreatedBy, opt => opt.Ignore())
+            .ForMember(dest => dest.UpdatedBy, opt => opt.Ignore())
+            .ForMember(dest => dest.IsDeleted, opt => opt.Ignore())
+            .ForMember(dest => dest.DeletedAt, opt => opt.Ignore())
+            .ForMember(dest => dest.DeletedBy, opt => opt.Ignore())
+            .ForMember(dest => dest.Project, opt => opt.Ignore())
+            .ForMember(dest => dest.ResolvedByEmployee, opt => opt.Ignore());
     }
 }
