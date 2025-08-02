@@ -62,7 +62,7 @@ public class PayrollController : BaseController
 
     [HttpPost("create")]
     [RequirePermission("payroll.create")]
-    public async Task<ActionResult<ApiResponse<PayrollRecord>>> CreatePayrollRecord(
+    public async Task<IActionResult> CreatePayrollRecord(
         [FromBody] PayrollCalculationRequest request)
     {
         try
@@ -78,7 +78,7 @@ public class PayrollController : BaseController
 
     [HttpPost("process-branch")]
     [RequirePermission("payroll.process")]
-    public async Task<ActionResult<ApiResponse<List<PayrollCalculationResult>>>> ProcessBranchPayroll(
+    public async Task<IActionResult> ProcessBranchPayroll(
         [FromQuery] int branchId, [FromQuery] int year, [FromQuery] int month)
     {
         try
@@ -94,7 +94,7 @@ public class PayrollController : BaseController
 
     [HttpPost("{payrollRecordId}/approve")]
     [RequirePermission("payroll.approve")]
-    public async Task<ActionResult<ApiResponse<bool>>> ApprovePayrollRecord(int payrollRecordId)
+    public async Task<IActionResult> ApprovePayrollRecord(int payrollRecordId)
     {
         try
         {
@@ -113,7 +113,7 @@ public class PayrollController : BaseController
 
     [HttpGet("templates")]
     [RequirePermission("payroll.templates.view")]
-    public async Task<ActionResult<ApiResponse<List<PayslipTemplateDto>>>> GetTemplates([FromQuery] int? branchId = null)
+    public async Task<IActionResult> GetTemplates([FromQuery] int? branchId = null)
     {
         try
         {
@@ -132,7 +132,7 @@ public class PayrollController : BaseController
 
     [HttpGet("templates/{templateId}")]
     [RequirePermission("payroll.templates.view")]
-    public async Task<ActionResult<ApiResponse<PayslipTemplateDto>>> GetTemplate(int templateId)
+    public async Task<IActionResult> GetTemplate(int templateId)
     {
         try
         {
@@ -150,7 +150,7 @@ public class PayrollController : BaseController
 
     [HttpPost("templates")]
     [RequirePermission("payroll.templates.create")]
-    public async Task<ActionResult<ApiResponse<PayslipTemplateDto>>> CreateTemplate(
+    public async Task<IActionResult> CreateTemplate(
         [FromBody] PayslipTemplateDto templateDto)
     {
         try
@@ -167,7 +167,7 @@ public class PayrollController : BaseController
 
     [HttpPut("templates/{templateId}")]
     [RequirePermission("payroll.templates.update")]
-    public async Task<ActionResult<ApiResponse<PayslipTemplateDto>>> UpdateTemplate(
+    public async Task<IActionResult> UpdateTemplate(
         int templateId, [FromBody] PayslipTemplateDto templateDto)
     {
         try
@@ -184,7 +184,7 @@ public class PayrollController : BaseController
 
     [HttpPost("templates/{templateId}/set-default")]
     [RequirePermission("payroll.templates.manage")]
-    public async Task<ActionResult<ApiResponse<bool>>> SetTemplateAsDefault(
+    public async Task<IActionResult> SetTemplateAsDefault(
         int templateId, [FromQuery] int? branchId = null)
     {
         try
@@ -201,7 +201,7 @@ public class PayrollController : BaseController
 
     [HttpDelete("templates/{templateId}")]
     [RequirePermission("payroll.templates.delete")]
-    public async Task<ActionResult<ApiResponse<bool>>> DeactivateTemplate(int templateId)
+    public async Task<IActionResult> DeactivateTemplate(int templateId)
     {
         try
         {
@@ -220,7 +220,7 @@ public class PayrollController : BaseController
 
     [HttpPost("payslips/generate")]
     [RequirePermission("payroll.payslips.generate")]
-    public async Task<ActionResult<ApiResponse<PayslipGenerationDto>>> GeneratePayslip(
+    public async Task<IActionResult> GeneratePayslip(
         [FromBody] CreatePayslipGenerationRequest request)
     {
         try
@@ -236,7 +236,7 @@ public class PayrollController : BaseController
 
     [HttpPost("payslips/generate-bulk")]
     [RequirePermission("payroll.payslips.generate")]
-    public async Task<ActionResult<ApiResponse<List<PayslipGenerationDto>>>> GenerateBulkPayslips(
+    public async Task<IActionResult> GenerateBulkPayslips(
         [FromBody] BulkPayslipGenerationRequest request)
     {
         try
@@ -252,7 +252,7 @@ public class PayrollController : BaseController
 
     [HttpGet("payslips/{payslipGenerationId}")]
     [RequirePermission("payroll.payslips.view")]
-    public async Task<ActionResult<ApiResponse<PayslipGenerationDto>>> GetPayslipGeneration(int payslipGenerationId)
+    public async Task<IActionResult> GetPayslipGeneration(int payslipGenerationId)
     {
         try
         {
@@ -270,7 +270,7 @@ public class PayrollController : BaseController
 
     [HttpGet("payslips/pending-approvals")]
     [RequirePermission("payroll.payslips.approve")]
-    public async Task<ActionResult<ApiResponse<List<PayslipGenerationDto>>>> GetPendingApprovals(
+    public async Task<IActionResult> GetPendingApprovals(
         [FromQuery] PayslipApprovalLevel approvalLevel)
     {
         try
@@ -286,7 +286,7 @@ public class PayrollController : BaseController
 
     [HttpPost("payslips/approve")]
     [RequirePermission("payroll.payslips.approve")]
-    public async Task<ActionResult<ApiResponse<bool>>> ProcessPayslipApproval(
+    public async Task<IActionResult> ProcessPayslipApproval(
         [FromBody] PayslipApprovalRequest request)
     {
         try
@@ -302,7 +302,7 @@ public class PayrollController : BaseController
 
     [HttpPost("payslips/release")]
     [RequirePermission("payroll.payslips.release")]
-    public async Task<ActionResult<ApiResponse<bool>>> ReleasePayslips(
+    public async Task<IActionResult> ReleasePayslips(
         [FromBody] PayslipReleaseRequest request)
     {
         try
@@ -318,7 +318,7 @@ public class PayrollController : BaseController
 
     [HttpGet("payslips/summary")]
     [RequirePermission("payroll.payslips.view")]
-    public async Task<ActionResult<ApiResponse<PayslipApprovalSummary>>> GetApprovalSummary(
+    public async Task<IActionResult> GetApprovalSummary(
         [FromQuery] int branchId, [FromQuery] int year, [FromQuery] int month)
     {
         try
@@ -334,7 +334,7 @@ public class PayrollController : BaseController
 
     [HttpGet("payslips/employee/{employeeId}")]
     [RequirePermission("payroll.payslips.view")]
-    public async Task<ActionResult<ApiResponse<List<PayslipGenerationDto>>>> GetEmployeePayslips(
+    public async Task<IActionResult> GetEmployeePayslips(
         int employeeId, [FromQuery] int year, [FromQuery] int? month = null)
     {
         try
@@ -350,7 +350,7 @@ public class PayrollController : BaseController
 
     [HttpPost("payslips/{payslipGenerationId}/regenerate")]
     [RequirePermission("payroll.payslips.regenerate")]
-    public async Task<ActionResult<ApiResponse<PayslipGenerationDto>>> RegeneratePayslip(
+    public async Task<IActionResult> RegeneratePayslip(
         int payslipGenerationId, [FromBody] RegeneratePayslipRequest request)
     {
         try
@@ -367,7 +367,7 @@ public class PayrollController : BaseController
 
     [HttpGet("payslips/{payslipGenerationId}/download")]
     [RequirePermission("payroll.payslips.download")]
-    public async Task<ActionResult> DownloadPayslip(int payslipGenerationId)
+    public async Task<IActionResult> DownloadPayslip(int payslipGenerationId)
     {
         try
         {

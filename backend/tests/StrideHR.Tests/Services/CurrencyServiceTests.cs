@@ -284,6 +284,6 @@ public class CurrencyServiceTests
         var result = await _currencyService.IsCurrencySupportedAsync(inputCurrency);
 
         // Assert
-        Assert.True(result);
+        Assert.True(result, $"Currency {inputCurrency} should be supported (normalized to {expectedCurrency})");
     }
 }

@@ -98,14 +98,14 @@ public class PayslipGenerationServiceTests
         _mockPayslipDesignerService.Setup(x => x.GeneratePdfPayslipAsync(template, payrollData))
             .ReturnsAsync((pdfContent, fileName));
 
-        _mockFileStorageService.Setup(x => x.SaveFileAsync(pdfContent, fileName, "payslips", "2024/12"))
+        _mockFileStorageService.Setup(x => x.SaveFileAsync(pdfContent, fileName, "payslips/2024/12"))
             .ReturnsAsync("/payslips/2024/12/payslip_john_doe_202412.pdf");
 
         _mockPayslipGenerationRepository.Setup(x => x.AddAsync(It.IsAny<PayslipGeneration>()))
-            .Returns(Task.CompletedTask);
+            .Returns(Task.FromResult(new PayslipGeneration()));
 
         _mockPayslipGenerationRepository.Setup(x => x.SaveChangesAsync())
-            .Returns(Task.CompletedTask);
+            .Returns(Task.FromResult(true));
 
         _mockPayslipGenerationRepository.Setup(x => x.GetByIdAsync(It.IsAny<int>()))
             .ReturnsAsync(new PayslipGeneration
@@ -118,7 +118,7 @@ public class PayslipGenerationServiceTests
                 GeneratedBy = 1,
                 Version = 1,
                 PayrollRecord = payrollRecord,
-                GeneratedByEmployee = new Employee { FullName = "Admin User" }
+                GeneratedByEmployee = new Employee { FirstName = "Admin", LastName = "User" }
             });
 
         // Act
@@ -207,7 +207,7 @@ public class PayslipGenerationServiceTests
             .Returns(Task.CompletedTask);
 
         _mockPayslipGenerationRepository.Setup(x => x.SaveChangesAsync())
-            .Returns(Task.CompletedTask);
+            .Returns(Task.FromResult(true));
 
         // Act
         var result = await _service.ProcessApprovalAsync(request, 1);
@@ -253,7 +253,7 @@ public class PayslipGenerationServiceTests
             .Returns(Task.CompletedTask);
 
         _mockPayslipGenerationRepository.Setup(x => x.SaveChangesAsync())
-            .Returns(Task.CompletedTask);
+            .Returns(Task.FromResult(true));
 
         // Act
         var result = await _service.ProcessApprovalAsync(request, 1);
@@ -292,7 +292,7 @@ public class PayslipGenerationServiceTests
             .Returns(Task.CompletedTask);
 
         _mockPayslipGenerationRepository.Setup(x => x.SaveChangesAsync())
-            .Returns(Task.CompletedTask);
+            .Returns(Task.FromResult(true));
 
         // Act
         var result = await _service.ProcessApprovalAsync(request, 1);
@@ -339,7 +339,7 @@ public class PayslipGenerationServiceTests
             .Returns(Task.CompletedTask);
 
         _mockPayslipGenerationRepository.Setup(x => x.SaveChangesAsync())
-            .Returns(Task.CompletedTask);
+            .Returns(Task.FromResult(true));
 
         // Act
         var result = await _service.ReleasePayslipsAsync(request, 1);
@@ -450,7 +450,7 @@ public class PayslipGenerationServiceTests
         _mockPayslipDesignerService.Setup(x => x.GeneratePdfPayslipAsync(template, payrollData))
             .ReturnsAsync((new byte[] { 1, 2, 3 }, "test.pdf"));
 
-        _mockFileStorageService.Setup(x => x.SaveFileAsync(It.IsAny<byte[]>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+        _mockFileStorageService.Setup(x => x.SaveFileAsync(It.IsAny<byte[]>(), It.IsAny<string>(), It.IsAny<string>()))
             .ReturnsAsync("/path/to/file.pdf");
 
         var newPayslip = new PayslipGeneration
@@ -460,18 +460,20 @@ public class PayslipGenerationServiceTests
             Version = 2,
             RegenerationReason = "Correction needed",
             PayrollRecord = payrollRecord,
-            GeneratedByEmployee = new Employee { FullName = "Admin" }
+            GeneratedByEmployee = new Employee { FirstName = "Admin", LastName = "User" }
         };
 
-        _mockPayslipGenerationRepository.SetupSequence(x => x.GetByIdAsync(It.IsAny<int>()))
-            .ReturnsAsync(existingPayslip) // First call for existing payslip
+        _mockPayslipGenerationRepository.Setup(x => x.GetByIdAsync(1))
+            .ReturnsAsync(existingPayslip); // First call for existing payslip
+        
+        _mockPayslipGenerationRepository.Setup(x => x.GetByIdAsync(2))
             .ReturnsAsync(newPayslip); // Second call for new payslip
 
         _mockPayslipGenerationRepository.Setup(x => x.AddAsync(It.IsAny<PayslipGeneration>()))
-            .Returns(Task.CompletedTask);
+            .Returns(Task.FromResult(new PayslipGeneration { Id = 2 }));
 
         _mockPayslipGenerationRepository.Setup(x => x.SaveChangesAsync())
-            .Returns(Task.CompletedTask);
+            .Returns(Task.FromResult(true));
 
         // Act
         var result = await _service.RegeneratePayslipAsync(1, "Correction needed", 1);

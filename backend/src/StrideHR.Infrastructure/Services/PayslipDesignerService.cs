@@ -24,7 +24,7 @@ public class PayslipDesignerService : IPayslipDesignerService
             
             // For now, we'll create a simple PDF representation
             // In a real implementation, you would use a library like iTextSharp, PuppeteerSharp, or similar
-            var fileName = $"Payslip_{payrollData.EmployeeName.Replace(" ", "_")}_{DateTime.Now:yyyyMM}.pdf";
+            var fileName = $"Payslip_{payrollData.EmployeeName.Replace(" ", "_")}_{payrollData.PayrollYear:D4}{payrollData.PayrollMonth:D2}.pdf";
             
             // Convert HTML to PDF (simplified implementation)
             var pdfContent = await ConvertHtmlToPdfAsync(htmlContent);
@@ -165,7 +165,7 @@ public class PayslipDesignerService : IPayslipDesignerService
             errors.Add("Template must include a summary section");
         
         // Validate section orders
-        var orders = templateConfig.Sections.Select(s => s.Order).ToList();
+        var orders = templateConfig.Sections?.Select(s => s.Order).ToList() ?? new List<int>();
         if (orders.Count != orders.Distinct().Count())
             errors.Add("Section orders must be unique");
         

@@ -56,10 +56,10 @@ public class PayslipTemplateServiceTests
             .ReturnsAsync((PayslipTemplate?)null);
 
         _mockRepository.Setup(x => x.AddAsync(It.IsAny<PayslipTemplate>()))
-            .Returns(Task.CompletedTask);
+            .Returns(Task.FromResult(new PayslipTemplate()));
 
         _mockRepository.Setup(x => x.SaveChangesAsync())
-            .Returns(Task.CompletedTask);
+            .Returns(Task.FromResult(true));
 
         var createdTemplate = new PayslipTemplate
         {
@@ -67,7 +67,12 @@ public class PayslipTemplateServiceTests
             Name = "Test Template",
             OrganizationId = 1,
             CreatedAt = DateTime.UtcNow,
-            CreatedByEmployee = new Employee { FullName = "Test User" }
+            CreatedByEmployee = new Employee { FirstName = "Test", LastName = "User" },
+            TemplateConfig = """{"Sections":[{"Id":"header","Name":"Header","Type":"header","Order":1}]}""",
+            VisibleFields = """["field1","field2"]""",
+            FieldLabels = """{"field1":"Field 1","field2":"Field 2"}""",
+            ShowOrganizationLogo = true,
+            HeaderText = "Test Header"
         };
 
         _mockRepository.Setup(x => x.GetByIdAsync(It.IsAny<int>()))
@@ -220,7 +225,7 @@ public class PayslipTemplateServiceTests
             Name = "Original Template",
             OrganizationId = 1,
             CreatedAt = DateTime.UtcNow.AddDays(-1),
-            CreatedByEmployee = new Employee { FullName = "Creator" }
+            CreatedByEmployee = new Employee { FirstName = "Creator", LastName = "User" }
         };
 
         _mockRepository.Setup(x => x.GetByIdAsync(templateId))
@@ -233,7 +238,7 @@ public class PayslipTemplateServiceTests
             .Returns(Task.CompletedTask);
 
         _mockRepository.Setup(x => x.SaveChangesAsync())
-            .Returns(Task.CompletedTask);
+            .Returns(Task.FromResult(true));
 
         // Act
         var result = await _service.UpdateTemplateAsync(templateId, templateDto, 1);
@@ -295,7 +300,12 @@ public class PayslipTemplateServiceTests
             OrganizationId = organizationId,
             BranchId = branchId,
             IsDefault = true,
-            CreatedByEmployee = new Employee { FullName = "Creator" }
+            CreatedByEmployee = new Employee { FirstName = "Creator", LastName = "User" },
+            TemplateConfig = """{"Sections":[{"Id":"header","Name":"Header","Type":"header","Order":1}]}""",
+            VisibleFields = """["field1","field2"]""",
+            FieldLabels = """{"field1":"Field 1","field2":"Field 2"}""",
+            ShowOrganizationLogo = true,
+            HeaderText = "Branch Header"
         };
 
         _mockRepository.Setup(x => x.GetDefaultTemplateAsync(organizationId, branchId))
@@ -348,7 +358,7 @@ public class PayslipTemplateServiceTests
             .Returns(Task.CompletedTask);
 
         _mockRepository.Setup(x => x.SaveChangesAsync())
-            .Returns(Task.CompletedTask);
+            .Returns(Task.FromResult(true));
 
         // Act
         var result = await _service.DeactivateTemplateAsync(templateId);
