@@ -363,6 +363,18 @@ public static class ServiceCollectionExtensions
         services.AddScoped<INotificationService, NotificationService>();
         services.AddScoped<IRealTimeNotificationService, StrideHR.API.Services.SignalRNotificationService>();
         
+        // Register chatbot repositories
+        services.AddScoped<IChatbotConversationRepository, ChatbotConversationRepository>();
+        services.AddScoped<IChatbotMessageRepository, ChatbotMessageRepository>();
+        services.AddScoped<IChatbotKnowledgeBaseRepository, ChatbotKnowledgeBaseRepository>();
+        services.AddScoped<IChatbotLearningDataRepository, ChatbotLearningDataRepository>();
+        
+        // Register chatbot services
+        services.AddScoped<IChatbotService, ChatbotService>();
+        services.AddScoped<INaturalLanguageProcessingService, NaturalLanguageProcessingService>();
+        services.AddScoped<IChatbotKnowledgeBaseService, ChatbotKnowledgeBaseService>();
+        services.AddScoped<IChatbotLearningService, ChatbotLearningService>();
+        
         // Add SignalR
         services.AddSignalR();
         
