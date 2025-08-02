@@ -27,7 +27,7 @@ public class EmailLogDto
     public int RetryCount { get; set; }
     public DateTime? NextRetryAt { get; set; }
     public Dictionary<string, object>? Metadata { get; set; }
-    public string? CampaignId { get; set; }
+    public int? CampaignId { get; set; }
     public DateTime CreatedAt { get; set; }
     public string? TemplateName { get; set; }
     public string? UserName { get; set; }
@@ -47,7 +47,7 @@ public class SendEmailDto
     public int? BranchId { get; set; }
     public EmailPriority Priority { get; set; } = EmailPriority.Normal;
     public Dictionary<string, object>? Metadata { get; set; }
-    public string? CampaignId { get; set; }
+    public int? CampaignId { get; set; }
     public DateTime? ScheduledAt { get; set; }
 }
 
@@ -59,7 +59,7 @@ public class BulkEmailDto
     public string? TextBody { get; set; }
     public EmailPriority Priority { get; set; } = EmailPriority.Normal;
     public Dictionary<string, object>? Metadata { get; set; }
-    public string? CampaignId { get; set; }
+    public int? CampaignId { get; set; }
     public DateTime? ScheduledAt { get; set; }
     public int? BranchId { get; set; }
 }
@@ -81,7 +81,7 @@ public class SendTemplateEmailDto
     public int? BranchId { get; set; }
     public Dictionary<string, object> Parameters { get; set; } = new();
     public EmailPriority Priority { get; set; } = EmailPriority.Normal;
-    public string? CampaignId { get; set; }
+    public int? CampaignId { get; set; }
     public DateTime? ScheduledAt { get; set; }
 }
 
@@ -91,7 +91,7 @@ public class BulkTemplateEmailDto
     public List<EmailRecipientDto> Recipients { get; set; } = new();
     public Dictionary<string, object> GlobalParameters { get; set; } = new();
     public EmailPriority Priority { get; set; } = EmailPriority.Normal;
-    public string? CampaignId { get; set; }
+    public int? CampaignId { get; set; }
     public DateTime? ScheduledAt { get; set; }
     public int? BranchId { get; set; }
 }
@@ -104,7 +104,7 @@ public class EmailLogFilterDto
     public EmailStatus? Status { get; set; }
     public DateTime? FromDate { get; set; }
     public DateTime? ToDate { get; set; }
-    public string? CampaignId { get; set; }
+    public int? CampaignId { get; set; }
     public EmailPriority? Priority { get; set; }
     public string? SearchTerm { get; set; }
     public int Page { get; set; } = 1;

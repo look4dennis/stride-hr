@@ -76,7 +76,7 @@ public class EmailCampaignConfiguration : IEntityTypeConfiguration<EmailCampaign
         builder.HasMany(e => e.EmailLogs)
             .WithOne()
             .HasForeignKey(l => l.CampaignId)
-            .HasPrincipalKey(e => e.Id.ToString())
+            .HasPrincipalKey(e => e.Id)
             .OnDelete(DeleteBehavior.SetNull);
     }
 }

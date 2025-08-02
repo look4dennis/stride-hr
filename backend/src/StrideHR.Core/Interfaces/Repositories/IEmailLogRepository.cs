@@ -9,7 +9,7 @@ public interface IEmailLogRepository : IRepository<EmailLog>
     Task<List<EmailLog>> GetByUserIdAsync(int userId);
     Task<List<EmailLog>> GetByBranchIdAsync(int branchId);
     Task<List<EmailLog>> GetByTemplateIdAsync(int templateId);
-    Task<List<EmailLog>> GetByCampaignIdAsync(string campaignId);
+    Task<List<EmailLog>> GetByCampaignIdAsync(int? campaignId);
     Task<List<EmailLog>> GetByStatusAsync(EmailStatus status);
     Task<List<EmailLog>> GetPendingEmailsAsync(int limit = 100);
     Task<List<EmailLog>> GetFailedEmailsAsync(int maxRetries = 3);

@@ -51,7 +51,7 @@ public class EmailLogRepository : Repository<EmailLog>, IEmailLogRepository
             .ToListAsync();
     }
 
-    public async Task<List<EmailLog>> GetByCampaignIdAsync(string campaignId)
+    public async Task<List<EmailLog>> GetByCampaignIdAsync(int? campaignId)
     {
         return await _context.EmailLogs
             .Include(l => l.EmailTemplate)

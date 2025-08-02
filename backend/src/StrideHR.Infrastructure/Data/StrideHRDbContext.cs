@@ -98,6 +98,13 @@ public class StrideHRDbContext : DbContext
     public DbSet<ChatbotConversation> ChatbotConversations { get; set; }
     public DbSet<ChatbotMessage> ChatbotMessages { get; set; }
     public DbSet<ChatbotKnowledgeBase> ChatbotKnowledgeBases { get; set; }
+    
+    // Report Management DbSets
+    public DbSet<Report> Reports { get; set; }
+    public DbSet<ReportExecution> ReportExecutions { get; set; }
+    public DbSet<ReportSchedule> ReportSchedules { get; set; }
+    public DbSet<ReportShare> ReportShares { get; set; }
+    public DbSet<ReportTemplate> ReportTemplates { get; set; }
     public DbSet<ChatbotKnowledgeBaseFeedback> ChatbotKnowledgeBaseFeedbacks { get; set; }
     public DbSet<ChatbotLearningData> ChatbotLearningData { get; set; }
     

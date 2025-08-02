@@ -9,6 +9,7 @@ public interface IEmailService
     // Basic email operations
     Task<EmailLogDto> SendEmailAsync(SendEmailDto dto);
     Task<List<EmailLogDto>> SendBulkEmailAsync(BulkEmailDto dto);
+    Task<EmailLogDto> SendEmailWithAttachmentAsync(List<string> recipients, string subject, string body, byte[] attachmentData, string attachmentFileName, string attachmentMimeType);
     Task<EmailLogDto?> GetEmailLogAsync(int id);
     Task<List<EmailLogDto>> GetEmailLogsAsync(EmailLogFilterDto filter);
     

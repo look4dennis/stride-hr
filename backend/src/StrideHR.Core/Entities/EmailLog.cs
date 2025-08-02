@@ -26,7 +26,7 @@ public class EmailLog : BaseEntity
     public int RetryCount { get; set; } = 0;
     public DateTime? NextRetryAt { get; set; }
     public Dictionary<string, object>? Metadata { get; set; }
-    public string? CampaignId { get; set; }
+    public int? CampaignId { get; set; }
     
     // Navigation Properties
     public virtual EmailTemplate? EmailTemplate { get; set; }

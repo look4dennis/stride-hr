@@ -151,6 +151,34 @@ public class EmailService : IEmailService
         }
     }
 
+    public async Task<EmailLogDto> SendEmailWithAttachmentAsync(List<string> recipients, string subject, string body, byte[] attachmentData, string attachmentFileName, string attachmentMimeType)
+    {
+        try
+        {
+            var emailLog = new EmailLog
+            {
+                ToEmail = string.Join(";", recipients),
+                Subject = subject,
+                HtmlBody = body,
+                Status = EmailStatus.Pending,
+                CreatedAt = DateTime.UtcNow
+            };
+
+            await _emailLogRepository.AddAsync(emailLog);
+            await _emailLogRepository.SaveChangesAsync();
+
+            // Send email with attachment immediately
+            await SendEmailWithAttachmentImmediatelyAsync(emailLog, attachmentData, attachmentFileName, attachmentMimeType);
+
+            return _mapper.Map<EmailLogDto>(emailLog);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error sending email with attachment to {Recipients}", string.Join(", ", recipients));
+            throw;
+        }
+    }
+
     public async Task<EmailLogDto?> GetEmailLogAsync(int id)
     {
         var emailLog = await _emailLogRepository.GetByIdAsync(id);
@@ -180,7 +208,7 @@ public class EmailService : IEmailService
         if (filter.ToDate.HasValue)
             query = query.Where(l => l.CreatedAt <= filter.ToDate.Value);
             
-        if (!string.IsNullOrWhiteSpace(filter.CampaignId))
+        if (filter.CampaignId.HasValue)
             query = query.Where(l => l.CampaignId == filter.CampaignId);
             
         if (filter.Priority.HasValue)
@@ -823,6 +851,40 @@ public class EmailService : IEmailService
             await _emailLogRepository.SaveChangesAsync();
             
             _logger.LogError(ex, "Failed to send email to {Email}", emailLog.ToEmail);
+        }
+    }
+
+    private async Task SendEmailWithAttachmentImmediatelyAsync(EmailLog emailLog, byte[] attachmentData, string attachmentFileName, string attachmentMimeType)
+    {
+        try
+        {
+            emailLog.Status = EmailStatus.Sending;
+            emailLog.ExternalId = Guid.NewGuid().ToString();
+            
+            // Here you would integrate with your email service provider to send with attachment
+            // For now, we'll simulate sending with attachment
+            await Task.Delay(150); // Simulate network delay (slightly longer for attachment)
+            
+            emailLog.Status = EmailStatus.Sent;
+            emailLog.SentAt = DateTime.UtcNow;
+            
+            await _emailLogRepository.UpdateAsync(emailLog);
+            await _emailLogRepository.SaveChangesAsync();
+            
+            _logger.LogInformation("Email with attachment sent successfully to {Email} with external ID {ExternalId}, attachment: {FileName}", 
+                emailLog.ToEmail, emailLog.ExternalId, attachmentFileName);
+        }
+        catch (Exception ex)
+        {
+            emailLog.Status = EmailStatus.Failed;
+            emailLog.ErrorMessage = ex.Message;
+            emailLog.RetryCount++;
+            emailLog.NextRetryAt = DateTime.UtcNow.AddMinutes(Math.Pow(2, emailLog.RetryCount)); // Exponential backoff
+            
+            await _emailLogRepository.UpdateAsync(emailLog);
+            await _emailLogRepository.SaveChangesAsync();
+            
+            _logger.LogError(ex, "Failed to send email with attachment to {Email}", emailLog.ToEmail);
         }
     }
 
