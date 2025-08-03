@@ -1,5 +1,7 @@
 using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi.Any;
 using Swashbuckle.AspNetCore.SwaggerGen;
+using System.Text.Json;
 
 namespace StrideHR.API.Filters;
 
@@ -9,7 +11,8 @@ public class SwaggerDefaultValues : IOperationFilter
     {
         var apiDescription = context.ApiDescription;
 
-        operation.Deprecated |= apiDescription.IsDeprecated();
+        // Check if the API is deprecated (simplified approach)
+        operation.Deprecated |= apiDescription.CustomAttributes().OfType<ObsoleteAttribute>().Any();
 
         foreach (var responseType in context.ApiDescription.SupportedResponseTypes)
         {
@@ -36,8 +39,8 @@ public class SwaggerDefaultValues : IOperationFilter
 
             if (parameter.Schema.Default == null && description.DefaultValue != null)
             {
-                parameter.Schema.Default = Microsoft.OpenApi.Any.OpenApiAnyFactory.CreateFromJson(
-                    System.Text.Json.JsonSerializer.Serialize(description.DefaultValue));
+                var jsonString = JsonSerializer.Serialize(description.DefaultValue);
+                parameter.Schema.Default = new OpenApiString(jsonString);
             }
 
             parameter.Required |= description.IsRequired;

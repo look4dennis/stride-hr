@@ -11,7 +11,7 @@ public class ExternalIntegration : BaseEntity
     public string Configuration { get; set; } = string.Empty; // JSON configuration
     public bool IsActive { get; set; }
     public DateTime? LastSyncAt { get; set; }
-    public int CreatedBy { get; set; }
+    public new int CreatedBy { get; set; }
     
     // Navigation properties
     public virtual Organization Organization { get; set; } = null!;

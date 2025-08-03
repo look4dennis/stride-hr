@@ -1,4 +1,5 @@
 using StrideHR.Core.Models.Calendar;
+using StrideHR.Core.Entities;
 
 namespace StrideHR.Core.Interfaces.Services;
 

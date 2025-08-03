@@ -1,4 +1,4 @@
-using StrideHR.Core.Enums;
+using StrideHR.Core.Models.Calendar;
 
 namespace StrideHR.Core.Entities;
 

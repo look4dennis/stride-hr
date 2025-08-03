@@ -1,10 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using StrideHR.API.Controllers;
-using StrideHR.Core.Entities;
 using StrideHR.Core.Interfaces.Services;
 using StrideHR.Core.Models.Webhooks;
 using Xunit;
+using EntityWebhookSubscription = StrideHR.Core.Entities.WebhookSubscription;
+using EntityWebhookDelivery = StrideHR.Core.Entities.WebhookDelivery;
 
 namespace StrideHR.Tests.Controllers;
 
@@ -38,7 +39,7 @@ public class WebhookControllerTests
             Name = dto.Name,
             Url = dto.Url,
             Secret = dto.Secret,
-            Events = "[\"employee.created\"]",
+            Events = dto.Events,
             IsActive = dto.IsActive,
             CreatedAt = DateTime.UtcNow
         };
@@ -93,7 +94,7 @@ public class WebhookControllerTests
             Name = "Test Webhook",
             Url = "https://example.com/webhook",
             Secret = "secret123",
-            Events = "[\"employee.created\"]",
+            Events = new List<string> { "employee.created" },
             IsActive = true,
             CreatedAt = DateTime.UtcNow
         };
@@ -142,7 +143,7 @@ public class WebhookControllerTests
                 Name = "Test Webhook 1",
                 Url = "https://example.com/webhook1",
                 Secret = "secret123",
-                Events = "[\"employee.created\"]",
+                Events = new List<string> { "employee.created" },
                 IsActive = true,
                 CreatedAt = DateTime.UtcNow
             },
@@ -153,7 +154,7 @@ public class WebhookControllerTests
                 Name = "Test Webhook 2",
                 Url = "https://example.com/webhook2",
                 Secret = "secret456",
-                Events = "[\"employee.updated\"]",
+                Events = new List<string> { "employee.updated" },
                 IsActive = true,
                 CreatedAt = DateTime.UtcNow
             }
@@ -189,7 +190,7 @@ public class WebhookControllerTests
             Name = dto.Name,
             Url = "https://example.com/webhook",
             Secret = "secret123",
-            Events = "[\"employee.created\"]",
+            Events = new List<string> { "employee.created" },
             IsActive = dto.IsActive.Value,
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow
@@ -274,7 +275,7 @@ public class WebhookControllerTests
             Id = 1,
             EventType = eventType,
             Payload = "{\"employeeId\":1,\"name\":\"John Doe\"}",
-            Status = Core.Enums.WebhookDeliveryStatus.Delivered,
+            Status = WebhookDeliveryStatus.Delivered,
             CreatedAt = DateTime.UtcNow,
             DeliveredAt = DateTime.UtcNow
         };

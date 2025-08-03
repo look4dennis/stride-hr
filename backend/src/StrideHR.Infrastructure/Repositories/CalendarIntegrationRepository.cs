@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using StrideHR.Core.Entities;
-using StrideHR.Core.Enums;
+using StrideHR.Core.Models.Calendar;
 using StrideHR.Core.Interfaces.Repositories;
 using StrideHR.Infrastructure.Data;
 

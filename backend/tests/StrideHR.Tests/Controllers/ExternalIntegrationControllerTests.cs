@@ -1,8 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using StrideHR.API.Controllers;
-using StrideHR.Core.Entities;
-using StrideHR.Core.Enums;
 using StrideHR.Core.Interfaces.Services;
 using StrideHR.Core.Models.Integrations;
 using Xunit;
@@ -407,8 +405,7 @@ public class ExternalIntegrationControllerTests
             SystemType = "ADP",
             Configuration = "{\"apiUrl\":\"https://new-api.example.com\",\"apiKey\":\"new_key\"}",
             IsActive = true,
-            CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow
+            CreatedAt = DateTime.UtcNow
         };
 
         _mockIntegrationService.Setup(s => s.UpdateIntegrationConfigAsync(integrationId, config))

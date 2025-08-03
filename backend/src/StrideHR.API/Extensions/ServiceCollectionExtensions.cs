@@ -597,8 +597,8 @@ For API support, contact: support@stridehr.com
             // Add examples for common request/response models
             c.SchemaFilter<SwaggerSchemaExampleFilter>();
 
-            // Enable annotations
-            c.EnableAnnotations();
+            // Note: EnableAnnotations() is not available in this version of Swashbuckle
+            // Annotations can be enabled through other means if needed
 
             // Add servers information
             c.AddServer(new OpenApiServer

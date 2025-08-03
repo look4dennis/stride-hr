@@ -10,7 +10,7 @@ public class WebhookSubscription : BaseEntity
     public string Secret { get; set; } = string.Empty;
     public string Events { get; set; } = string.Empty; // JSON array of event types
     public bool IsActive { get; set; }
-    public int CreatedBy { get; set; }
+    public new int CreatedBy { get; set; }
     
     // Navigation properties
     public virtual Organization Organization { get; set; } = null!;

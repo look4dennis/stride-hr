@@ -1,5 +1,5 @@
 using StrideHR.Core.Entities;
-using StrideHR.Core.Enums;
+using StrideHR.Core.Models.Calendar;
 
 namespace StrideHR.Core.Interfaces.Repositories;
 

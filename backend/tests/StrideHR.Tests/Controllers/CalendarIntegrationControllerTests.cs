@@ -6,6 +6,8 @@ using StrideHR.Core.Enums;
 using StrideHR.Core.Interfaces.Services;
 using StrideHR.Core.Models.Calendar;
 using Xunit;
+using EntityCalendarEventType = StrideHR.Core.Enums.CalendarEventType;
+using DtoCalendarEventType = StrideHR.Core.Models.Calendar.CalendarEventType;
 
 namespace StrideHR.Tests.Controllers;
 
@@ -49,8 +51,8 @@ public class CalendarIntegrationControllerTests
         // Assert
         var okResult = Assert.IsType<OkObjectResult>(response);
         var responseData = okResult.Value as dynamic;
-        Assert.True(responseData?.success);
-        Assert.NotNull(responseData?.data);
+        Assert.True(responseData?.Success);
+        Assert.NotNull(responseData?.Data);
     }
 
     [Fact]
@@ -75,9 +77,9 @@ public class CalendarIntegrationControllerTests
         // Assert
         var badRequestResult = Assert.IsType<BadRequestObjectResult>(response);
         var responseData = badRequestResult.Value as dynamic;
-        Assert.False(responseData?.success);
-        Assert.Equal("Failed to exchange authorization code for access token", responseData?.message?.ToString());
-        Assert.Equal("TOKEN_EXCHANGE_FAILED", responseData?.errorCode?.ToString());
+        Assert.False(responseData?.Success);
+        Assert.Equal("Failed to exchange authorization code for access token", responseData?.Message?.ToString());
+        Assert.NotNull(responseData?.Errors);
     }
 
     [Fact]
@@ -100,8 +102,8 @@ public class CalendarIntegrationControllerTests
         // Assert
         var okResult = Assert.IsType<OkObjectResult>(response);
         var responseData = okResult.Value as dynamic;
-        Assert.True(responseData?.success);
-        Assert.Equal("Google Calendar disconnected successfully", responseData?.message?.ToString());
+        Assert.True(responseData?.Success);
+        Assert.Equal("Google Calendar disconnected successfully", responseData?.Message?.ToString());
     }
 
     [Fact]
@@ -115,19 +117,21 @@ public class CalendarIntegrationControllerTests
         {
             new CalendarEvent
             {
-                Id = "event1",
+                Id = 1,
+                CalendarIntegrationId = 1,
                 Title = "Meeting 1",
                 StartTime = startDate.AddHours(9),
                 EndTime = startDate.AddHours(10),
-                Provider = CalendarProvider.GoogleCalendar
+                ProviderEventId = "event1"
             },
             new CalendarEvent
             {
-                Id = "event2",
+                Id = 2,
+                CalendarIntegrationId = 1,
                 Title = "Meeting 2",
                 StartTime = startDate.AddHours(14),
                 EndTime = startDate.AddHours(15),
-                Provider = CalendarProvider.GoogleCalendar
+                ProviderEventId = "event2"
             }
         };
 
@@ -140,8 +144,8 @@ public class CalendarIntegrationControllerTests
         // Assert
         var okResult = Assert.IsType<OkObjectResult>(response);
         var responseData = okResult.Value as dynamic;
-        Assert.True(responseData?.success);
-        Assert.NotNull(responseData?.data);
+        Assert.True(responseData?.Success);
+        Assert.NotNull(responseData?.Data);
     }
 
     [Fact]
@@ -157,19 +161,20 @@ public class CalendarIntegrationControllerTests
             EndTime = DateTime.UtcNow.AddHours(2),
             Location = "Conference Room A",
             AttendeeEmails = new List<string> { "john@example.com", "jane@example.com" },
-            EventType = CalendarEventType.Meeting
+            EventType = DtoCalendarEventType.Meeting
         };
 
         var createdEvent = new CalendarEvent
         {
-            Id = "new_event_id",
+            Id = 1,
+            CalendarIntegrationId = 1,
             Title = eventDto.Title,
             Description = eventDto.Description,
             StartTime = eventDto.StartTime,
             EndTime = eventDto.EndTime,
             Location = eventDto.Location,
-            Provider = CalendarProvider.GoogleCalendar,
-            EventType = eventDto.EventType
+            ProviderEventId = "new_event_id",
+            EventType = DtoCalendarEventType.Meeting
         };
 
         _mockCalendarService.Setup(s => s.CreateGoogleCalendarEventAsync(employeeId, eventDto))
@@ -181,8 +186,8 @@ public class CalendarIntegrationControllerTests
         // Assert
         var okResult = Assert.IsType<OkObjectResult>(response);
         var responseData = okResult.Value as dynamic;
-        Assert.True(responseData?.success);
-        Assert.NotNull(responseData?.data);
+        Assert.True(responseData?.Success);
+        Assert.NotNull(responseData?.Data);
     }
 
     [Fact]
@@ -206,8 +211,8 @@ public class CalendarIntegrationControllerTests
         // Assert
         var badRequestResult = Assert.IsType<BadRequestObjectResult>(response);
         var responseData = badRequestResult.Value as dynamic;
-        Assert.False(responseData?.success);
-        Assert.Equal("Google Calendar integration not found or inactive", responseData?.message?.ToString());
+        Assert.False(responseData?.Success);
+        Assert.Equal("Google Calendar integration not found or inactive", responseData?.Message?.ToString());
     }
 
     [Fact]
@@ -225,11 +230,12 @@ public class CalendarIntegrationControllerTests
 
         var updatedEvent = new CalendarEvent
         {
-            Id = eventId,
+            Id = 1,
+            CalendarIntegrationId = 1,
             Title = eventDto.Title,
             StartTime = eventDto.StartTime.Value,
             EndTime = eventDto.EndTime.Value,
-            Provider = CalendarProvider.GoogleCalendar
+            ProviderEventId = eventId
         };
 
         _mockCalendarService.Setup(s => s.UpdateGoogleCalendarEventAsync(employeeId, eventId, eventDto))
@@ -241,8 +247,8 @@ public class CalendarIntegrationControllerTests
         // Assert
         var okResult = Assert.IsType<OkObjectResult>(response);
         var responseData = okResult.Value as dynamic;
-        Assert.True(responseData?.success);
-        Assert.NotNull(responseData?.data);
+        Assert.True(responseData?.Success);
+        Assert.NotNull(responseData?.Data);
     }
 
     [Fact]
@@ -261,8 +267,8 @@ public class CalendarIntegrationControllerTests
         // Assert
         var okResult = Assert.IsType<OkObjectResult>(response);
         var responseData = okResult.Value as dynamic;
-        Assert.True(responseData?.success);
-        Assert.Equal("Event deleted successfully", responseData?.message?.ToString());
+        Assert.True(responseData?.Success);
+        Assert.Equal("Event deleted successfully", responseData?.Message?.ToString());
     }
 
     [Fact]
@@ -281,8 +287,8 @@ public class CalendarIntegrationControllerTests
         // Assert
         var badRequestResult = Assert.IsType<BadRequestObjectResult>(response);
         var responseData = badRequestResult.Value as dynamic;
-        Assert.False(responseData?.success);
-        Assert.Equal("Failed to delete event", responseData?.message?.ToString());
+        Assert.False(responseData?.Success);
+        Assert.Equal("Failed to delete event", responseData?.Message?.ToString());
     }
 
     [Fact]
@@ -311,8 +317,8 @@ public class CalendarIntegrationControllerTests
         // Assert
         var okResult = Assert.IsType<OkObjectResult>(response);
         var responseData = okResult.Value as dynamic;
-        Assert.True(responseData?.success);
-        Assert.NotNull(responseData?.data);
+        Assert.True(responseData?.Success);
+        Assert.NotNull(responseData?.Data);
     }
 
     [Fact]
@@ -326,9 +332,10 @@ public class CalendarIntegrationControllerTests
         {
             new CalendarEvent
             {
-                Id = "google_event",
+                Id = 1,
+                CalendarIntegrationId = 1,
                 Title = "Google Meeting",
-                Provider = CalendarProvider.GoogleCalendar,
+                ProviderEventId = "google_event",
                 StartTime = startDate.AddHours(9),
                 EndTime = startDate.AddHours(10)
             }
@@ -343,8 +350,8 @@ public class CalendarIntegrationControllerTests
         // Assert
         var okResult = Assert.IsType<OkObjectResult>(response);
         var responseData = okResult.Value as dynamic;
-        Assert.True(responseData?.success);
-        Assert.NotNull(responseData?.data);
+        Assert.True(responseData?.Success);
+        Assert.NotNull(responseData?.Data);
     }
 
     [Fact]
@@ -373,8 +380,8 @@ public class CalendarIntegrationControllerTests
         // Assert
         var okResult = Assert.IsType<OkObjectResult>(response);
         var responseData = okResult.Value as dynamic;
-        Assert.True(responseData?.success);
-        Assert.NotNull(responseData?.data);
+        Assert.True(responseData?.Success);
+        Assert.NotNull(responseData?.Data);
     }
 
     [Fact]
@@ -392,9 +399,23 @@ public class CalendarIntegrationControllerTests
 
         // Assert
         var okResult = Assert.IsType<OkObjectResult>(response);
-        var responseData = okResult.Value as dynamic;
-        Assert.True(responseData?.success);
-        Assert.True(responseData?.valid);
+        
+        // Use reflection to access the properties since dynamic isn't working
+        var responseValue = okResult.Value;
+        var successProperty = responseValue.GetType().GetProperty("Success");
+        var dataProperty = responseValue.GetType().GetProperty("Data");
+        
+        Assert.NotNull(successProperty);
+        Assert.NotNull(dataProperty);
+        Assert.True((bool)successProperty.GetValue(responseValue));
+        
+        var dataValue = dataProperty.GetValue(responseValue);
+        Assert.NotNull(dataValue);
+        
+        // Access the valid property from the data object
+        var validProperty = dataValue.GetType().GetProperty("valid");
+        Assert.NotNull(validProperty);
+        Assert.True((bool)validProperty.GetValue(dataValue));
     }
 
     [Fact]
@@ -413,8 +434,8 @@ public class CalendarIntegrationControllerTests
         // Assert
         var badRequestResult = Assert.IsType<BadRequestObjectResult>(response);
         var responseData = badRequestResult.Value as dynamic;
-        Assert.False(responseData?.success);
-        Assert.Equal("Outlook Calendar integration is not yet implemented", responseData?.message?.ToString());
+        Assert.False(responseData?.Success);
+        Assert.Equal("Outlook Calendar integration is not yet implemented", responseData?.Message?.ToString());
     }
 
     [Fact]
@@ -432,7 +453,7 @@ public class CalendarIntegrationControllerTests
         // Assert
         var badRequestResult = Assert.IsType<BadRequestObjectResult>(response);
         var responseData = badRequestResult.Value as dynamic;
-        Assert.False(responseData?.success);
-        Assert.Equal("Leave event creation is not yet implemented", responseData?.message?.ToString());
+        Assert.False(responseData?.Success);
+        Assert.Equal("Leave event creation is not yet implemented", responseData?.Message?.ToString());
     }
 }

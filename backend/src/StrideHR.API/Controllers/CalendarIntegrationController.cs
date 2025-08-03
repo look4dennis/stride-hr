@@ -35,13 +35,13 @@ public class CalendarIntegrationController : BaseController
         {
             var result = await _calendarService.ConnectGoogleCalendarAsync(employeeId, authorizationCode);
             if (result.Success)
-                return Ok(new { success = true, data = result });
+                return Success(result, "Google Calendar connected successfully");
             else
-                return BadRequest(new { success = false, message = result.Message, errorCode = result.ErrorCode });
+                return Error(result.Message, result.ErrorCode != null ? new List<string> { result.ErrorCode } : null);
         }
         catch (Exception ex)
         {
-            return BadRequest(new { success = false, message = ex.Message });
+            return Error(ex.Message);
         }
     }
 
@@ -58,13 +58,13 @@ public class CalendarIntegrationController : BaseController
         {
             var result = await _calendarService.DisconnectGoogleCalendarAsync(employeeId);
             if (result.Success)
-                return Ok(new { success = true, message = result.Message });
+                return Success(result.Message);
             else
-                return BadRequest(new { success = false, message = result.Message, errorCode = result.ErrorCode });
+                return Error(result.Message, result.ErrorCode != null ? new List<string> { result.ErrorCode } : null);
         }
         catch (Exception ex)
         {
-            return BadRequest(new { success = false, message = ex.Message });
+            return Error(ex.Message);
         }
     }
 
@@ -82,11 +82,11 @@ public class CalendarIntegrationController : BaseController
         try
         {
             var events = await _calendarService.GetGoogleCalendarEventsAsync(employeeId, startDate, endDate);
-            return Ok(new { success = true, data = events });
+            return Success(events, "Google Calendar events retrieved successfully");
         }
         catch (Exception ex)
         {
-            return BadRequest(new { success = false, message = ex.Message });
+            return Error(ex.Message);
         }
     }
 
@@ -103,15 +103,15 @@ public class CalendarIntegrationController : BaseController
         try
         {
             var calendarEvent = await _calendarService.CreateGoogleCalendarEventAsync(employeeId, eventDto);
-            return Ok(new { success = true, data = calendarEvent });
+            return Success(calendarEvent, "Google Calendar event created successfully");
         }
         catch (InvalidOperationException ex)
         {
-            return BadRequest(new { success = false, message = ex.Message });
+            return Error(ex.Message);
         }
         catch (Exception ex)
         {
-            return BadRequest(new { success = false, message = ex.Message });
+            return Error(ex.Message);
         }
     }
 
@@ -129,15 +129,15 @@ public class CalendarIntegrationController : BaseController
         try
         {
             var calendarEvent = await _calendarService.UpdateGoogleCalendarEventAsync(employeeId, eventId, eventDto);
-            return Ok(new { success = true, data = calendarEvent });
+            return Success(calendarEvent, "Google Calendar event updated successfully");
         }
         catch (InvalidOperationException ex)
         {
-            return BadRequest(new { success = false, message = ex.Message });
+            return Error(ex.Message);
         }
         catch (Exception ex)
         {
-            return BadRequest(new { success = false, message = ex.Message });
+            return Error(ex.Message);
         }
     }
 
@@ -155,13 +155,13 @@ public class CalendarIntegrationController : BaseController
         {
             var result = await _calendarService.DeleteGoogleCalendarEventAsync(employeeId, eventId);
             if (result)
-                return Ok(new { success = true, message = "Event deleted successfully" });
+                return Success("Event deleted successfully");
             else
-                return BadRequest(new { success = false, message = "Failed to delete event" });
+                return Error("Failed to delete event");
         }
         catch (Exception ex)
         {
-            return BadRequest(new { success = false, message = ex.Message });
+            return Error(ex.Message);
         }
     }
 
@@ -179,17 +179,17 @@ public class CalendarIntegrationController : BaseController
         {
             var result = await _calendarService.ConnectOutlookCalendarAsync(employeeId, authorizationCode);
             if (result.Success)
-                return Ok(new { success = true, data = result });
+                return Success(result, "Outlook Calendar connected successfully");
             else
-                return BadRequest(new { success = false, message = result.Message, errorCode = result.ErrorCode });
+                return Error(result.Message, result.ErrorCode != null ? new List<string> { result.ErrorCode } : null);
         }
         catch (NotImplementedException)
         {
-            return BadRequest(new { success = false, message = "Outlook Calendar integration is not yet implemented" });
+            return Error("Outlook Calendar integration is not yet implemented");
         }
         catch (Exception ex)
         {
-            return BadRequest(new { success = false, message = ex.Message });
+            return Error(ex.Message);
         }
     }
 
@@ -206,17 +206,17 @@ public class CalendarIntegrationController : BaseController
         {
             var result = await _calendarService.DisconnectOutlookCalendarAsync(employeeId);
             if (result.Success)
-                return Ok(new { success = true, message = result.Message });
+                return Success(result.Message);
             else
-                return BadRequest(new { success = false, message = result.Message, errorCode = result.ErrorCode });
+                return Error(result.Message, result.ErrorCode != null ? new List<string> { result.ErrorCode } : null);
         }
         catch (NotImplementedException)
         {
-            return BadRequest(new { success = false, message = "Outlook Calendar integration is not yet implemented" });
+            return Error("Outlook Calendar integration is not yet implemented");
         }
         catch (Exception ex)
         {
-            return BadRequest(new { success = false, message = ex.Message });
+            return Error(ex.Message);
         }
     }
 
@@ -232,11 +232,11 @@ public class CalendarIntegrationController : BaseController
         try
         {
             var integrations = await _calendarService.GetEmployeeCalendarIntegrationsAsync(employeeId);
-            return Ok(new { success = true, data = integrations });
+            return Success(integrations, "Employee calendar integrations retrieved successfully");
         }
         catch (Exception ex)
         {
-            return BadRequest(new { success = false, message = ex.Message });
+            return Error(ex.Message);
         }
     }
 
@@ -254,11 +254,11 @@ public class CalendarIntegrationController : BaseController
         try
         {
             var events = await _calendarService.GetAllCalendarEventsAsync(employeeId, startDate, endDate);
-            return Ok(new { success = true, data = events });
+            return Success(events, "All calendar events retrieved successfully");
         }
         catch (Exception ex)
         {
-            return BadRequest(new { success = false, message = ex.Message });
+            return Error(ex.Message);
         }
     }
 
@@ -275,11 +275,11 @@ public class CalendarIntegrationController : BaseController
         try
         {
             var result = await _calendarService.SyncCalendarEventsAsync(employeeId, provider);
-            return Ok(new { success = true, data = result });
+            return Success(result, "Calendar events synced successfully");
         }
         catch (Exception ex)
         {
-            return BadRequest(new { success = false, message = ex.Message });
+            return Error(ex.Message);
         }
     }
 
@@ -296,11 +296,11 @@ public class CalendarIntegrationController : BaseController
         try
         {
             var isValid = await _calendarService.ValidateCalendarConnectionAsync(employeeId, provider);
-            return Ok(new { success = true, valid = isValid });
+            return Success(new { valid = isValid }, "Calendar connection validated successfully");
         }
         catch (Exception ex)
         {
-            return BadRequest(new { success = false, message = ex.Message });
+            return Error(ex.Message);
         }
     }
 
@@ -316,15 +316,15 @@ public class CalendarIntegrationController : BaseController
         try
         {
             var calendarEvent = await _calendarService.CreateLeaveEventAsync(leaveRequestId);
-            return Ok(new { success = true, data = calendarEvent });
+            return Success(calendarEvent, "Leave event created successfully");
         }
         catch (NotImplementedException)
         {
-            return BadRequest(new { success = false, message = "Leave event creation is not yet implemented" });
+            return Error("Leave event creation is not yet implemented");
         }
         catch (Exception ex)
         {
-            return BadRequest(new { success = false, message = ex.Message });
+            return Error(ex.Message);
         }
     }
 
@@ -340,15 +340,15 @@ public class CalendarIntegrationController : BaseController
         try
         {
             var calendarEvent = await _calendarService.CreateMeetingEventAsync(meetingId);
-            return Ok(new { success = true, data = calendarEvent });
+            return Success(calendarEvent, "Meeting event created successfully");
         }
         catch (NotImplementedException)
         {
-            return BadRequest(new { success = false, message = "Meeting event creation is not yet implemented" });
+            return Error("Meeting event creation is not yet implemented");
         }
         catch (Exception ex)
         {
-            return BadRequest(new { success = false, message = ex.Message });
+            return Error(ex.Message);
         }
     }
 
@@ -366,17 +366,17 @@ public class CalendarIntegrationController : BaseController
         {
             var result = await _calendarService.UpdateLeaveEventAsync(leaveRequestId, status);
             if (result)
-                return Ok(new { success = true, message = "Leave event updated successfully" });
+                return Success("Leave event updated successfully");
             else
-                return BadRequest(new { success = false, message = "Failed to update leave event" });
+                return Error("Failed to update leave event");
         }
         catch (NotImplementedException)
         {
-            return BadRequest(new { success = false, message = "Leave event updates are not yet implemented" });
+            return Error("Leave event updates are not yet implemented");
         }
         catch (Exception ex)
         {
-            return BadRequest(new { success = false, message = ex.Message });
+            return Error(ex.Message);
         }
     }
 
@@ -393,17 +393,17 @@ public class CalendarIntegrationController : BaseController
         {
             var result = await _calendarService.DeleteLeaveEventAsync(leaveRequestId);
             if (result)
-                return Ok(new { success = true, message = "Leave event deleted successfully" });
+                return Success("Leave event deleted successfully");
             else
-                return BadRequest(new { success = false, message = "Failed to delete leave event" });
+                return Error("Failed to delete leave event");
         }
         catch (NotImplementedException)
         {
-            return BadRequest(new { success = false, message = "Leave event deletion is not yet implemented" });
+            return Error("Leave event deletion is not yet implemented");
         }
         catch (Exception ex)
         {
-            return BadRequest(new { success = false, message = ex.Message });
+            return Error(ex.Message);
         }
     }
 }
