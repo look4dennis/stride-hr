@@ -363,9 +363,6 @@ Convert the feature design into a series of prompts for a code-generation LLM th
 - [ ] 17. Frontend Application Development
   - [x] 17.1 Angular project setup and core components
 
-
-
-
     - Create Angular project with Bootstrap 5 integration
     - Implement authentication guards and interceptors
     - Create shared components and services
@@ -373,7 +370,9 @@ Convert the feature design into a series of prompts for a code-generation LLM th
     - Write unit tests for core components
     - _Requirements: 22.1, 25.1, 8.1_
 
-  - [ ] 17.2 Dashboard components for all user roles
+  - [x] 17.2 Dashboard components for all user roles
+
+
     - Create role-based dashboard layouts
     - Implement weather and time widget with OpenWeatherMap integration
     - Add birthday notification widget
