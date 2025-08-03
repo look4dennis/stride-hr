@@ -98,6 +98,14 @@ public class StrideHRDbContext : DbContext
     public DbSet<NotificationTemplate> NotificationTemplates { get; set; }
     public DbSet<UserNotificationPreference> UserNotificationPreferences { get; set; }
     
+    // Integration DbSets
+    public DbSet<WebhookSubscription> WebhookSubscriptions { get; set; }
+    public DbSet<WebhookDelivery> WebhookDeliveries { get; set; }
+    public DbSet<CalendarIntegration> CalendarIntegrations { get; set; }
+    public DbSet<CalendarEvent> CalendarEvents { get; set; }
+    public DbSet<ExternalIntegration> ExternalIntegrations { get; set; }
+    public DbSet<IntegrationLog> IntegrationLogs { get; set; }
+    
     // Chatbot DbSets
     public DbSet<ChatbotConversation> ChatbotConversations { get; set; }
     public DbSet<ChatbotMessage> ChatbotMessages { get; set; }

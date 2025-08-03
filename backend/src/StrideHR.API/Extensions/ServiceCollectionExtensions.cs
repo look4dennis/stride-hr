@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using StrideHR.API.Filters;
 using StrideHR.Core.Entities;
 using StrideHR.Core.Interfaces;
 using StrideHR.Core.Interfaces.Repositories;
@@ -433,6 +434,19 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IExcelService, ExcelService>();
         services.AddScoped<ICsvService, CsvService>();
         
+        // Register integration repositories
+        services.AddScoped<IWebhookRepository, WebhookRepository>();
+        services.AddScoped<IWebhookDeliveryRepository, WebhookDeliveryRepository>();
+        services.AddScoped<ICalendarIntegrationRepository, CalendarIntegrationRepository>();
+        services.AddScoped<ICalendarEventRepository, CalendarEventRepository>();
+        services.AddScoped<IExternalIntegrationRepository, ExternalIntegrationRepository>();
+        services.AddScoped<IIntegrationLogRepository, IntegrationLogRepository>();
+        
+        // Register integration services
+        services.AddScoped<IWebhookService, WebhookService>();
+        services.AddScoped<ICalendarIntegrationService, CalendarIntegrationService>();
+        services.AddScoped<IExternalIntegrationService, ExternalIntegrationService>();
+        
         // Add SignalR
         services.AddSignalR();
         
@@ -455,6 +469,9 @@ public static class ServiceCollectionExtensions
 
         // Add FluentValidation
         services.AddFluentValidationAutoValidation();
+        
+        // Add HttpClient for integrations
+        services.AddHttpClient();
 
         return services;
     }
@@ -467,23 +484,78 @@ public static class ServiceCollectionExtensions
             c.SwaggerDoc("v1", new OpenApiInfo
             {
                 Title = "StrideHR API",
-                Version = "v1",
-                Description = "A comprehensive Human Resource Management System API",
+                Version = "v1.0",
+                Description = @"
+# StrideHR API Documentation
+
+A comprehensive Human Resource Management System API designed for global organizations with multi-branch support.
+
+## Features
+
+### Core HR Management
+- **Employee Management**: Complete lifecycle from onboarding to exit
+- **Attendance Tracking**: Real-time location-based check-in/out with break management
+- **Leave Management**: Multi-level approval workflows with balance tracking
+- **Performance Management**: Including PIP (Performance Improvement Plans)
+
+### Advanced Features
+- **Payroll System**: Advanced payroll with custom formulas and multi-currency support
+- **Project Management**: Kanban boards with integrated time tracking
+- **Asset Management**: Complete asset lifecycle tracking
+- **Training & Certification**: Module-based training with assessments
+
+### Integration & APIs
+- **Webhook Support**: Real-time event notifications to external systems
+- **Calendar Integration**: Google Calendar and Outlook integration
+- **External Systems**: Payroll and accounting system integrations
+- **Data Import/Export**: Bulk operations with Excel/CSV support
+
+### Security & Compliance
+- **Role-based Access Control**: Granular permissions system
+- **Multi-branch Data Isolation**: Organization-level data separation
+- **Audit Trails**: Comprehensive logging and monitoring
+- **International Compliance**: Multi-currency, timezone, and regulatory support
+
+## Authentication
+
+All API endpoints require JWT Bearer token authentication unless otherwise specified.
+
+## Rate Limiting
+
+API requests are rate-limited to ensure system stability. Please refer to response headers for current limits.
+
+## Support
+
+For API support, contact: support@stridehr.com
+",
                 Contact = new OpenApiContact
                 {
-                    Name = "StrideHR Team",
-                    Email = "support@stridehr.com"
-                }
+                    Name = "StrideHR Development Team",
+                    Email = "support@stridehr.com",
+                    Url = new Uri("https://stridehr.com/support")
+                },
+                License = new OpenApiLicense
+                {
+                    Name = "StrideHR License",
+                    Url = new Uri("https://stridehr.com/license")
+                },
+                TermsOfService = new Uri("https://stridehr.com/terms")
             });
+
+            // Add multiple API versions if needed
+            c.SwaggerDoc("v1", new OpenApiInfo { Title = "StrideHR API", Version = "v1.0" });
 
             // Add JWT Authentication to Swagger
             c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
             {
-                Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
+                Description = @"JWT Authorization header using the Bearer scheme. 
+                      Enter 'Bearer' [space] and then your token in the text input below.
+                      Example: 'Bearer 12345abcdef'",
                 Name = "Authorization",
                 In = ParameterLocation.Header,
                 Type = SecuritySchemeType.ApiKey,
-                Scheme = "Bearer"
+                Scheme = "Bearer",
+                BearerFormat = "JWT"
             });
 
             c.AddSecurityRequirement(new OpenApiSecurityRequirement
@@ -495,19 +567,55 @@ public static class ServiceCollectionExtensions
                         {
                             Type = ReferenceType.SecurityScheme,
                             Id = "Bearer"
-                        }
+                        },
+                        Scheme = "oauth2",
+                        Name = "Bearer",
+                        In = ParameterLocation.Header
                     },
-                    Array.Empty<string>()
+                    new List<string>()
                 }
             });
 
-            // Include XML comments if available
-            var xmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
-            var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
-            if (File.Exists(xmlPath))
+            // Group endpoints by tags
+            c.TagActionsBy(api => new[] { api.GroupName ?? api.ActionDescriptor.RouteValues["controller"] });
+            c.DocInclusionPredicate((name, api) => true);
+
+            // Add custom operation filters
+            c.OperationFilter<SwaggerDefaultValues>();
+            c.DocumentFilter<SwaggerDocumentFilter>();
+
+            // Include XML comments for better documentation
+            var xmlFiles = Directory.GetFiles(AppContext.BaseDirectory, "*.xml");
+            foreach (var xmlFile in xmlFiles)
             {
-                c.IncludeXmlComments(xmlPath);
+                if (Path.GetFileNameWithoutExtension(xmlFile).StartsWith("StrideHR"))
+                {
+                    c.IncludeXmlComments(xmlFile);
+                }
             }
+
+            // Add examples for common request/response models
+            c.SchemaFilter<SwaggerSchemaExampleFilter>();
+
+            // Enable annotations
+            c.EnableAnnotations();
+
+            // Add servers information
+            c.AddServer(new OpenApiServer
+            {
+                Url = "https://api.stridehr.com",
+                Description = "Production Server"
+            });
+            c.AddServer(new OpenApiServer
+            {
+                Url = "https://staging-api.stridehr.com",
+                Description = "Staging Server"
+            });
+            c.AddServer(new OpenApiServer
+            {
+                Url = "http://localhost:5000",
+                Description = "Development Server"
+            });
         });
 
         return services;
