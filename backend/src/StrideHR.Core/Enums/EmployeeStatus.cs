@@ -32,7 +32,8 @@ public enum ShiftType
     Day = 1,
     Night = 2,
     Rotating = 3,
-    Flexible = 4
+    Split = 4,
+    Flexible = 5
 }
 
 public enum HolidayType

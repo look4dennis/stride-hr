@@ -284,7 +284,7 @@ Convert the feature design into a series of prompts for a code-generation LLM th
     - Write unit tests for grievance management
     - _Requirements: 14.3, 14.4, 14.7_
 
-- [ ] 13. Expense Management System
+- [x] 13. Expense Management System
   - [x] 13.1 Expense claim submission and processing
 
     - Create expense claim forms with receipt upload
@@ -296,9 +296,6 @@ Convert the feature design into a series of prompts for a code-generation LLM th
 
   - [x] 13.2 Travel and expense reporting
 
-
-
-
     - Implement travel expense management with mileage calculation
     - Create expense analytics and budget tracking
     - Add expense policy compliance monitoring
@@ -307,7 +304,14 @@ Convert the feature design into a series of prompts for a code-generation LLM th
     - _Requirements: 38.3, 38.8, 38.9_
 
 - [ ] 14. Shift Management and Scheduling
-  - [ ] 14.1 Shift creation and assignment
+  - [x] 14.1 Shift creation and assignment
+
+
+
+
+
+
+
     - Create shift templates and scheduling system
     - Implement employee shift assignments
     - Add shift pattern management (day/night/rotating)
