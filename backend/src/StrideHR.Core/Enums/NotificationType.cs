@@ -46,6 +46,15 @@ public enum NotificationType
     SecurityAlert,
     PolicyUpdate,
     
+    // Grievance Related
+    GrievanceSubmitted,
+    GrievanceAssigned,
+    GrievanceStatusChanged,
+    GrievanceResolved,
+    GrievanceEscalated,
+    GrievanceCommentAdded,
+    GrievanceFollowUpScheduled,
+    
     // General
     Announcement,
     Reminder,

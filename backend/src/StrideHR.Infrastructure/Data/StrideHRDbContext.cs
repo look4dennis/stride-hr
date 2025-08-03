@@ -121,6 +121,13 @@ public class StrideHRDbContext : DbContext
     public DbSet<SurveyAnswer> SurveyAnswers { get; set; }
     public DbSet<SurveyDistribution> SurveyDistributions { get; set; }
     public DbSet<SurveyAnalytics> SurveyAnalytics { get; set; }
+    
+    // Grievance Management DbSets
+    public DbSet<Grievance> Grievances { get; set; }
+    public DbSet<GrievanceComment> GrievanceComments { get; set; }
+    public DbSet<GrievanceStatusHistory> GrievanceStatusHistories { get; set; }
+    public DbSet<GrievanceEscalation> GrievanceEscalations { get; set; }
+    public DbSet<GrievanceFollowUp> GrievanceFollowUps { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

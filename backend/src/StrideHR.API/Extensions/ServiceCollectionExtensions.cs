@@ -400,6 +400,14 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ISurveyResponseService, SurveyResponseService>();
         services.AddScoped<ISurveyAnalyticsService, SurveyAnalyticsService>();
         
+        // Register grievance management repositories
+        services.AddScoped<IGrievanceRepository, GrievanceRepository>();
+        services.AddScoped<IGrievanceCommentRepository, GrievanceCommentRepository>();
+        services.AddScoped<IGrievanceFollowUpRepository, GrievanceFollowUpRepository>();
+        
+        // Register grievance management services
+        services.AddScoped<IGrievanceService, GrievanceService>();
+        
         // Add SignalR
         services.AddSignalR();
         

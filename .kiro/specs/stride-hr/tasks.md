@@ -102,7 +102,7 @@ Convert the feature design into a series of prompts for a code-generation LLM th
     - Write unit tests for attendance operations
     - _Requirements: 4.1, 4.2, 4.9, 4.10, 21.8, 21.9_
 
-- [ ] 5. Project Management and Task Tracking
+- [x] 5. Project Management and Task Tracking
 
   - [x] 5.1 Project and task management service
 
@@ -160,7 +160,7 @@ Convert the feature design into a series of prompts for a code-generation LLM th
     - Write unit tests for payroll reporting
     - _Requirements: 3.10, 1.6, 6.3, 3.7_
 
-- [ ] 7. Leave Management System
+- [x] 7. Leave Management System
   - [x] 7.1 Leave request and approval workflow
 
     - Create leave request submission with balance validation
@@ -276,7 +276,12 @@ Convert the feature design into a series of prompts for a code-generation LLM th
     - Write unit tests for survey system
     - _Requirements: 44.1, 44.2, 44.3, 44.8_
 
-  - [ ] 12.2 Grievance management system
+  - [x] 12.2 Grievance management system
+
+
+
+
+
     - Create grievance submission with anonymity options
     - Implement escalation workflows and status tracking
     - Add grievance resolution and follow-up processes
