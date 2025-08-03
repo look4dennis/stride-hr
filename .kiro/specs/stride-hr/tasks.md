@@ -278,10 +278,6 @@ Convert the feature design into a series of prompts for a code-generation LLM th
 
   - [x] 12.2 Grievance management system
 
-
-
-
-
     - Create grievance submission with anonymity options
     - Implement escalation workflows and status tracking
     - Add grievance resolution and follow-up processes

@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using StrideHR.Core.Entities;
 using StrideHR.Core.Enums;
+using StrideHR.Core.Interfaces;
 using StrideHR.Core.Interfaces.Repositories;
 using StrideHR.Core.Interfaces.Services;
 using StrideHR.Core.Models.Grievance;
@@ -67,16 +68,16 @@ public class GrievanceServiceTests
             .ReturnsAsync(grievanceNumber);
 
         _mockGrievanceRepository.Setup(r => r.AddAsync(It.IsAny<Grievance>()))
-            .Returns(Task.CompletedTask);
+            .ReturnsAsync(It.IsAny<Grievance>());
 
         _mockGrievanceRepository.Setup(r => r.SaveChangesAsync())
-            .Returns(Task.CompletedTask);
+            .ReturnsAsync(true);
 
         _mockStatusHistoryRepository.Setup(r => r.AddAsync(It.IsAny<GrievanceStatusHistory>()))
-            .Returns(Task.CompletedTask);
+            .ReturnsAsync(It.IsAny<GrievanceStatusHistory>());
 
         _mockStatusHistoryRepository.Setup(r => r.SaveChangesAsync())
-            .Returns(Task.CompletedTask);
+            .ReturnsAsync(true);
 
         var grievance = new Grievance
         {
@@ -223,7 +224,7 @@ public class GrievanceServiceTests
             .Returns(Task.CompletedTask);
 
         _mockGrievanceRepository.Setup(r => r.SaveChangesAsync())
-            .Returns(Task.CompletedTask);
+            .ReturnsAsync(true);
 
         var expectedDto = new GrievanceDto
         {
@@ -284,10 +285,10 @@ public class GrievanceServiceTests
             .Returns(Task.CompletedTask);
 
         _mockGrievanceRepository.Setup(r => r.SaveChangesAsync())
-            .Returns(Task.CompletedTask);
+            .ReturnsAsync(true);
 
         _mockStatusHistoryRepository.Setup(r => r.AddAsync(It.IsAny<GrievanceStatusHistory>()))
-            .Returns(Task.CompletedTask);
+            .ReturnsAsync(It.IsAny<GrievanceStatusHistory>());
 
         var expectedDto = new GrievanceDto
         {
@@ -356,10 +357,10 @@ public class GrievanceServiceTests
             .Returns(Task.CompletedTask);
 
         _mockGrievanceRepository.Setup(r => r.SaveChangesAsync())
-            .Returns(Task.CompletedTask);
+            .ReturnsAsync(true);
 
         _mockEscalationRepository.Setup(r => r.AddAsync(It.IsAny<GrievanceEscalation>()))
-            .Returns(Task.CompletedTask);
+            .ReturnsAsync(It.IsAny<GrievanceEscalation>());
 
         var expectedDto = new GrievanceDto
         {
@@ -434,10 +435,10 @@ public class GrievanceServiceTests
             .ReturnsAsync(grievance);
 
         _mockCommentRepository.Setup(r => r.AddAsync(It.IsAny<GrievanceComment>()))
-            .Returns(Task.CompletedTask);
+            .ReturnsAsync(comment);
 
         _mockCommentRepository.Setup(r => r.SaveChangesAsync())
-            .Returns(Task.CompletedTask);
+            .ReturnsAsync(true);
 
         _mockCommentRepository.Setup(r => r.GetByIdAsync(It.IsAny<int>()))
             .ReturnsAsync(comment);
@@ -559,10 +560,10 @@ public class GrievanceServiceTests
             .Returns(Task.CompletedTask);
 
         _mockGrievanceRepository.Setup(r => r.SaveChangesAsync())
-            .Returns(Task.CompletedTask);
+            .ReturnsAsync(true);
 
         _mockStatusHistoryRepository.Setup(r => r.AddAsync(It.IsAny<GrievanceStatusHistory>()))
-            .Returns(Task.CompletedTask);
+            .ReturnsAsync(It.IsAny<GrievanceStatusHistory>());
 
         var expectedDto = new GrievanceDto
         {

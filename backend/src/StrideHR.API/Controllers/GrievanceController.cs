@@ -294,7 +294,7 @@ public class GrievanceController : BaseController
     public async Task<IActionResult> DeleteGrievance(int id)
     {
         await _grievanceService.DeleteGrievanceAsync(id);
-        return Success(null, "Grievance deleted successfully");
+        return Success("Grievance deleted successfully");
     }
 }
 

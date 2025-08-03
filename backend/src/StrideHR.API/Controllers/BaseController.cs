@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using StrideHR.API.Models;
+using System.Security.Claims;
 
 namespace StrideHR.API.Controllers;
 
@@ -39,5 +40,39 @@ public abstract class BaseController : ControllerBase
             Errors = errors ?? new List<string>()
         };
         return BadRequest(response);
+    }
+
+    /// <summary>
+    /// Gets the current employee ID from JWT claims
+    /// </summary>
+    /// <returns>The employee ID of the currently authenticated user</returns>
+    /// <exception cref="UnauthorizedAccessException">Thrown when employee ID claim is not found or invalid</exception>
+    protected int GetCurrentEmployeeId()
+    {
+        var employeeIdClaim = User.FindFirst("EmployeeId")?.Value;
+        
+        if (string.IsNullOrEmpty(employeeIdClaim) || !int.TryParse(employeeIdClaim, out var employeeId))
+        {
+            throw new UnauthorizedAccessException("Employee ID not found in token claims");
+        }
+        
+        return employeeId;
+    }
+
+    /// <summary>
+    /// Gets the current user ID from JWT claims
+    /// </summary>
+    /// <returns>The user ID of the currently authenticated user</returns>
+    /// <exception cref="UnauthorizedAccessException">Thrown when user ID claim is not found or invalid</exception>
+    protected int GetCurrentUserId()
+    {
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        
+        if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out var userId))
+        {
+            throw new UnauthorizedAccessException("User ID not found in token claims");
+        }
+        
+        return userId;
     }
 }
