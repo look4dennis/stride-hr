@@ -249,7 +249,6 @@ Convert the feature design into a series of prompts for a code-generation LLM th
 - [x] 11. Reporting and Analytics System
   - [x] 11.1 Report builder and data visualization
 
-
     - Create drag-and-drop report builder interface
     - Implement data visualization with charts and graphs
     - Add custom report creation and scheduling
@@ -266,7 +265,7 @@ Convert the feature design into a series of prompts for a code-generation LLM th
     - Write unit tests for analytics features
     - _Requirements: 17.1, 17.2, 17.4, 17.7_
 
-- [ ] 12. Survey and Feedback System
+- [x] 12. Survey and Feedback System
   - [x] 12.1 Employee survey creation and management
 
     - Create survey builder with multiple question types
@@ -287,6 +286,10 @@ Convert the feature design into a series of prompts for a code-generation LLM th
 
 - [ ] 13. Expense Management System
   - [ ] 13.1 Expense claim submission and processing
+
+
+
+
     - Create expense claim forms with receipt upload
     - Implement expense categorization and policy validation
     - Add multi-level approval workflows
