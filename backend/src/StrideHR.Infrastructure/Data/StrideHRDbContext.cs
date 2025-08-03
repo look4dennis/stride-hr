@@ -25,6 +25,10 @@ public class StrideHRDbContext : DbContext
     public DbSet<EmployeeRole> EmployeeRoles { get; set; }
     public DbSet<Shift> Shifts { get; set; }
     public DbSet<ShiftAssignment> ShiftAssignments { get; set; }
+    public DbSet<ShiftSwapRequest> ShiftSwapRequests { get; set; }
+    public DbSet<ShiftSwapResponse> ShiftSwapResponses { get; set; }
+    public DbSet<ShiftCoverageRequest> ShiftCoverageRequests { get; set; }
+    public DbSet<ShiftCoverageResponse> ShiftCoverageResponses { get; set; }
     public DbSet<WorkingHours> WorkingHours { get; set; }
     public DbSet<Holiday> Holidays { get; set; }
     public DbSet<AttendancePolicy> AttendancePolicies { get; set; }

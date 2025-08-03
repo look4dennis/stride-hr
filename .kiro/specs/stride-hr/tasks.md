@@ -319,7 +319,12 @@ Convert the feature design into a series of prompts for a code-generation LLM th
     - Write unit tests for shift management
     - _Requirements: 24.3, 24.5, 45.4, 45.6_
 
-  - [ ] 14.2 Shift swapping and schedule management
+  - [x] 14.2 Shift swapping and schedule management
+
+
+
+
+
     - Implement shift swap request workflows
     - Create manager approval for shift changes
     - Add emergency shift coverage broadcasting

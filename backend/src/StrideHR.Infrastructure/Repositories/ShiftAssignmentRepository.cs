@@ -235,4 +235,13 @@ public class ShiftAssignmentRepository : Repository<ShiftAssignment>, IShiftAssi
 
         return await query.CountAsync();
     }
+
+    public async Task<bool> HasConflictingAssignmentAsync(int employeeId, DateTime date)
+    {
+        return await _dbSet
+            .AnyAsync(sa => sa.EmployeeId == employeeId && 
+                           sa.IsActive && 
+                           sa.StartDate <= date && 
+                           (sa.EndDate == null || sa.EndDate >= date));
+    }
 }

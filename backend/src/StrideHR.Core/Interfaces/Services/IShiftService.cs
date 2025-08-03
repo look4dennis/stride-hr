@@ -37,7 +37,30 @@ public interface IShiftService
     Task<IEnumerable<ShiftDto>> GetShiftsByPatternAsync(int organizationId, Enums.ShiftType shiftType);
     Task<IEnumerable<ShiftAssignmentDto>> GenerateRotatingShiftScheduleAsync(int branchId, List<int> employeeIds, List<int> shiftIds, DateTime startDate, int weeks);
     
+    // Shift Swapping
+    Task<ShiftSwapRequestDto> CreateShiftSwapRequestAsync(int requesterId, CreateShiftSwapRequestDto createDto);
+    Task<ShiftSwapRequestDto> RespondToShiftSwapRequestAsync(int responderId, CreateShiftSwapResponseDto responseDto);
+    Task<ShiftSwapRequestDto> ApproveShiftSwapRequestAsync(int requestId, int approverId, ApproveShiftSwapDto approvalDto);
+    Task<bool> CancelShiftSwapRequestAsync(int requestId, int userId);
+    Task<IEnumerable<ShiftSwapRequestDto>> GetShiftSwapRequestsAsync(int employeeId);
+    Task<IEnumerable<ShiftSwapRequestDto>> GetPendingShiftSwapApprovalsAsync(int managerId);
+    Task<(IEnumerable<ShiftSwapRequestDto> Requests, int TotalCount)> SearchShiftSwapRequestsAsync(ShiftSwapSearchCriteria criteria);
+    
+    // Shift Coverage
+    Task<ShiftCoverageRequestDto> CreateShiftCoverageRequestAsync(int requesterId, CreateShiftCoverageRequestDto createDto);
+    Task<ShiftCoverageRequestDto> RespondToShiftCoverageRequestAsync(int responderId, CreateShiftCoverageResponseDto responseDto);
+    Task<ShiftCoverageRequestDto> ApproveShiftCoverageRequestAsync(int requestId, int approverId, ApproveShiftCoverageDto approvalDto);
+    Task<bool> CancelShiftCoverageRequestAsync(int requestId, int userId);
+    Task<IEnumerable<ShiftCoverageRequestDto>> GetShiftCoverageRequestsAsync(int employeeId);
+    Task<IEnumerable<ShiftCoverageRequestDto>> GetPendingShiftCoverageApprovalsAsync(int managerId);
+    Task<(IEnumerable<ShiftCoverageRequestDto> Requests, int TotalCount)> SearchShiftCoverageRequestsAsync(ShiftCoverageSearchCriteria criteria);
+    
+    // Emergency Coverage Broadcasting
+    Task<List<ShiftCoverageRequestDto>> BroadcastEmergencyShiftCoverageAsync(int broadcasterId, EmergencyShiftCoverageBroadcastDto broadcastDto);
+    Task<IEnumerable<ShiftCoverageRequestDto>> GetEmergencyShiftCoverageRequestsAsync(int branchId);
+    
     // Reporting and Analytics
     Task<IEnumerable<ShiftAssignmentDto>> GetUpcomingShiftAssignmentsAsync(int employeeId, int days = 7);
     Task<Dictionary<string, object>> GetShiftAnalyticsAsync(int branchId, DateTime startDate, DateTime endDate);
+    Task<ShiftAnalyticsDto> GetDetailedShiftAnalyticsAsync(ShiftAnalyticsSearchCriteria criteria);
 }

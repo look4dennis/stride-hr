@@ -17,4 +17,5 @@ public interface IShiftAssignmentRepository : IRepository<ShiftAssignment>
     Task<bool> HasActiveAssignmentAsync(int employeeId, int shiftId);
     Task<IEnumerable<ShiftAssignment>> GetUpcomingAssignmentsAsync(int employeeId, int days = 7);
     Task<int> GetAssignedEmployeesCountAsync(int shiftId, DateTime? date = null);
+    Task<bool> HasConflictingAssignmentAsync(int employeeId, DateTime date);
 }
