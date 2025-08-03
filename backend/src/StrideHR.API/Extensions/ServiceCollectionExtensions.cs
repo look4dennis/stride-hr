@@ -428,6 +428,11 @@ public static class ServiceCollectionExtensions
         // Register document template services
         services.AddScoped<IDocumentTemplateService, DocumentTemplateService>();
         
+        // Register data import/export services
+        services.AddScoped<IDataImportExportService, DataImportExportService>();
+        services.AddScoped<IExcelService, ExcelService>();
+        services.AddScoped<ICsvService, CsvService>();
+        
         // Add SignalR
         services.AddSignalR();
         
