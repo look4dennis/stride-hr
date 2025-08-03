@@ -128,6 +128,19 @@ public class StrideHRDbContext : DbContext
     public DbSet<GrievanceStatusHistory> GrievanceStatusHistories { get; set; }
     public DbSet<GrievanceEscalation> GrievanceEscalations { get; set; }
     public DbSet<GrievanceFollowUp> GrievanceFollowUps { get; set; }
+    
+    // Expense Management DbSets
+    public DbSet<ExpenseClaim> ExpenseClaims { get; set; }
+    public DbSet<ExpenseItem> ExpenseItems { get; set; }
+    public DbSet<ExpenseCategory> ExpenseCategories { get; set; }
+    public DbSet<ExpenseDocument> ExpenseDocuments { get; set; }
+    public DbSet<ExpenseApprovalHistory> ExpenseApprovalHistories { get; set; }
+    public DbSet<ExpensePolicyRule> ExpensePolicyRules { get; set; }
+    public DbSet<TravelExpense> TravelExpenses { get; set; }
+    public DbSet<TravelExpenseItem> TravelExpenseItems { get; set; }
+    public DbSet<ExpenseBudget> ExpenseBudgets { get; set; }
+    public DbSet<ExpenseBudgetAlert> ExpenseBudgetAlerts { get; set; }
+    public DbSet<ExpenseComplianceViolation> ExpenseComplianceViolations { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

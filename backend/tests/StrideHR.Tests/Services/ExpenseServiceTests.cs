@@ -37,6 +37,9 @@ public class ExpenseServiceTests
             _mockExpenseClaimRepository.Object,
             _mockExpenseCategoryRepository.Object,
             _mockExpenseDocumentRepository.Object,
+            new Mock<ITravelExpenseRepository>().Object,
+            new Mock<IExpenseBudgetRepository>().Object,
+            new Mock<IExpenseComplianceViolationRepository>().Object,
             _mockMapper.Object,
             _mockLogger.Object,
             _mockFileStorageService.Object,
@@ -86,6 +89,11 @@ public class ExpenseServiceTests
             Status = ExpenseClaimStatus.Draft
         };
 
+        var expenseCategory = new ExpenseCategory { Id = 1, Name = "Travel", IsActive = true };
+        
+        _mockExpenseCategoryRepository.Setup(r => r.GetByIdAsync(1))
+            .ReturnsAsync(expenseCategory);
+            
         _mockExpenseClaimRepository.Setup(r => r.GenerateClaimNumberAsync())
             .ReturnsAsync(claimNumber);
 
@@ -190,6 +198,7 @@ public class ExpenseServiceTests
         // Arrange
         var claimId = 1;
         var employeeId = 1;
+        var expenseCategory = new ExpenseCategory { Id = 1, Name = "Travel", IsActive = true };
         var expenseClaim = new ExpenseClaim
         {
             Id = claimId,
@@ -197,12 +206,41 @@ public class ExpenseServiceTests
             Status = ExpenseClaimStatus.Draft,
             ExpenseItems = new List<ExpenseItem>
             {
-                new ExpenseItem { Amount = 100.00m }
+                new ExpenseItem 
+                { 
+                    Amount = 100.00m, 
+                    ExpenseCategoryId = 1,
+                    ExpenseCategory = expenseCategory
+                }
             }
         };
 
         _mockExpenseClaimRepository.Setup(r => r.GetByIdWithDetailsAsync(claimId))
             .ReturnsAsync(expenseClaim);
+            
+        _mockExpenseCategoryRepository.Setup(r => r.GetByIdAsync(1))
+            .ReturnsAsync(expenseCategory);
+            
+        var createDto = new CreateExpenseClaimDto
+        {
+            Title = "Business Travel",
+            Description = "Travel to client site",
+            ExpenseDate = DateTime.Today,
+            Currency = "USD",
+            ExpenseItems = new List<CreateExpenseItemDto>
+            {
+                new CreateExpenseItemDto
+                {
+                    ExpenseCategoryId = 1,
+                    Description = "Test item",
+                    Amount = 100.00m,
+                    ExpenseDate = DateTime.Today
+                }
+            }
+        };
+        
+        _mockMapper.Setup(m => m.Map<CreateExpenseClaimDto>(It.IsAny<ExpenseClaim>()))
+            .Returns(createDto);
 
         _mockExpenseClaimRepository.Setup(r => r.UpdateAsync(It.IsAny<ExpenseClaim>()))
             .Returns(Task.CompletedTask);
