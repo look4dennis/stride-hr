@@ -28,8 +28,38 @@ export const routes: Routes = [
       },
       {
         path: 'employees',
-        loadComponent: () => import('./features/employees/employee-list').then(m => m.EmployeeListComponent),
-        data: { roles: ['HR', 'Admin', 'Manager'] }
+        children: [
+          {
+            path: '',
+            loadComponent: () => import('./features/employees/employee-list').then(m => m.EmployeeListComponent),
+            data: { roles: ['HR', 'Admin', 'Manager'] }
+          },
+          {
+            path: 'org-chart',
+            loadComponent: () => import('./features/employees/org-chart').then(m => m.OrgChartComponent),
+            data: { roles: ['HR', 'Admin', 'Manager'] }
+          },
+          {
+            path: ':id',
+            loadComponent: () => import('./features/employees/employee-profile').then(m => m.EmployeeProfileComponent),
+            data: { roles: ['HR', 'Admin', 'Manager'] }
+          },
+          {
+            path: ':id/edit',
+            loadComponent: () => import('./features/employees/employee-profile').then(m => m.EmployeeProfileComponent),
+            data: { roles: ['HR', 'Admin'] }
+          },
+          {
+            path: ':id/onboarding',
+            loadComponent: () => import('./features/employees/employee-onboarding').then(m => m.EmployeeOnboardingComponent),
+            data: { roles: ['HR', 'Admin'] }
+          },
+          {
+            path: ':id/exit',
+            loadComponent: () => import('./features/employees/employee-exit').then(m => m.EmployeeExitComponent),
+            data: { roles: ['HR', 'Admin'] }
+          }
+        ]
       },
       {
         path: 'attendance',

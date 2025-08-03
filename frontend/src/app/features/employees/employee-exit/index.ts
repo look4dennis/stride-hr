@@ -1,0 +1,1 @@
+export { EmployeeExitComponent } from './employee-exit.component';

@@ -154,7 +154,21 @@ export class SidebarComponent implements OnInit, OnDestroy {
       label: 'Employees',
       icon: 'fas fa-users',
       route: '/employees',
-      roles: ['HR', 'Admin', 'Manager']
+      roles: ['HR', 'Admin', 'Manager'],
+      children: [
+        {
+          label: 'Employee List',
+          icon: 'fas fa-list',
+          route: '/employees',
+          roles: ['HR', 'Admin', 'Manager']
+        },
+        {
+          label: 'Org Chart',
+          icon: 'fas fa-sitemap',
+          route: '/employees/org-chart',
+          roles: ['HR', 'Admin', 'Manager']
+        }
+      ]
     },
     {
       label: 'Attendance',

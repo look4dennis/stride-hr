@@ -380,7 +380,11 @@ Convert the feature design into a series of prompts for a code-generation LLM th
     - Write unit tests for dashboard components
     - _Requirements: 20.1, 20.2, 20.5, 14.8, 14.9_
 
-  - [ ] 17.3 Employee management interfaces
+  - [x] 17.3 Employee management interfaces
+
+
+
+
     - Create employee list with search and filtering
     - Implement employee profile management with photo upload
     - Add employee onboarding and exit workflows

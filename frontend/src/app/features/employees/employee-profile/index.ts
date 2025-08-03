@@ -1,0 +1,1 @@
+export { EmployeeProfileComponent } from './employee-profile.component';
