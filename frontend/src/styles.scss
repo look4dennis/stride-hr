@@ -1,3 +1,9 @@
+/* Bootstrap Import */
+@import 'bootstrap/scss/bootstrap';
+
+/* Font Awesome (if using CDN, otherwise install and import) */
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css');
+
 /* Google Fonts Import */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap');
 
