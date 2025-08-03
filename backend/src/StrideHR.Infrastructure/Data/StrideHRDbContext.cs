@@ -103,6 +103,14 @@ public class StrideHRDbContext : DbContext
     public DbSet<ChatbotMessage> ChatbotMessages { get; set; }
     public DbSet<ChatbotKnowledgeBase> ChatbotKnowledgeBases { get; set; }
     
+    // Knowledge Base DbSets
+    public DbSet<KnowledgeBaseDocument> KnowledgeBaseDocuments { get; set; }
+    public DbSet<KnowledgeBaseCategory> KnowledgeBaseCategories { get; set; }
+    public DbSet<KnowledgeBaseDocumentApproval> KnowledgeBaseDocumentApprovals { get; set; }
+    public DbSet<KnowledgeBaseDocumentAttachment> KnowledgeBaseDocumentAttachments { get; set; }
+    public DbSet<KnowledgeBaseDocumentView> KnowledgeBaseDocumentViews { get; set; }
+    public DbSet<KnowledgeBaseDocumentComment> KnowledgeBaseDocumentComments { get; set; }
+    
     // Report Management DbSets
     public DbSet<Report> Reports { get; set; }
     public DbSet<ReportExecution> ReportExecutions { get; set; }

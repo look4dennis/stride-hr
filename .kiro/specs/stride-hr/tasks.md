@@ -303,14 +303,8 @@ Convert the feature design into a series of prompts for a code-generation LLM th
     - Write unit tests for expense reporting
     - _Requirements: 38.3, 38.8, 38.9_
 
-- [ ] 14. Shift Management and Scheduling
+- [x] 14. Shift Management and Scheduling
   - [x] 14.1 Shift creation and assignment
-
-
-
-
-
-
 
     - Create shift templates and scheduling system
     - Implement employee shift assignments
@@ -321,12 +315,6 @@ Convert the feature design into a series of prompts for a code-generation LLM th
 
   - [x] 14.2 Shift swapping and schedule management
 
-
-
-
-
-
-
     - Implement shift swap request workflows
     - Create manager approval for shift changes
     - Add emergency shift coverage broadcasting
@@ -335,7 +323,11 @@ Convert the feature design into a series of prompts for a code-generation LLM th
     - _Requirements: 45.1, 45.2, 45.7, 45.12_
 
 - [ ] 15. Knowledge Base and Document Management
-  - [ ] 15.1 Knowledge base creation and management
+  - [x] 15.1 Knowledge base creation and management
+
+
+
+
     - Create document creation with rich text editor
     - Implement document approval workflows
     - Add document search and categorization
