@@ -1,0 +1,161 @@
+export interface AttendanceRecord {
+  id: number;
+  employeeId: number;
+  date: string;
+  checkInTime?: string;
+  checkOutTime?: string;
+  totalWorkingHours?: string;
+  breakDuration?: string;
+  overtimeHours?: string;
+  status: AttendanceStatusType;
+  location?: string;
+  notes?: string;
+  employee?: {
+    id: number;
+    employeeId: string;
+    firstName: string;
+    lastName: string;
+    profilePhoto?: string;
+    designation: string;
+    department: string;
+  };
+  breakRecords?: BreakRecord[];
+}
+
+export interface BreakRecord {
+  id: number;
+  attendanceRecordId: number;
+  type: BreakType;
+  startTime: string;
+  endTime?: string;
+  duration?: string;
+}
+
+export interface CheckInDto {
+  location?: string;
+  timestamp?: string;
+}
+
+export interface CheckOutDto {
+  timestamp?: string;
+}
+
+export interface StartBreakDto {
+  timestamp?: string;
+}
+
+export interface EndBreakDto {
+  timestamp?: string;
+}
+
+export interface AttendanceStatus {
+  employeeId: number;
+  isCheckedIn: boolean;
+  currentStatus: AttendanceStatusType;
+  checkInTime?: string;
+  currentBreak?: BreakRecord;
+  totalWorkingHours: string;
+  totalBreakTime: string;
+  location?: string;
+}
+
+export interface AttendanceReportCriteria {
+  branchId?: number;
+  departmentId?: string;
+  employeeId?: number;
+  startDate: string;
+  endDate: string;
+  status?: AttendanceStatusType;
+}
+
+export interface AttendanceReport {
+  criteria: AttendanceReportCriteria;
+  records: AttendanceRecord[];
+  summary: AttendanceSummary;
+}
+
+export interface AttendanceSummary {
+  totalEmployees: number;
+  presentCount: number;
+  absentCount: number;
+  lateCount: number;
+  onBreakCount: number;
+  onLeaveCount: number;
+  averageWorkingHours: string;
+  totalOvertimeHours: string;
+}
+
+export interface TodayAttendanceOverview {
+  branchId: number;
+  date: string;
+  summary: AttendanceSummary;
+  employeeStatuses: EmployeeAttendanceStatus[];
+}
+
+export interface EmployeeAttendanceStatus {
+  employee: {
+    id: number;
+    employeeId: string;
+    firstName: string;
+    lastName: string;
+    profilePhoto?: string;
+    designation: string;
+    department: string;
+  };
+  status: AttendanceStatusType;
+  checkInTime?: string;
+  checkOutTime?: string;
+  currentBreak?: BreakRecord;
+  totalWorkingHours: string;
+  totalBreakTime: string;
+  location?: string;
+  isLate: boolean;
+}
+
+export interface LocationInfo {
+  latitude: number;
+  longitude: number;
+  address?: string;
+  accuracy?: number;
+}
+
+export enum AttendanceStatusType {
+  Present = 'Present',
+  Absent = 'Absent',
+  Late = 'Late',
+  OnBreak = 'OnBreak',
+  HalfDay = 'HalfDay',
+  OnLeave = 'OnLeave'
+}
+
+export enum BreakType {
+  Tea = 'Tea',
+  Lunch = 'Lunch',
+  Personal = 'Personal',
+  Meeting = 'Meeting'
+}
+
+export const BreakTypeLabels = {
+  [BreakType.Tea]: 'Tea Break',
+  [BreakType.Lunch]: 'Lunch Break',
+  [BreakType.Personal]: 'Personal Break',
+  [BreakType.Meeting]: 'Meeting Break'
+};
+
+export const AttendanceStatusLabels = {
+  [AttendanceStatusType.Present]: 'Present',
+  [AttendanceStatusType.Absent]: 'Absent',
+  [AttendanceStatusType.Late]: 'Late',
+  [AttendanceStatusType.OnBreak]: 'On Break',
+  [AttendanceStatusType.HalfDay]: 'Half Day',
+  [AttendanceStatusType.OnLeave]: 'On Leave'
+};
+
+export const AttendanceStatusColors = {
+  [AttendanceStatusType.Present]: 'success',
+  [AttendanceStatusType.Absent]: 'danger',
+  [AttendanceStatusType.Late]: 'warning',
+  [AttendanceStatusType.OnBreak]: 'info',
+  [AttendanceStatusType.HalfDay]: 'secondary',
+  [AttendanceStatusType.OnLeave]: 'primary'
+};

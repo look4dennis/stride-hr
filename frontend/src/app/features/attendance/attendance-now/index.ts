@@ -1,0 +1,1 @@
+export { AttendanceNowComponent } from './attendance-now.component';

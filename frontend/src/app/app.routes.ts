@@ -63,7 +63,17 @@ export const routes: Routes = [
       },
       {
         path: 'attendance',
-        loadComponent: () => import('./features/attendance/attendance-tracker').then(m => m.AttendanceTrackerComponent)
+        children: [
+          {
+            path: '',
+            loadComponent: () => import('./features/attendance/attendance-tracker').then(m => m.AttendanceTrackerComponent)
+          },
+          {
+            path: 'now',
+            loadComponent: () => import('./features/attendance/attendance-now').then(m => m.AttendanceNowComponent),
+            data: { roles: ['HR', 'Admin', 'Manager'] }
+          }
+        ]
       },
       {
         path: 'projects',
