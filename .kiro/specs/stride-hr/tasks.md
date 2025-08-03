@@ -325,6 +325,8 @@ Convert the feature design into a series of prompts for a code-generation LLM th
 
 
 
+
+
     - Implement shift swap request workflows
     - Create manager approval for shift changes
     - Add emergency shift coverage broadcasting

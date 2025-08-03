@@ -15,6 +15,11 @@ public class ShiftServiceTests
 {
     private readonly Mock<IShiftRepository> _mockShiftRepository;
     private readonly Mock<IShiftAssignmentRepository> _mockShiftAssignmentRepository;
+    private readonly Mock<IShiftSwapRequestRepository> _mockShiftSwapRequestRepository;
+    private readonly Mock<IShiftSwapResponseRepository> _mockShiftSwapResponseRepository;
+    private readonly Mock<IShiftCoverageRequestRepository> _mockShiftCoverageRequestRepository;
+    private readonly Mock<IShiftCoverageResponseRepository> _mockShiftCoverageResponseRepository;
+    private readonly Mock<IEmployeeRepository> _mockEmployeeRepository;
     private readonly Mock<ILogger<ShiftService>> _mockLogger;
     private readonly IMapper _mapper;
     private readonly ShiftService _shiftService;
@@ -23,6 +28,11 @@ public class ShiftServiceTests
     {
         _mockShiftRepository = new Mock<IShiftRepository>();
         _mockShiftAssignmentRepository = new Mock<IShiftAssignmentRepository>();
+        _mockShiftSwapRequestRepository = new Mock<IShiftSwapRequestRepository>();
+        _mockShiftSwapResponseRepository = new Mock<IShiftSwapResponseRepository>();
+        _mockShiftCoverageRequestRepository = new Mock<IShiftCoverageRequestRepository>();
+        _mockShiftCoverageResponseRepository = new Mock<IShiftCoverageResponseRepository>();
+        _mockEmployeeRepository = new Mock<IEmployeeRepository>();
         _mockLogger = new Mock<ILogger<ShiftService>>();
 
         var mapperConfig = new MapperConfiguration(cfg =>
@@ -34,6 +44,11 @@ public class ShiftServiceTests
         _shiftService = new ShiftService(
             _mockShiftRepository.Object,
             _mockShiftAssignmentRepository.Object,
+            _mockShiftSwapRequestRepository.Object,
+            _mockShiftSwapResponseRepository.Object,
+            _mockShiftCoverageRequestRepository.Object,
+            _mockShiftCoverageResponseRepository.Object,
+            _mockEmployeeRepository.Object,
             _mapper,
             _mockLogger.Object);
     }

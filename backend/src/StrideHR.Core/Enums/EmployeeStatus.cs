@@ -27,15 +27,6 @@ public enum BreakType
     Meeting = 4
 }
 
-public enum ShiftType
-{
-    Day = 1,
-    Night = 2,
-    Rotating = 3,
-    Split = 4,
-    Flexible = 5
-}
-
 public enum HolidayType
 {
     National = 1,
