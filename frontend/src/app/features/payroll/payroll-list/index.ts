@@ -1,0 +1,1 @@
+export { PayrollListComponent } from './payroll-list.component';

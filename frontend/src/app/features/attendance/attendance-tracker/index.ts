@@ -1,0 +1,1 @@
+export { AttendanceTrackerComponent } from './attendance-tracker.component';

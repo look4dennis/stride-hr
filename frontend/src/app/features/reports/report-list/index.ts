@@ -1,0 +1,1 @@
+export { ReportListComponent } from './report-list.component';

@@ -1,0 +1,1 @@
+export { PerformanceListComponent } from './performance-list.component';
