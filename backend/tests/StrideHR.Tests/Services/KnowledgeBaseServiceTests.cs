@@ -94,7 +94,7 @@ public class KnowledgeBaseServiceTests
 
         _mockDocumentRepository.Verify(r => r.AddAsync(It.IsAny<KnowledgeBaseDocument>()), Times.Once);
         _mockDocumentRepository.Verify(r => r.SaveChangesAsync(), Times.Once);
-        _mockAuditLogService.Verify(a => a.LogAsync(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>()), Times.Once);
+        _mockAuditLogService.Verify(a => a.LogEventAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<object>()), Times.Once);
     }
 
     [Fact]
@@ -147,7 +147,7 @@ public class KnowledgeBaseServiceTests
 
         _mockDocumentRepository.Verify(r => r.UpdateAsync(It.IsAny<KnowledgeBaseDocument>()), Times.Once);
         _mockDocumentRepository.Verify(r => r.SaveChangesAsync(), Times.Once);
-        _mockAuditLogService.Verify(a => a.LogAsync(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>()), Times.Once);
+        _mockAuditLogService.Verify(a => a.LogEventAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<object>()), Times.Once);
     }
 
     [Fact]
@@ -271,7 +271,7 @@ public class KnowledgeBaseServiceTests
         Assert.True(result);
         _mockDocumentRepository.Verify(r => r.DeleteAsync(document), Times.Once);
         _mockDocumentRepository.Verify(r => r.SaveChangesAsync(), Times.Once);
-        _mockAuditLogService.Verify(a => a.LogAsync(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>()), Times.Once);
+        _mockAuditLogService.Verify(a => a.LogEventAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<object>()), Times.Once);
     }
 
     [Fact]
@@ -339,7 +339,7 @@ public class KnowledgeBaseServiceTests
         Assert.Equal(DocumentStatus.PendingReview, document.Status);
         _mockDocumentRepository.Verify(r => r.UpdateAsync(document), Times.Once);
         _mockDocumentRepository.Verify(r => r.SaveChangesAsync(), Times.Once);
-        _mockAuditLogService.Verify(a => a.LogAsync(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>()), Times.Once);
+        _mockAuditLogService.Verify(a => a.LogEventAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<object>()), Times.Once);
     }
 
     [Fact]
@@ -434,7 +434,7 @@ public class KnowledgeBaseServiceTests
 
         _mockDocumentRepository.Verify(r => r.UpdateAsync(document), Times.Once);
         _mockDocumentRepository.Verify(r => r.SaveChangesAsync(), Times.Once);
-        _mockAuditLogService.Verify(a => a.LogAsync(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>()), Times.Once);
+        _mockAuditLogService.Verify(a => a.LogEventAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<object>()), Times.Once);
     }
 
     [Fact]
@@ -473,7 +473,7 @@ public class KnowledgeBaseServiceTests
 
         _mockDocumentRepository.Verify(r => r.UpdateAsync(document), Times.Once);
         _mockDocumentRepository.Verify(r => r.SaveChangesAsync(), Times.Once);
-        _mockAuditLogService.Verify(a => a.LogAsync(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>()), Times.Once);
+        _mockAuditLogService.Verify(a => a.LogEventAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<object>()), Times.Once);
     }
 
     #endregion

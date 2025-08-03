@@ -223,6 +223,18 @@ public static class ServiceCollectionExtensions
             options.AddPolicy("Permission:AuditLog.ViewSecurity", policy => 
                 policy.Requirements.Add(new PermissionRequirement("AuditLog.ViewSecurity")));
 
+            // Document template policies
+            options.AddPolicy("Permission:DocumentTemplate.View", policy => 
+                policy.Requirements.Add(new PermissionRequirement("DocumentTemplate.View")));
+            options.AddPolicy("Permission:DocumentTemplate.Create", policy => 
+                policy.Requirements.Add(new PermissionRequirement("DocumentTemplate.Create")));
+            options.AddPolicy("Permission:DocumentTemplate.Update", policy => 
+                policy.Requirements.Add(new PermissionRequirement("DocumentTemplate.Update")));
+            options.AddPolicy("Permission:DocumentTemplate.Delete", policy => 
+                policy.Requirements.Add(new PermissionRequirement("DocumentTemplate.Delete")));
+            options.AddPolicy("Permission:DocumentTemplate.Read", policy => 
+                policy.Requirements.Add(new PermissionRequirement("DocumentTemplate.Read")));
+
             // Training management policies
             options.AddPolicy("CanManageTraining", policy => 
                 policy.Requirements.Add(new PermissionRequirement("Training.Manage")));
@@ -407,6 +419,14 @@ public static class ServiceCollectionExtensions
         
         // Register grievance management services
         services.AddScoped<IGrievanceService, GrievanceService>();
+        
+        // Register document template repositories
+        services.AddScoped<IDocumentTemplateRepository, DocumentTemplateRepository>();
+        services.AddScoped<IGeneratedDocumentRepository, GeneratedDocumentRepository>();
+        services.AddScoped<IDocumentRetentionPolicyRepository, DocumentRetentionPolicyRepository>();
+        
+        // Register document template services
+        services.AddScoped<IDocumentTemplateService, DocumentTemplateService>();
         
         // Add SignalR
         services.AddSignalR();

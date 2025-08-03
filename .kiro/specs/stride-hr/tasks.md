@@ -335,7 +335,14 @@ Convert the feature design into a series of prompts for a code-generation LLM th
     - Write unit tests for knowledge base
     - _Requirements: 26.1, 26.2, 26.4, 26.5_
 
-  - [ ] 15.2 Document templates and digital workflows
+  - [x] 15.2 Document templates and digital workflows
+
+
+
+
+
+
+
     - Create document templates with merge fields
     - Implement digital signature workflows
     - Add document generation and automation

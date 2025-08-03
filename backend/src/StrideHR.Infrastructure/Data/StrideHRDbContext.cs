@@ -111,6 +111,16 @@ public class StrideHRDbContext : DbContext
     public DbSet<KnowledgeBaseDocumentView> KnowledgeBaseDocumentViews { get; set; }
     public DbSet<KnowledgeBaseDocumentComment> KnowledgeBaseDocumentComments { get; set; }
     
+    // Document Template DbSets
+    public DbSet<DocumentTemplate> DocumentTemplates { get; set; }
+    public DbSet<DocumentTemplateVersion> DocumentTemplateVersions { get; set; }
+    public DbSet<GeneratedDocument> GeneratedDocuments { get; set; }
+    public DbSet<DocumentSignature> DocumentSignatures { get; set; }
+    public DbSet<DocumentApproval> DocumentApprovals { get; set; }
+    public DbSet<DocumentAuditLog> DocumentAuditLogs { get; set; }
+    public DbSet<DocumentRetentionPolicy> DocumentRetentionPolicies { get; set; }
+    public DbSet<DocumentRetentionExecution> DocumentRetentionExecutions { get; set; }
+    
     // Report Management DbSets
     public DbSet<Report> Reports { get; set; }
     public DbSet<ReportExecution> ReportExecutions { get; set; }
