@@ -61,4 +61,14 @@ public class ProjectAssignmentRepository : Repository<ProjectAssignment>, IProje
             .AnyAsync(pa => pa.ProjectId == projectId && pa.EmployeeId == employeeId && 
                            pa.IsTeamLead && pa.UnassignedDate == null && !pa.IsDeleted);
     }
+
+    public async Task<IEnumerable<Employee>> GetProjectTeamMembersAsync(int projectId)
+    {
+        return await _dbSet
+            .Where(pa => pa.ProjectId == projectId && pa.UnassignedDate == null && !pa.IsDeleted)
+            .Select(pa => pa.Employee)
+            .OrderBy(e => e.FirstName)
+            .ThenBy(e => e.LastName)
+            .ToListAsync();
+    }
 }

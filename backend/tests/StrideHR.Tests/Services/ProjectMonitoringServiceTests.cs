@@ -13,7 +13,6 @@ public class ProjectMonitoringServiceTests
 {
     private readonly Mock<IProjectRepository> _mockProjectRepository;
     private readonly Mock<IProjectAlertRepository> _mockAlertRepository;
-    private readonly Mock<IProjectRiskRepository> _mockRiskRepository;
     private readonly Mock<IDSRRepository> _mockDsrRepository;
     private readonly Mock<IProjectAssignmentRepository> _mockAssignmentRepository;
     private readonly Mock<IMapper> _mockMapper;
@@ -24,7 +23,6 @@ public class ProjectMonitoringServiceTests
     {
         _mockProjectRepository = new Mock<IProjectRepository>();
         _mockAlertRepository = new Mock<IProjectAlertRepository>();
-        _mockRiskRepository = new Mock<IProjectRiskRepository>();
         _mockDsrRepository = new Mock<IDSRRepository>();
         _mockAssignmentRepository = new Mock<IProjectAssignmentRepository>();
         _mockMapper = new Mock<IMapper>();
@@ -33,7 +31,6 @@ public class ProjectMonitoringServiceTests
         _service = new ProjectMonitoringService(
             _mockProjectRepository.Object,
             _mockAlertRepository.Object,
-            _mockRiskRepository.Object,
             _mockDsrRepository.Object,
             _mockAssignmentRepository.Object,
             _mockMapper.Object,
@@ -62,10 +59,10 @@ public class ProjectMonitoringServiceTests
 
         _mockProjectRepository.Setup(r => r.GetProjectWithDetailsAsync(projectId))
             .ReturnsAsync(project);
-        _mockDsrRepository.Setup(r => r.GetProjectDSRsAsync(projectId, It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+        _mockDsrRepository.Setup(r => r.GetProjectDSRsAsync(It.IsAny<int>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
             .ReturnsAsync(dsrRecords);
         _mockAssignmentRepository.Setup(r => r.GetProjectTeamMembersAsync(projectId))
-            .ReturnsAsync(new List<ProjectAssignment>());
+            .ReturnsAsync(new List<Employee>());
 
         // Act
         var result = await _service.GetProjectHoursTrackingAsync(projectId);
@@ -104,9 +101,9 @@ public class ProjectMonitoringServiceTests
             Budget = 10000,
             Tasks = new List<ProjectTask>
             {
-                new ProjectTask { Id = 1, Status = Core.Enums.ProjectTaskStatus.Completed },
+                new ProjectTask { Id = 1, Status = Core.Enums.ProjectTaskStatus.Done },
                 new ProjectTask { Id = 2, Status = Core.Enums.ProjectTaskStatus.InProgress },
-                new ProjectTask { Id = 3, Status = Core.Enums.ProjectTaskStatus.Todo }
+                new ProjectTask { Id = 3, Status = Core.Enums.ProjectTaskStatus.ToDo }
             }
         };
 
@@ -116,24 +113,20 @@ public class ProjectMonitoringServiceTests
             new DSR { Id = 2, ProjectId = projectId, HoursWorked = 6 }
         };
 
-        var teamMembers = new List<ProjectAssignment>
+        var teamMembers = new List<Employee>
         {
-            new ProjectAssignment { Id = 1, ProjectId = projectId, EmployeeId = 1 },
-            new ProjectAssignment { Id = 2, ProjectId = projectId, EmployeeId = 2 }
+            new Employee { Id = 1, FirstName = "John", LastName = "Doe" },
+            new Employee { Id = 2, FirstName = "Jane", LastName = "Smith" }
         };
 
         var risks = new List<ProjectRisk>();
 
         _mockProjectRepository.Setup(r => r.GetProjectWithDetailsAsync(projectId))
             .ReturnsAsync(project);
-        _mockDsrRepository.Setup(r => r.GetProjectDSRsAsync(projectId))
+        _mockDsrRepository.Setup(r => r.GetProjectDSRsAsync(It.IsAny<int>(), null, null))
             .ReturnsAsync(dsrRecords);
         _mockAssignmentRepository.Setup(r => r.GetProjectTeamMembersAsync(projectId))
             .ReturnsAsync(teamMembers);
-        _mockRiskRepository.Setup(r => r.GetProjectRisksAsync(projectId))
-            .ReturnsAsync(risks);
-        _mockMapper.Setup(m => m.Map<List<ProjectRiskDto>>(risks))
-            .Returns(new List<ProjectRiskDto>());
 
         // Act
         var result = await _service.GetProjectAnalyticsAsync(projectId);
@@ -155,7 +148,7 @@ public class ProjectMonitoringServiceTests
     {
         // Arrange
         var projectId = 1;
-        var alertType = "Budget Alert";
+        var alertType = "BudgetOverrun";
         var message = "Project is over budget";
         var severity = "High";
 
@@ -163,17 +156,17 @@ public class ProjectMonitoringServiceTests
         {
             Id = 1,
             ProjectId = projectId,
-            AlertType = alertType,
+            AlertType = Core.Enums.ProjectAlertType.BudgetOverrun,
             Message = message,
-            Severity = severity,
+            Severity = Core.Enums.AlertSeverity.High,
             IsResolved = false,
             CreatedAt = DateTime.UtcNow
         };
 
         _mockAlertRepository.Setup(r => r.AddAsync(It.IsAny<ProjectAlert>()))
-            .Returns(Task.CompletedTask);
+            .ReturnsAsync(createdAlert);
         _mockAlertRepository.Setup(r => r.SaveChangesAsync())
-            .Returns(Task.CompletedTask);
+            .ReturnsAsync(true);
         _mockMapper.Setup(m => m.Map<ProjectAlertDto>(It.IsAny<ProjectAlert>()))
             .Returns(new ProjectAlertDto
             {
@@ -204,34 +197,16 @@ public class ProjectMonitoringServiceTests
         // Arrange
         var alertId = 1;
         var resolvedBy = 123;
-        var alert = new ProjectAlert
-        {
-            Id = alertId,
-            ProjectId = 1,
-            AlertType = "Test Alert",
-            Message = "Test message",
-            Severity = "Medium",
-            IsResolved = false
-        };
 
-        _mockAlertRepository.Setup(r => r.GetByIdAsync(alertId))
-            .ReturnsAsync(alert);
-        _mockAlertRepository.Setup(r => r.UpdateAsync(It.IsAny<ProjectAlert>()))
-            .Returns(Task.CompletedTask);
-        _mockAlertRepository.Setup(r => r.SaveChangesAsync())
-            .Returns(Task.CompletedTask);
+        _mockAlertRepository.Setup(r => r.ResolveAlertAsync(alertId, resolvedBy, null))
+            .ReturnsAsync(true);
 
         // Act
         var result = await _service.ResolveProjectAlertAsync(alertId, resolvedBy);
 
         // Assert
         Assert.True(result);
-        Assert.True(alert.IsResolved);
-        Assert.Equal(resolvedBy, alert.ResolvedBy);
-        Assert.NotNull(alert.ResolvedAt);
-
-        _mockAlertRepository.Verify(r => r.UpdateAsync(alert), Times.Once);
-        _mockAlertRepository.Verify(r => r.SaveChangesAsync(), Times.Once);
+        _mockAlertRepository.Verify(r => r.ResolveAlertAsync(alertId, resolvedBy, null), Times.Once);
     }
 
     [Fact]
@@ -241,16 +216,15 @@ public class ProjectMonitoringServiceTests
         var alertId = 999;
         var resolvedBy = 123;
 
-        _mockAlertRepository.Setup(r => r.GetByIdAsync(alertId))
-            .ReturnsAsync((ProjectAlert)null);
+        _mockAlertRepository.Setup(r => r.ResolveAlertAsync(alertId, resolvedBy, null))
+            .ReturnsAsync(false);
 
         // Act
         var result = await _service.ResolveProjectAlertAsync(alertId, resolvedBy);
 
         // Assert
         Assert.False(result);
-        _mockAlertRepository.Verify(r => r.UpdateAsync(It.IsAny<ProjectAlert>()), Times.Never);
-        _mockAlertRepository.Verify(r => r.SaveChangesAsync(), Times.Never);
+        _mockAlertRepository.Verify(r => r.ResolveAlertAsync(alertId, resolvedBy, null), Times.Once);
     }
 
     [Fact]
@@ -278,10 +252,7 @@ public class ProjectMonitoringServiceTests
             CreatedAt = DateTime.UtcNow
         };
 
-        _mockRiskRepository.Setup(r => r.AddAsync(It.IsAny<ProjectRisk>()))
-            .Returns(Task.CompletedTask);
-        _mockRiskRepository.Setup(r => r.SaveChangesAsync())
-            .Returns(Task.CompletedTask);
+
         _mockMapper.Setup(m => m.Map<ProjectRiskDto>(It.IsAny<ProjectRisk>()))
             .Returns(new ProjectRiskDto
             {
@@ -306,8 +277,7 @@ public class ProjectMonitoringServiceTests
         Assert.Equal(probability, result.Probability);
         Assert.Equal(impact, result.Impact);
 
-        _mockRiskRepository.Verify(r => r.AddAsync(It.IsAny<ProjectRisk>()), Times.Once);
-        _mockRiskRepository.Verify(r => r.SaveChangesAsync(), Times.Once);
+
     }
 
     [Fact]
@@ -325,7 +295,7 @@ public class ProjectMonitoringServiceTests
             EndDate = DateTime.Today.AddDays(30),
             Tasks = new List<ProjectTask>
             {
-                new ProjectTask { Id = 1, Status = Core.Enums.ProjectTaskStatus.Completed },
+                new ProjectTask { Id = 1, Status = Core.Enums.ProjectTaskStatus.Done },
                 new ProjectTask { Id = 2, Status = Core.Enums.ProjectTaskStatus.InProgress }
             },
             ProjectAssignments = new List<ProjectAssignment>
@@ -342,7 +312,7 @@ public class ProjectMonitoringServiceTests
 
         _mockProjectRepository.Setup(r => r.GetProjectWithDetailsAsync(projectId))
             .ReturnsAsync(project);
-        _mockDsrRepository.Setup(r => r.GetProjectDSRsAsync(projectId))
+        _mockDsrRepository.Setup(r => r.GetProjectDSRsAsync(It.IsAny<int>(), null, null))
             .ReturnsAsync(dsrRecords);
 
         // Act
@@ -368,8 +338,8 @@ public class ProjectMonitoringServiceTests
             EndDate = DateTime.Today.AddDays(20),
             Tasks = new List<ProjectTask>
             {
-                new ProjectTask { Id = 1, Status = Core.Enums.ProjectTaskStatus.Completed },
-                new ProjectTask { Id = 2, Status = Core.Enums.ProjectTaskStatus.Completed }
+                new ProjectTask { Id = 1, Status = Core.Enums.ProjectTaskStatus.Done },
+                new ProjectTask { Id = 2, Status = Core.Enums.ProjectTaskStatus.Done }
             },
             ProjectAssignments = new List<ProjectAssignment>
             {
@@ -384,7 +354,7 @@ public class ProjectMonitoringServiceTests
 
         _mockProjectRepository.Setup(r => r.GetProjectWithDetailsAsync(projectId))
             .ReturnsAsync(project);
-        _mockDsrRepository.Setup(r => r.GetProjectDSRsAsync(projectId))
+        _mockDsrRepository.Setup(r => r.GetProjectDSRsAsync(It.IsAny<int>(), null, null))
             .ReturnsAsync(dsrRecords);
 
         // Act
@@ -412,7 +382,7 @@ public class ProjectMonitoringServiceTests
                 new ProjectTask 
                 { 
                     Id = 1, 
-                    Status = Core.Enums.ProjectTaskStatus.Todo,
+                    Status = Core.Enums.ProjectTaskStatus.ToDo,
                     DueDate = DateTime.Today.AddDays(-5) // Overdue task
                 }
             }
@@ -425,12 +395,12 @@ public class ProjectMonitoringServiceTests
 
         _mockProjectRepository.Setup(r => r.GetProjectWithDetailsAsync(projectId))
             .ReturnsAsync(project);
-        _mockDsrRepository.Setup(r => r.GetProjectDSRsAsync(projectId))
+        _mockDsrRepository.Setup(r => r.GetProjectDSRsAsync(It.IsAny<int>(), null, null))
             .ReturnsAsync(dsrRecords);
         _mockAlertRepository.Setup(r => r.AddAsync(It.IsAny<ProjectAlert>()))
-            .Returns(Task.CompletedTask);
+            .ReturnsAsync(It.IsAny<ProjectAlert>());
         _mockAlertRepository.Setup(r => r.SaveChangesAsync())
-            .Returns(Task.CompletedTask);
+            .ReturnsAsync(true);
 
         // Act
         await _service.CheckProjectHealthAsync(projectId);

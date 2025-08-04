@@ -12,4 +12,5 @@ public interface IDSRRepository : IRepository<DSR>
     Task<IEnumerable<DSR>> GetPendingDSRsForReviewAsync(int reviewerId);
     Task<decimal> GetTotalHoursByProjectAsync(int projectId, DateTime? startDate = null, DateTime? endDate = null);
     Task<decimal> GetTotalHoursByEmployeeAsync(int employeeId, DateTime? startDate = null, DateTime? endDate = null);
+    Task<IEnumerable<DSR>> GetProjectDSRsAsync(int projectId, DateTime? startDate = null, DateTime? endDate = null);
 }

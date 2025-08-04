@@ -17,7 +17,7 @@ public class ProjectCollaborationService : IProjectCollaborationService
     private readonly IProjectAssignmentRepository _assignmentRepository;
     private readonly IMapper _mapper;
     private readonly ILogger<ProjectCollaborationService> _logger;
-    private readonly IHubContext<ProjectHub> _hubContext;
+    private readonly IHubContext<Hub> _hubContext;
 
     public ProjectCollaborationService(
         IProjectCommentRepository commentRepository,
@@ -27,7 +27,7 @@ public class ProjectCollaborationService : IProjectCollaborationService
         IProjectAssignmentRepository assignmentRepository,
         IMapper mapper,
         ILogger<ProjectCollaborationService> logger,
-        IHubContext<ProjectHub> hubContext)
+        IHubContext<Hub> hubContext)
     {
         _commentRepository = commentRepository;
         _replyRepository = replyRepository;
@@ -292,11 +292,11 @@ public class ProjectCollaborationService : IProjectCollaborationService
 
             var memberActivities = teamMembers.Select(tm => new TeamMemberActivityDto
             {
-                EmployeeId = tm.EmployeeId,
-                EmployeeName = tm.EmployeeName,
-                CommentsCount = comments.Count(c => c.EmployeeId == tm.EmployeeId),
-                ActivitiesCount = activities.Count(a => a.EmployeeId == tm.EmployeeId),
-                LastActivity = activities.Where(a => a.EmployeeId == tm.EmployeeId)
+                EmployeeId = tm.Id, // Use Employee.Id instead of EmployeeId
+                EmployeeName = tm.FullName ?? "Unknown",
+                CommentsCount = comments.Count(c => c.EmployeeId == tm.Id),
+                ActivitiesCount = activities.Count(a => a.EmployeeId == tm.Id),
+                LastActivity = activities.Where(a => a.EmployeeId == tm.Id)
                                       .OrderByDescending(a => a.CreatedAt)
                                       .FirstOrDefault()?.CreatedAt ?? DateTime.MinValue
             }).ToList();
@@ -347,7 +347,7 @@ public class ProjectCollaborationService : IProjectCollaborationService
             });
 
             _logger.LogInformation("Notification sent to {MemberCount} team members for project {ProjectId}", 
-                teamMembers.Count, projectId);
+                teamMembers.Count(), projectId);
         }
         catch (Exception ex)
         {

@@ -12,4 +12,5 @@ public interface IProjectAlertRepository : IRepository<ProjectAlert>
     Task<IEnumerable<ProjectAlert>> GetAlertsByTypeAsync(ProjectAlertType alertType);
     Task<bool> ResolveAlertAsync(int alertId, int resolvedByEmployeeId, string? resolutionNotes = null);
     Task<int> GetUnresolvedAlertCountAsync(int projectId);
+    Task<IEnumerable<ProjectAlert>> GetCriticalAlertsAsync();
 }

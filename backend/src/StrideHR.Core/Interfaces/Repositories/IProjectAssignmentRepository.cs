@@ -9,4 +9,5 @@ public interface IProjectAssignmentRepository : IRepository<ProjectAssignment>
     Task<ProjectAssignment?> GetAssignmentAsync(int projectId, int employeeId);
     Task<IEnumerable<ProjectAssignment>> GetTeamLeadAssignmentsAsync(int employeeId);
     Task<bool> IsTeamLeadAsync(int projectId, int employeeId);
+    Task<IEnumerable<Employee>> GetProjectTeamMembersAsync(int projectId);
 }

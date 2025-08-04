@@ -7,4 +7,5 @@ public class DailyHoursDto
     public string Description { get; set; } = string.Empty;
     public int? TaskId { get; set; }
     public string? TaskTitle { get; set; }
+    public int TasksWorked { get; set; }
 }

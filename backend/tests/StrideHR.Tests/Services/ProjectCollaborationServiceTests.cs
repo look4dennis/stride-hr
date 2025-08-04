@@ -19,7 +19,7 @@ public class ProjectCollaborationServiceTests
     private readonly Mock<IProjectAssignmentRepository> _mockAssignmentRepository;
     private readonly Mock<IMapper> _mockMapper;
     private readonly Mock<ILogger<ProjectCollaborationService>> _mockLogger;
-    private readonly Mock<IHubContext<ProjectHub>> _mockHubContext;
+    private readonly Mock<IHubContext<Hub>> _mockHubContext;
     private readonly ProjectCollaborationService _service;
 
     public ProjectCollaborationServiceTests()
@@ -31,7 +31,7 @@ public class ProjectCollaborationServiceTests
         _mockAssignmentRepository = new Mock<IProjectAssignmentRepository>();
         _mockMapper = new Mock<IMapper>();
         _mockLogger = new Mock<ILogger<ProjectCollaborationService>>();
-        _mockHubContext = new Mock<IHubContext<ProjectHub>>();
+        _mockHubContext = new Mock<IHubContext<Hub>>();
 
         _service = new ProjectCollaborationService(
             _mockCommentRepository.Object,
@@ -65,9 +65,9 @@ public class ProjectCollaborationServiceTests
             new ProjectActivityDto { Id = 1, ProjectId = projectId, Description = "Test activity" }
         };
 
-        var teamMembers = new List<ProjectAssignment>
+        var teamMembers = new List<Employee>
         {
-            new ProjectAssignment { Id = 1, ProjectId = projectId, EmployeeId = 1 }
+            new Employee { Id = 1, FirstName = "John", LastName = "Doe" }
         };
 
         var communicationStats = new ProjectCommunicationStatsDto
@@ -142,9 +142,9 @@ public class ProjectCollaborationServiceTests
         };
 
         _mockCommentRepository.Setup(r => r.AddAsync(It.IsAny<ProjectComment>()))
-            .Returns(Task.CompletedTask);
+            .ReturnsAsync(savedComment);
         _mockCommentRepository.Setup(r => r.SaveChangesAsync())
-            .Returns(Task.CompletedTask);
+            .ReturnsAsync(true);
         _mockCommentRepository.Setup(r => r.GetCommentWithRepliesAsync(It.IsAny<int>()))
             .ReturnsAsync(savedComment);
 
@@ -161,10 +161,10 @@ public class ProjectCollaborationServiceTests
             .Returns(expectedDto);
 
         // Mock SignalR
-        var mockClients = new Mock<IHubCallerClients>();
-        var mockGroup = new Mock<IClientProxy>();
-        _mockHubContext.Setup(h => h.Clients).Returns(mockClients.Object);
-        mockClients.Setup(c => c.Group(It.IsAny<string>())).Returns(mockGroup.Object);
+        // var mockClients = new Mock<IHubCallerClients<Hub>>();
+        // var mockGroup = new Mock<IClientProxy>();
+        // _mockHubContext.Setup(h => h.Clients).Returns(mockClients.Object);
+        // mockClients.Setup(c => c.Group(It.IsAny<string>())).Returns(mockGroup.Object);
 
         // Act
         var result = await _service.AddProjectCommentAsync(dto, employeeId);
@@ -210,9 +210,9 @@ public class ProjectCollaborationServiceTests
         _mockCommentRepository.Setup(r => r.GetByIdAsync(dto.CommentId))
             .ReturnsAsync(originalComment);
         _mockReplyRepository.Setup(r => r.AddAsync(It.IsAny<ProjectCommentReply>()))
-            .Returns(Task.CompletedTask);
+            .ReturnsAsync(savedReply);
         _mockReplyRepository.Setup(r => r.SaveChangesAsync())
-            .Returns(Task.CompletedTask);
+            .ReturnsAsync(true);
         _mockReplyRepository.Setup(r => r.GetByIdAsync(It.IsAny<int>()))
             .ReturnsAsync(savedReply);
 
@@ -259,7 +259,7 @@ public class ProjectCollaborationServiceTests
         _mockCommentRepository.Setup(r => r.DeleteAsync(comment))
             .Returns(Task.CompletedTask);
         _mockCommentRepository.Setup(r => r.SaveChangesAsync())
-            .Returns(Task.CompletedTask);
+            .ReturnsAsync(true);
 
         // Act
         var result = await _service.DeleteCommentAsync(commentId, employeeId);
@@ -337,9 +337,9 @@ public class ProjectCollaborationServiceTests
         };
 
         _mockActivityRepository.Setup(r => r.AddAsync(It.IsAny<ProjectActivity>()))
-            .Returns(Task.CompletedTask);
+            .ReturnsAsync(savedActivity);
         _mockActivityRepository.Setup(r => r.SaveChangesAsync())
-            .Returns(Task.CompletedTask);
+            .ReturnsAsync(true);
         _mockActivityRepository.Setup(r => r.GetByIdAsync(It.IsAny<int>()))
             .ReturnsAsync(savedActivity);
 
@@ -357,10 +357,10 @@ public class ProjectCollaborationServiceTests
             .Returns(expectedDto);
 
         // Mock SignalR
-        var mockClients = new Mock<IHubCallerClients>();
-        var mockGroup = new Mock<IClientProxy>();
-        _mockHubContext.Setup(h => h.Clients).Returns(mockClients.Object);
-        mockClients.Setup(c => c.Group(It.IsAny<string>())).Returns(mockGroup.Object);
+        // var mockClients = new Mock<IHubCallerClients<Hub>>();
+        // var mockGroup = new Mock<IClientProxy>();
+        // _mockHubContext.Setup(h => h.Clients).Returns(mockClients.Object);
+        // mockClients.Setup(c => c.Group(It.IsAny<string>())).Returns(mockGroup.Object);
 
         // Act
         var result = await _service.LogProjectActivityAsync(projectId, employeeId, activityType, description, details);
@@ -394,10 +394,10 @@ public class ProjectCollaborationServiceTests
             new ProjectActivity { Id = 2, ProjectId = projectId, EmployeeId = 2, CreatedAt = DateTime.UtcNow }
         };
 
-        var teamMembers = new List<ProjectAssignment>
+        var teamMembers = new List<Employee>
         {
-            new ProjectAssignment { Id = 1, ProjectId = projectId, EmployeeId = 1 },
-            new ProjectAssignment { Id = 2, ProjectId = projectId, EmployeeId = 2 }
+            new Employee { Id = 1, FirstName = "John", LastName = "Doe" },
+            new Employee { Id = 2, FirstName = "Jane", LastName = "Smith" }
         };
 
         _mockCommentRepository.Setup(r => r.GetProjectCommentsAsync(projectId))

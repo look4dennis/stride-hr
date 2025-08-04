@@ -111,4 +111,23 @@ public class DSRRepository : Repository<DSR>, IDSRRepository
 
         return await query.SumAsync(d => d.HoursWorked);
     }
+
+    public async Task<IEnumerable<DSR>> GetProjectDSRsAsync(int projectId, DateTime? startDate = null, DateTime? endDate = null)
+    {
+        var query = _dbSet
+            .Where(d => d.ProjectId == projectId && !d.IsDeleted);
+
+        if (startDate.HasValue)
+            query = query.Where(d => d.Date >= startDate.Value);
+
+        if (endDate.HasValue)
+            query = query.Where(d => d.Date <= endDate.Value);
+
+        return await query
+            .Include(d => d.Employee)
+            .Include(d => d.Project)
+            .Include(d => d.Task)
+            .OrderByDescending(d => d.Date)
+            .ToListAsync();
+    }
 }

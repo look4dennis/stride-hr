@@ -85,4 +85,14 @@ public class ProjectAlertRepository : Repository<ProjectAlert>, IProjectAlertRep
         return await _context.ProjectAlerts
             .CountAsync(a => a.ProjectId == projectId && !a.IsResolved && !a.IsDeleted);
     }
+
+    public async Task<IEnumerable<ProjectAlert>> GetCriticalAlertsAsync()
+    {
+        return await _context.ProjectAlerts
+            .Where(a => a.Severity == AlertSeverity.Critical && !a.IsResolved && !a.IsDeleted)
+            .Include(a => a.Project)
+            .Include(a => a.ResolvedByEmployee)
+            .OrderByDescending(a => a.CreatedAt)
+            .ToListAsync();
+    }
 }
