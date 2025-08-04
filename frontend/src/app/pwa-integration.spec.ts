@@ -102,7 +102,7 @@ describe('PWA Integration Tests', () => {
       // After expiry, should not be cached
       setTimeout(() => {
         expect(offlineStorageService.isCached('test-key')).toBe(false);
-        done();
+        done?.();
       }, 100);
     });
   });

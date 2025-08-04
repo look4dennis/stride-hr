@@ -185,7 +185,7 @@ describe('BirthdayService', () => {
     service.todayBirthdays$.subscribe(birthdays => {
       if (birthdays.length > 0) {
         expect(birthdays).toEqual(mockBirthdayEmployees);
-        done();
+        done?.();
       }
     });
     

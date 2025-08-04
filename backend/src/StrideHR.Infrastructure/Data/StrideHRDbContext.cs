@@ -37,6 +37,7 @@ public class StrideHRDbContext : DbContext
     // Project Management DbSets
     public DbSet<Project> Projects { get; set; }
     public DbSet<ProjectTask> ProjectTasks { get; set; }
+    public DbSet<ProjectTask> Tasks { get; set; } // Alias for ProjectTasks for backward compatibility
     public DbSet<ProjectAssignment> ProjectAssignments { get; set; }
     public DbSet<TaskAssignment> TaskAssignments { get; set; }
     public DbSet<DSR> DSRs { get; set; }

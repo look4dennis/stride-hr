@@ -7,6 +7,7 @@ public class PayrollRecord : BaseEntity
     public int EmployeeId { get; set; }
     public DateTime PayrollPeriodStart { get; set; }
     public DateTime PayrollPeriodEnd { get; set; }
+    public PayrollPeriod PayrollPeriod { get; set; }
     public int PayrollMonth { get; set; }
     public int PayrollYear { get; set; }
     
@@ -37,6 +38,9 @@ public class PayrollRecord : BaseEntity
     public decimal AdvanceDeduction { get; set; }
     public decimal OtherDeductions { get; set; }
     public decimal TotalDeductions { get; set; }
+    
+    // Additional deductions for complex payroll
+    public string Deductions { get; set; } = "{}"; // JSON string for additional deductions
     
     // Attendance-based calculations
     public int WorkingDays { get; set; }

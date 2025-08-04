@@ -17,6 +17,7 @@ using Microsoft.Extensions.Options;
 using System.Security.Claims;
 using System.Text.Encodings.Web;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using StrideHR.Tests.TestConfiguration;
 
 namespace StrideHR.Tests.Integration;
 
@@ -365,38 +366,4 @@ public class SupportTicketIntegrationTests : IClassFixture<WebApplicationFactory
         Assert.NotNull(apiResponse.Data);
         Assert.True(apiResponse.Data.TotalTickets >= 0);
     }
-}
-
-public class TestAuthenticationHandler : AuthenticationHandler<AuthenticationSchemeOptions>
-{
-    public TestAuthenticationHandler(IOptionsMonitor<AuthenticationSchemeOptions> options,
-        ILoggerFactory logger, UrlEncoder encoder, ISystemClock clock)
-        : base(options, logger, encoder, clock)
-    {
-    }
-
-    protected override Task<AuthenticateResult> HandleAuthenticateAsync()
-    {
-        var claims = new[]
-        {
-            new Claim("EmployeeId", "1"),
-            new Claim(ClaimTypes.Name, "Test Employee"),
-            new Claim(ClaimTypes.Email, "test.employee@test.com")
-        };
-
-        var identity = new ClaimsIdentity(claims, "Test");
-        var principal = new ClaimsPrincipal(identity);
-        var ticket = new AuthenticationTicket(principal, "Test");
-
-        return Task.FromResult(AuthenticateResult.Success(ticket));
-    }
-}
-
-// Helper class for API response deserialization
-public class ApiResponse<T>
-{
-    public bool Success { get; set; }
-    public string Message { get; set; } = string.Empty;
-    public T? Data { get; set; }
-    public List<string> Errors { get; set; } = new();
 }

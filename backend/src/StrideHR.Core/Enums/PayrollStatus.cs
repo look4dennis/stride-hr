@@ -6,7 +6,9 @@ public enum PayrollStatus
     Calculated = 1,
     UnderReview = 2,
     Approved = 3,
-    Processed = 4,
-    Paid = 5,
-    Cancelled = 6
+    HRApproved = 4,
+    Processed = 5,
+    Released = 6,
+    Paid = 7,
+    Cancelled = 8
 }

@@ -58,4 +58,7 @@ public class Employee : BaseEntity
     // Training-related Navigation Properties
     public virtual ICollection<TrainingAssignment> TrainingAssignments { get; set; } = new List<TrainingAssignment>();
     public virtual ICollection<TrainingProgress> TrainingProgress { get; set; } = new List<TrainingProgress>();
+    
+    // Payroll-related Navigation Properties
+    public virtual ICollection<PayrollRecord> PayrollRecords { get; set; } = new List<PayrollRecord>();
 }

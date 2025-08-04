@@ -44,7 +44,7 @@ describe('WeatherService', () => {
 
     // Mock geolocation
     const mockGeolocation = {
-      getCurrentPosition: jasmine.createSpy('getCurrentPosition').and.callFake((success) => {
+      getCurrentPosition: jasmine.createSpy('getCurrentPosition').and.callFake((success: any) => {
         success({
           coords: {
             latitude: 40.7128,
@@ -120,7 +120,7 @@ describe('WeatherService', () => {
   it('should handle geolocation error gracefully', () => {
     // Mock geolocation error
     const mockGeolocationError = {
-      getCurrentPosition: jasmine.createSpy('getCurrentPosition').and.callFake((success, error) => {
+      getCurrentPosition: jasmine.createSpy('getCurrentPosition').and.callFake((success: any, error: any) => {
         error({ code: 1, message: 'Permission denied' });
       })
     };
