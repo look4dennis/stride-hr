@@ -16,6 +16,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.Security.Claims;
 using System.Text.Encodings.Web;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace StrideHR.Tests.Integration;
 
@@ -40,8 +41,13 @@ public class SupportTicketIntegrationTests : IClassFixture<WebApplicationFactory
                 // Add in-memory database for testing
                 services.AddDbContext<StrideHRDbContext>(options =>
                 {
-                    options.UseInMemoryDatabase($"TestDatabase_{Guid.NewGuid()}");
+                    options.UseInMemoryDatabase("TestDatabase");
                 });
+
+                // Clear existing authorization services to avoid duplicates
+                services.RemoveAll<IAuthorizationService>();
+                services.RemoveAll<IAuthorizationPolicyProvider>();
+                services.RemoveAll<IAuthorizationHandlerProvider>();
 
                 // Replace authorization with a policy that always succeeds for testing
                 services.AddAuthorization(options =>
@@ -51,32 +57,28 @@ public class SupportTicketIntegrationTests : IClassFixture<WebApplicationFactory
                         .Build();
                     
                     // Add specific policies that always succeed for testing
-                    options.AddPolicy("Permission:SupportTicket.Create", policy => 
-                        policy.RequireAssertion(_ => true));
-                    options.AddPolicy("Permission:SupportTicket.Read", policy => 
-                        policy.RequireAssertion(_ => true));
-                    options.AddPolicy("Permission:SupportTicket.Update", policy => 
-                        policy.RequireAssertion(_ => true));
-                    options.AddPolicy("Permission:SupportTicket.Delete", policy => 
-                        policy.RequireAssertion(_ => true));
-                    options.AddPolicy("Permission:SupportTicket.ViewAnalytics", policy => 
-                        policy.RequireAssertion(_ => true));
-                    options.AddPolicy("Permission:SupportTicket.Assign", policy => 
-                        policy.RequireAssertion(_ => true));
-                    options.AddPolicy("Permission:SupportTicket.UpdateStatus", policy => 
-                        policy.RequireAssertion(_ => true));
-                    options.AddPolicy("Permission:SupportTicket.Resolve", policy => 
-                        policy.RequireAssertion(_ => true));
-                    options.AddPolicy("Permission:SupportTicket.Close", policy => 
-                        policy.RequireAssertion(_ => true));
-                    options.AddPolicy("Permission:SupportTicket.Reopen", policy => 
-                        policy.RequireAssertion(_ => true));
-                    options.AddPolicy("Permission:SupportTicket.ViewAssigned", policy => 
-                        policy.RequireAssertion(_ => true));
-                    options.AddPolicy("Permission:SupportTicket.ViewOverdue", policy => 
-                        policy.RequireAssertion(_ => true));
-                    options.AddPolicy("Permission:SupportTicket.Comment", policy => 
-                        policy.RequireAssertion(_ => true));
+                    var policies = new[]
+                    {
+                        "Permission:SupportTicket.Create",
+                        "Permission:SupportTicket.Read", 
+                        "Permission:SupportTicket.Update",
+                        "Permission:SupportTicket.Delete",
+                        "Permission:SupportTicket.ViewAnalytics",
+                        "Permission:SupportTicket.Assign",
+                        "Permission:SupportTicket.UpdateStatus",
+                        "Permission:SupportTicket.Resolve",
+                        "Permission:SupportTicket.Close",
+                        "Permission:SupportTicket.Reopen",
+                        "Permission:SupportTicket.ViewAssigned",
+                        "Permission:SupportTicket.ViewOverdue",
+                        "Permission:SupportTicket.Comment"
+                    };
+
+                    foreach (var policy in policies)
+                    {
+                        options.AddPolicy(policy, policyBuilder => 
+                            policyBuilder.RequireAssertion(_ => true));
+                    }
                 });
 
                 // Add test authentication
@@ -241,6 +243,13 @@ public class SupportTicketIntegrationTests : IClassFixture<WebApplicationFactory
 
         // Act
         var response = await _client.GetAsync($"/api/supportticket/{ticketId}");
+
+        // Debug: Print response details if not successful
+        if (!response.IsSuccessStatusCode)
+        {
+            var errorContent = await response.Content.ReadAsStringAsync();
+            throw new Exception($"Get request failed with status {response.StatusCode}: {errorContent}");
+        }
 
         // Assert
         Assert.True(response.IsSuccessStatusCode);

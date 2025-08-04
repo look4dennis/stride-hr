@@ -49,16 +49,29 @@ public class SupportTicketService : ISupportTicketService
         await _ticketRepository.AddAsync(ticket);
         await _unitOfWork.SaveChangesAsync();
 
-        // Load the ticket with details for return
+        // Try to load the ticket with details, but fallback to basic mapping if not found
         var createdTicket = await _ticketRepository.GetWithDetailsAsync(ticket.Id);
-        return MapToDto(createdTicket!);
+        if (createdTicket != null)
+        {
+            return MapToDto(createdTicket);
+        }
+        
+        // Fallback: return DTO from the created ticket without navigation properties
+        return MapToDtoBasic(ticket);
     }
 
     public async Task<SupportTicketDto> GetTicketByIdAsync(int id)
     {
         var ticket = await _ticketRepository.GetWithDetailsAsync(id);
         if (ticket == null)
-            throw new ArgumentException($"Support ticket with ID {id} not found.");
+        {
+            // Fallback: try to get the basic ticket without navigation properties
+            ticket = await _ticketRepository.GetByIdAsync(id);
+            if (ticket == null)
+                throw new ArgumentException($"Support ticket with ID {id} not found.");
+            
+            return MapToDtoBasic(ticket);
+        }
 
         return MapToDto(ticket);
     }
@@ -307,12 +320,15 @@ public class SupportTicketService : ISupportTicketService
 
     private SupportTicketDto MapToDto(SupportTicket ticket)
     {
+        if (ticket == null)
+            throw new ArgumentNullException(nameof(ticket));
+
         return new SupportTicketDto
         {
             Id = ticket.Id,
-            TicketNumber = ticket.TicketNumber,
-            Title = ticket.Title,
-            Description = ticket.Description,
+            TicketNumber = ticket.TicketNumber ?? string.Empty,
+            Title = ticket.Title ?? string.Empty,
+            Description = ticket.Description ?? string.Empty,
             Category = ticket.Category,
             CategoryName = ticket.Category.ToString(),
             Priority = ticket.Priority,
@@ -338,6 +354,45 @@ public class SupportTicketService : ISupportTicketService
             SatisfactionRating = ticket.SatisfactionRating,
             FeedbackComments = ticket.FeedbackComments,
             CommentsCount = ticket.Comments?.Count ?? 0
+        };
+    }
+
+    private SupportTicketDto MapToDtoBasic(SupportTicket ticket)
+    {
+        if (ticket == null)
+            throw new ArgumentNullException(nameof(ticket));
+
+        return new SupportTicketDto
+        {
+            Id = ticket.Id,
+            TicketNumber = ticket.TicketNumber ?? string.Empty,
+            Title = ticket.Title ?? string.Empty,
+            Description = ticket.Description ?? string.Empty,
+            Category = ticket.Category,
+            CategoryName = ticket.Category.ToString(),
+            Priority = ticket.Priority,
+            PriorityName = ticket.Priority.ToString(),
+            Status = ticket.Status,
+            StatusName = ticket.Status.ToString(),
+            RequesterId = ticket.RequesterId,
+            RequesterName = "Unknown", // Will be populated when navigation properties are available
+            RequesterEmail = string.Empty,
+            AssignedToId = ticket.AssignedToId,
+            AssignedToName = null,
+            CreatedAt = ticket.CreatedAt,
+            AssignedAt = ticket.AssignedAt,
+            ResolvedAt = ticket.ResolvedAt,
+            ClosedAt = ticket.ClosedAt,
+            Resolution = ticket.Resolution,
+            RequiresRemoteAccess = ticket.RequiresRemoteAccess,
+            RemoteAccessDetails = ticket.RemoteAccessDetails,
+            AssetId = ticket.AssetId,
+            AssetName = null,
+            AttachmentPath = ticket.AttachmentPath,
+            ResolutionTime = ticket.ResolutionTime,
+            SatisfactionRating = ticket.SatisfactionRating,
+            FeedbackComments = ticket.FeedbackComments,
+            CommentsCount = 0
         };
     }
 
