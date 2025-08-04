@@ -453,8 +453,6 @@ Convert the feature design into a series of prompts for a code-generation LLM th
 - [ ] 21. Leave and Performance Management UI
   - [x] 21.1 Leave management interface
 
-
-
     - Create leave request forms with calendar integration
     - Implement leave approval workflows
     - Add leave balance tracking and visualization
@@ -462,7 +460,8 @@ Convert the feature design into a series of prompts for a code-generation LLM th
     - Write unit tests for leave components
     - _Requirements: 4.6, 37.1_
 
-  - [ ] 21.2 Performance and training management
+  - [x] 21.2 Performance and training management
+
     - Create performance review interfaces
     - Implement PIP management workflows
     - Add training module interfaces with assessments
