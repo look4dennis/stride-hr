@@ -1,6 +1,7 @@
 import { TestBed } from '@angular/core/testing';
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { BirthdayService, BirthdayEmployee, BirthdayWish } from './birthday.service';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 
 describe('BirthdayService', () => {
   let service: BirthdayService;
@@ -41,9 +42,9 @@ describe('BirthdayService', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
-      providers: [BirthdayService]
-    });
+    imports: [],
+    providers: [BirthdayService, provideHttpClient(withInterceptorsFromDi()), provideHttpClientTesting()]
+});
     
     httpMock = TestBed.inject(HttpTestingController);
     service = TestBed.inject(BirthdayService);
@@ -127,9 +128,9 @@ describe('BirthdayService', () => {
     // Create a new service instance to test error handling
     TestBed.resetTestingModule();
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
-      providers: [BirthdayService]
-    });
+    imports: [],
+    providers: [BirthdayService, provideHttpClient(withInterceptorsFromDi()), provideHttpClientTesting()]
+});
     
     const httpMockNew = TestBed.inject(HttpTestingController);
     const newService = TestBed.inject(BirthdayService);

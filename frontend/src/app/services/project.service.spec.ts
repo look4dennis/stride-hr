@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 
 import { ProjectService } from './project.service';
 import { 
@@ -16,6 +16,7 @@ import {
   TaskPriority,
   KanbanColumn
 } from '../models/project.models';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 
 describe('ProjectService', () => {
   let service: ProjectService;
@@ -68,9 +69,9 @@ describe('ProjectService', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
-      providers: [ProjectService]
-    });
+    imports: [],
+    providers: [ProjectService, provideHttpClient(withInterceptorsFromDi()), provideHttpClientTesting()]
+});
     service = TestBed.inject(ProjectService);
     httpMock = TestBed.inject(HttpTestingController);
   });

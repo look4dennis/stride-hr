@@ -1,5 +1,5 @@
 import { TestBed, fakeAsync, tick } from '@angular/core/testing';
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { AttendanceService } from './attendance.service';
 import {
   AttendanceRecord,
@@ -20,6 +20,7 @@ import {
   AddMissingAttendanceRequest
 } from '../models/attendance.models';
 import { of } from 'rxjs';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 
 describe('AttendanceService', () => {
   let service: AttendanceService;
@@ -49,9 +50,9 @@ describe('AttendanceService', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
-      providers: [AttendanceService]
-    });
+    imports: [],
+    providers: [AttendanceService, provideHttpClient(withInterceptorsFromDi()), provideHttpClientTesting()]
+});
 
     service = TestBed.inject(AttendanceService);
     httpMock = TestBed.inject(HttpTestingController);

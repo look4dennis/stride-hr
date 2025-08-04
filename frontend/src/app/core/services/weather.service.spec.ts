@@ -1,6 +1,7 @@
 import { TestBed } from '@angular/core/testing';
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { WeatherService, WeatherData } from './weather.service';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 
 describe('WeatherService', () => {
   let service: WeatherService;
@@ -35,9 +36,9 @@ describe('WeatherService', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
-      providers: [WeatherService]
-    });
+    imports: [],
+    providers: [WeatherService, provideHttpClient(withInterceptorsFromDi()), provideHttpClientTesting()]
+});
     
     httpMock = TestBed.inject(HttpTestingController);
 
@@ -131,9 +132,9 @@ describe('WeatherService', () => {
     // Create a new service instance to trigger initialization
     TestBed.resetTestingModule();
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
-      providers: [WeatherService]
-    });
+    imports: [],
+    providers: [WeatherService, provideHttpClient(withInterceptorsFromDi()), provideHttpClientTesting()]
+});
     
     const httpMockNew = TestBed.inject(HttpTestingController);
     const newService = TestBed.inject(WeatherService);
@@ -159,9 +160,9 @@ describe('WeatherService', () => {
     // Create a new service instance to trigger initialization
     TestBed.resetTestingModule();
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
-      providers: [WeatherService]
-    });
+    imports: [],
+    providers: [WeatherService, provideHttpClient(withInterceptorsFromDi()), provideHttpClientTesting()]
+});
     
     const httpMockNew = TestBed.inject(HttpTestingController);
     const newService = TestBed.inject(WeatherService);
