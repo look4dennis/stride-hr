@@ -307,7 +307,7 @@ import { ProjectProgressComponent } from '../project-progress/project-progress.c
         <div class="results-info">
           <small class="text-muted">
             Showing {{ (currentPage - 1) * pageSize + 1 }} to 
-            {{ Math.min(currentPage * pageSize, totalProjects) }} of 
+            {{ getMaxDisplayed() }} of 
             {{ totalProjects }} projects
           </small>
         </div>
@@ -488,7 +488,7 @@ import { ProjectProgressComponent } from '../project-progress/project-progress.c
 })
 export class ProjectListComponent implements OnInit, OnDestroy {
   projects: Project[] = [];
-  selectedProject: Project | null = null;
+  selectedProject: Project | undefined = undefined;
   totalProjects = 0;
   loading = false;
   viewMode: 'grid' | 'list' = 'grid';
@@ -573,7 +573,7 @@ export class ProjectListComponent implements OnInit, OnDestroy {
   }
 
   backToProjects(): void {
-    this.selectedProject = null;
+    this.selectedProject = undefined;
   }
 
   openProjectModal(): void {
@@ -650,5 +650,9 @@ export class ProjectListComponent implements OnInit, OnDestroy {
     if (diffDays < 0) return 'text-danger'; // Overdue
     if (diffDays <= 7) return 'text-warning'; // Due soon
     return 'text-muted'; // Normal
+  }
+
+  getMaxDisplayed(): number {
+    return Math.min(this.currentPage * this.pageSize, this.totalProjects);
   }
 }

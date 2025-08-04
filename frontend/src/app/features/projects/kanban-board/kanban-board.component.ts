@@ -416,7 +416,7 @@ import { TaskModalComponent } from '../task-modal/task-modal.component';
   `]
 })
 export class KanbanBoardComponent implements OnInit, OnDestroy {
-  @Input() project: Project | null = null;
+  @Input() project: Project | undefined = undefined;
   @Input() projectId: number | null = null;
   @Output() taskCreated = new EventEmitter<Task>();
   @Output() taskUpdated = new EventEmitter<Task>();
