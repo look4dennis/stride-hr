@@ -14,7 +14,13 @@ import {
   LocationInfo,
   BreakType,
   AttendanceStatusType,
-  EmployeeAttendanceStatus
+  EmployeeAttendanceStatus,
+  AttendanceReportRequest,
+  AttendanceReportResponse,
+  AttendanceCalendarResponse,
+  AttendanceAlertResponse,
+  AttendanceCorrectionRequest,
+  AddMissingAttendanceRequest
 } from '../models/attendance.models';
 
 @Injectable({
@@ -320,5 +326,61 @@ export class AttendanceService {
       },
       employeeStatuses: mockEmployeeStatuses
     };
+  }
+
+  // New methods for attendance management and reporting
+  generateAttendanceReport(request: AttendanceReportRequest): Observable<AttendanceReportResponse> {
+    return this.http.post<AttendanceReportResponse>(`${this.API_URL}/attendance/reports/generate`, request);
+  }
+
+  exportAttendanceReport(request: AttendanceReportRequest, format: string = 'excel'): Observable<Blob> {
+    return this.http.post(`${this.API_URL}/attendance/reports/export?format=${format}`, request, {
+      responseType: 'blob'
+    });
+  }
+
+  getAttendanceCalendar(employeeId: number, year: number, month: number): Observable<AttendanceCalendarResponse> {
+    return this.http.get<AttendanceCalendarResponse>(`${this.API_URL}/attendance/calendar/${employeeId}/${year}/${month}`);
+  }
+
+  getMyAttendanceCalendar(year: number, month: number): Observable<AttendanceCalendarResponse> {
+    return this.http.get<AttendanceCalendarResponse>(`${this.API_URL}/attendance/calendar/${year}/${month}`);
+  }
+
+  getAttendanceAlerts(branchId?: number, unreadOnly: boolean = false): Observable<AttendanceAlertResponse[]> {
+    let params = new HttpParams().set('unreadOnly', unreadOnly.toString());
+    if (branchId) {
+      params = params.set('branchId', branchId.toString());
+    }
+
+    return this.http.get<AttendanceAlertResponse[]>(`${this.API_URL}/attendance/alerts`, { params });
+  }
+
+  markAlertAsRead(alertId: number): Observable<boolean> {
+    return this.http.put<boolean>(`${this.API_URL}/attendance/alerts/${alertId}/read`, {});
+  }
+
+  getPendingCorrections(branchId: number, startDate?: Date, endDate?: Date): Observable<AttendanceRecord[]> {
+    let params = new HttpParams().set('branchId', branchId.toString());
+    if (startDate) {
+      params = params.set('startDate', startDate.toISOString().split('T')[0]);
+    }
+    if (endDate) {
+      params = params.set('endDate', endDate.toISOString().split('T')[0]);
+    }
+
+    return this.http.get<AttendanceRecord[]>(`${this.API_URL}/attendance/corrections/pending`, { params });
+  }
+
+  correctAttendance(attendanceRecordId: number, request: AttendanceCorrectionRequest): Observable<AttendanceRecord> {
+    return this.http.put<AttendanceRecord>(`${this.API_URL}/attendance/${attendanceRecordId}/correct`, request);
+  }
+
+  addMissingAttendance(request: AddMissingAttendanceRequest): Observable<AttendanceRecord> {
+    return this.http.post<AttendanceRecord>(`${this.API_URL}/attendance/add-missing`, request);
+  }
+
+  deleteAttendanceRecord(attendanceRecordId: number, reason: string): Observable<boolean> {
+    return this.http.delete<boolean>(`${this.API_URL}/attendance/${attendanceRecordId}?reason=${encodeURIComponent(reason)}`);
   }
 }

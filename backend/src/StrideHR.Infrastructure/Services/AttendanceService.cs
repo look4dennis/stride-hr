@@ -3,6 +3,9 @@ using StrideHR.Core.Entities;
 using StrideHR.Core.Enums;
 using StrideHR.Core.Interfaces;
 using StrideHR.Core.Interfaces.Services;
+using StrideHR.Core.Models.Attendance;
+using System.Linq.Expressions;
+using System.Text.Json;
 
 namespace StrideHR.Infrastructure.Services;
 
@@ -493,5 +496,373 @@ public class AttendanceService : IAttendanceService
 
         var totalTicks = records.Sum(r => r.OvertimeHours!.Value.Ticks);
         return new TimeSpan(totalTicks);
+    }
+
+    public async Task<AttendanceReportResponse> GenerateAttendanceReportAsync(AttendanceReportRequest request)
+    {
+        // Build the predicate for filtering
+        Expression<Func<AttendanceRecord, bool>> predicate = a => a.Date >= request.StartDate && a.Date <= request.EndDate;
+
+        if (request.EmployeeId.HasValue)
+        {
+            var employeeId = request.EmployeeId.Value;
+            predicate = a => a.Date >= request.StartDate && a.Date <= request.EndDate && a.EmployeeId == employeeId;
+        }
+
+        if (request.BranchId.HasValue)
+        {
+            var branchId = request.BranchId.Value;
+            predicate = a => a.Date >= request.StartDate && a.Date <= request.EndDate && a.Employee.BranchId == branchId;
+        }
+
+        if (request.DepartmentId.HasValue)
+        {
+            var departmentId = request.DepartmentId.Value.ToString();
+            predicate = a => a.Date >= request.StartDate && a.Date <= request.EndDate && a.Employee.Department == departmentId;
+        }
+
+        var records = await _unitOfWork.AttendanceRecords.FindAsync(
+            predicate,
+            a => a.Employee, a => a.BreakRecords
+        );
+
+        var groupedRecords = records.GroupBy(r => r.EmployeeId);
+        var reportItems = new List<AttendanceReportItem>();
+
+        foreach (var group in groupedRecords)
+        {
+            var employee = group.First().Employee;
+            var employeeRecords = group.ToList();
+            
+            var totalWorkingDays = (request.EndDate - request.StartDate).Days + 1;
+            var presentDays = employeeRecords.Count(r => r.Status != AttendanceStatus.Absent);
+            var absentDays = totalWorkingDays - presentDays;
+            var lateDays = employeeRecords.Count(r => r.IsLate);
+            var earlyDepartures = employeeRecords.Count(r => r.IsEarlyOut);
+            
+            var totalWorkingHours = TimeSpan.FromTicks(
+                employeeRecords.Where(r => r.TotalWorkingHours.HasValue)
+                              .Sum(r => r.TotalWorkingHours!.Value.Ticks)
+            );
+            
+            var totalOvertimeHours = TimeSpan.FromTicks(
+                employeeRecords.Where(r => r.OvertimeHours.HasValue)
+                              .Sum(r => r.OvertimeHours!.Value.Ticks)
+            );
+            
+            var totalBreakTime = TimeSpan.FromTicks(
+                employeeRecords.Where(r => r.BreakDuration.HasValue)
+                              .Sum(r => r.BreakDuration!.Value.Ticks)
+            );
+
+            var attendancePercentage = totalWorkingDays > 0 ? (double)presentDays / totalWorkingDays * 100 : 0;
+
+            var reportItem = new AttendanceReportItem
+            {
+                EmployeeId = employee.Id,
+                EmployeeName = $"{employee.FirstName} {employee.LastName}",
+                EmployeeCode = employee.EmployeeId,
+                Department = employee.Department ?? "N/A",
+                TotalWorkingDays = totalWorkingDays,
+                PresentDays = presentDays,
+                AbsentDays = absentDays,
+                LateDays = lateDays,
+                EarlyDepartures = earlyDepartures,
+                TotalWorkingHours = totalWorkingHours,
+                TotalOvertimeHours = totalOvertimeHours,
+                TotalBreakTime = totalBreakTime,
+                AttendancePercentage = Math.Round(attendancePercentage, 2)
+            };
+
+            // Add detailed records if requested
+            if (request.ReportType == "detailed")
+            {
+                reportItem.Details = employeeRecords.Select(r => new AttendanceDetailItem
+                {
+                    Date = r.Date,
+                    CheckInTime = r.CheckInTime,
+                    CheckOutTime = r.CheckOutTime,
+                    WorkingHours = r.TotalWorkingHours,
+                    BreakDuration = r.BreakDuration,
+                    OvertimeHours = r.OvertimeHours,
+                    Status = r.Status.ToString(),
+                    IsLate = r.IsLate,
+                    LateBy = r.LateBy,
+                    IsEarlyOut = r.IsEarlyOut,
+                    EarlyOutBy = r.EarlyOutBy,
+                    Notes = r.Notes
+                }).ToList();
+            }
+
+            reportItems.Add(reportItem);
+        }
+
+        // Calculate summary
+        var summary = new AttendanceReportSummary
+        {
+            TotalEmployees = reportItems.Count,
+            TotalWorkingDays = reportItems.Sum(r => r.TotalWorkingDays),
+            AverageAttendancePercentage = reportItems.Any() ? Math.Round(reportItems.Average(r => r.AttendancePercentage), 2) : 0,
+            TotalPresentDays = reportItems.Sum(r => r.PresentDays),
+            TotalAbsentDays = reportItems.Sum(r => r.AbsentDays),
+            TotalLateDays = reportItems.Sum(r => r.LateDays),
+            TotalEarlyDepartures = reportItems.Sum(r => r.EarlyDepartures),
+            TotalWorkingHours = TimeSpan.FromTicks(reportItems.Sum(r => r.TotalWorkingHours.Ticks)),
+            TotalOvertimeHours = TimeSpan.FromTicks(reportItems.Sum(r => r.TotalOvertimeHours.Ticks)),
+            AverageWorkingHoursPerDay = reportItems.Any() && reportItems.Sum(r => r.PresentDays) > 0 
+                ? TimeSpan.FromTicks(reportItems.Sum(r => r.TotalWorkingHours.Ticks) / reportItems.Sum(r => r.PresentDays))
+                : TimeSpan.Zero,
+            AverageOvertimePerDay = reportItems.Any() && reportItems.Sum(r => r.PresentDays) > 0
+                ? TimeSpan.FromTicks(reportItems.Sum(r => r.TotalOvertimeHours.Ticks) / reportItems.Sum(r => r.PresentDays))
+                : TimeSpan.Zero
+        };
+
+        return new AttendanceReportResponse
+        {
+            ReportType = request.ReportType ?? "summary",
+            StartDate = request.StartDate,
+            EndDate = request.EndDate,
+            GeneratedAt = DateTime.Now,
+            TotalEmployees = reportItems.Count,
+            Items = reportItems,
+            Summary = summary
+        };
+    }
+
+    public async Task<AttendanceCalendarResponse> GetAttendanceCalendarAsync(int employeeId, int year, int month)
+    {
+        var startDate = new DateTime(year, month, 1);
+        var endDate = startDate.AddMonths(1).AddDays(-1);
+
+        var records = await _unitOfWork.AttendanceRecords.FindAsync(
+            a => a.EmployeeId == employeeId && a.Date >= startDate && a.Date <= endDate,
+            a => a.BreakRecords
+        );
+
+        var calendarDays = new List<AttendanceCalendarDay>();
+        
+        for (var date = startDate; date <= endDate; date = date.AddDays(1))
+        {
+            var record = records.FirstOrDefault(r => r.Date.Date == date.Date);
+            var isWeekend = date.DayOfWeek == DayOfWeek.Saturday || date.DayOfWeek == DayOfWeek.Sunday;
+            
+            var calendarDay = new AttendanceCalendarDay
+            {
+                Date = date,
+                Status = record?.Status ?? AttendanceStatus.Absent,
+                CheckInTime = record?.CheckInTime,
+                CheckOutTime = record?.CheckOutTime,
+                WorkingHours = record?.TotalWorkingHours,
+                BreakDuration = record?.BreakDuration,
+                OvertimeHours = record?.OvertimeHours,
+                IsLate = record?.IsLate ?? false,
+                LateBy = record?.LateBy,
+                IsEarlyOut = record?.IsEarlyOut ?? false,
+                EarlyOutBy = record?.EarlyOutBy,
+                IsWeekend = isWeekend,
+                IsHoliday = false, // TODO: Implement holiday checking
+                Notes = record?.Notes,
+                Breaks = record?.BreakRecords?.Select(b => new AttendanceCalendarBreak
+                {
+                    Type = b.Type,
+                    StartTime = b.StartTime,
+                    EndTime = b.EndTime,
+                    Duration = b.Duration
+                }).ToList() ?? new List<AttendanceCalendarBreak>()
+            };
+
+            calendarDays.Add(calendarDay);
+        }
+
+        // Calculate summary
+        var workingDays = calendarDays.Count(d => !d.IsWeekend && !d.IsHoliday);
+        var presentDays = calendarDays.Count(d => d.Status != AttendanceStatus.Absent && !d.IsWeekend && !d.IsHoliday);
+        var absentDays = workingDays - presentDays;
+        var lateDays = calendarDays.Count(d => d.IsLate);
+        var earlyDepartures = calendarDays.Count(d => d.IsEarlyOut);
+        var weekends = calendarDays.Count(d => d.IsWeekend);
+        var holidays = calendarDays.Count(d => d.IsHoliday);
+
+        var totalWorkingHours = TimeSpan.FromTicks(
+            calendarDays.Where(d => d.WorkingHours.HasValue).Sum(d => d.WorkingHours!.Value.Ticks)
+        );
+        
+        var totalOvertimeHours = TimeSpan.FromTicks(
+            calendarDays.Where(d => d.OvertimeHours.HasValue).Sum(d => d.OvertimeHours!.Value.Ticks)
+        );
+
+        var summary = new AttendanceCalendarSummary
+        {
+            TotalWorkingDays = workingDays,
+            PresentDays = presentDays,
+            AbsentDays = absentDays,
+            LateDays = lateDays,
+            EarlyDepartures = earlyDepartures,
+            Weekends = weekends,
+            Holidays = holidays,
+            TotalWorkingHours = totalWorkingHours,
+            TotalOvertimeHours = totalOvertimeHours,
+            AttendancePercentage = workingDays > 0 ? Math.Round((double)presentDays / workingDays * 100, 2) : 0
+        };
+
+        return new AttendanceCalendarResponse
+        {
+            Year = year,
+            Month = month,
+            Days = calendarDays,
+            Summary = summary
+        };
+    }
+
+    public async Task<IEnumerable<AttendanceAlertResponse>> GetAttendanceAlertsAsync(int? branchId = null, bool unreadOnly = false)
+    {
+        // Build the predicate for filtering
+        Expression<Func<AttendanceAlert, bool>> predicate = a => true;
+
+        if (branchId.HasValue)
+        {
+            var branchIdValue = branchId.Value;
+            predicate = a => a.BranchId == branchIdValue;
+        }
+
+        if (unreadOnly)
+        {
+            if (branchId.HasValue)
+            {
+                var branchIdValue = branchId.Value;
+                predicate = a => a.BranchId == branchIdValue && !a.IsRead;
+            }
+            else
+            {
+                predicate = a => !a.IsRead;
+            }
+        }
+
+        var alerts = await _unitOfWork.AttendanceAlerts.FindAsync(
+            predicate,
+            a => a.Employee, a => a.Branch
+        );
+
+        return alerts.Select(a => new AttendanceAlertResponse
+        {
+            Id = a.Id,
+            AlertType = a.AlertType,
+            AlertMessage = a.AlertMessage,
+            EmployeeId = a.EmployeeId,
+            EmployeeName = a.Employee != null ? $"{a.Employee.FirstName} {a.Employee.LastName}" : null,
+            BranchId = a.BranchId,
+            BranchName = a.Branch?.Name,
+            CreatedAt = a.CreatedAt,
+            IsRead = a.IsRead,
+            Severity = a.Severity,
+            Metadata = JsonSerializer.Deserialize<Dictionary<string, object>>(a.Metadata) ?? new Dictionary<string, object>()
+        }).OrderByDescending(a => a.CreatedAt);
+    }
+
+    public async Task<AttendanceAlertResponse> CreateAttendanceAlertAsync(AttendanceAlertRequest request)
+    {
+        var alert = new AttendanceAlert
+        {
+            AlertType = request.AlertType,
+            AlertMessage = GenerateAlertMessage(request.AlertType, request.EmployeeId),
+            EmployeeId = request.EmployeeId,
+            BranchId = request.BranchId,
+            CreatedAt = DateTime.Now,
+            IsRead = false,
+            Severity = DetermineAlertSeverity(request.AlertType),
+            Metadata = JsonSerializer.Serialize(new
+            {
+                ThresholdMinutes = request.ThresholdMinutes,
+                StartDate = request.StartDate,
+                EndDate = request.EndDate
+            })
+        };
+
+        await _unitOfWork.AttendanceAlerts.AddAsync(alert);
+        await _unitOfWork.SaveChangesAsync();
+
+        return new AttendanceAlertResponse
+        {
+            Id = alert.Id,
+            AlertType = alert.AlertType,
+            AlertMessage = alert.AlertMessage,
+            EmployeeId = alert.EmployeeId,
+            BranchId = alert.BranchId,
+            CreatedAt = alert.CreatedAt,
+            IsRead = alert.IsRead,
+            Severity = alert.Severity,
+            Metadata = JsonSerializer.Deserialize<Dictionary<string, object>>(alert.Metadata) ?? new Dictionary<string, object>()
+        };
+    }
+
+    public async Task<bool> MarkAlertAsReadAsync(int alertId)
+    {
+        var alert = await _unitOfWork.AttendanceAlerts.GetByIdAsync(alertId);
+        if (alert == null)
+        {
+            return false;
+        }
+
+        alert.IsRead = true;
+        alert.ReadAt = DateTime.Now;
+
+        await _unitOfWork.AttendanceAlerts.UpdateAsync(alert);
+        await _unitOfWork.SaveChangesAsync();
+
+        return true;
+    }
+
+    public async Task<IEnumerable<AttendanceRecord>> GetAttendanceRecordsForCorrectionAsync(int branchId, DateTime? startDate = null, DateTime? endDate = null)
+    {
+        var start = startDate ?? DateTime.Today.AddDays(-30);
+        var end = endDate ?? DateTime.Today;
+
+        return await _unitOfWork.AttendanceRecords.FindAsync(
+            a => a.Employee.BranchId == branchId && 
+                 a.Date >= start && 
+                 a.Date <= end &&
+                 (a.CheckInTime == null || a.CheckOutTime == null || a.IsLate || a.IsEarlyOut),
+            a => a.Employee, a => a.BreakRecords
+        );
+    }
+
+    public async Task<byte[]> ExportAttendanceReportAsync(AttendanceReportRequest request, string format = "excel")
+    {
+        var report = await GenerateAttendanceReportAsync(request);
+        
+        // TODO: Implement actual export functionality based on format
+        // For now, return a placeholder
+        var jsonData = JsonSerializer.Serialize(report);
+        return System.Text.Encoding.UTF8.GetBytes(jsonData);
+    }
+
+    private string GenerateAlertMessage(AttendanceAlertType alertType, int? employeeId)
+    {
+        return alertType switch
+        {
+            AttendanceAlertType.LateArrival => $"Employee {employeeId} arrived late",
+            AttendanceAlertType.EarlyDeparture => $"Employee {employeeId} left early",
+            AttendanceAlertType.MissedCheckIn => $"Employee {employeeId} missed check-in",
+            AttendanceAlertType.MissedCheckOut => $"Employee {employeeId} missed check-out",
+            AttendanceAlertType.ExcessiveBreakTime => $"Employee {employeeId} exceeded break time limit",
+            AttendanceAlertType.ConsecutiveAbsences => $"Employee {employeeId} has consecutive absences",
+            AttendanceAlertType.LowAttendancePercentage => $"Employee {employeeId} has low attendance percentage",
+            AttendanceAlertType.OvertimeThreshold => $"Employee {employeeId} exceeded overtime threshold",
+            AttendanceAlertType.UnusualWorkingHours => $"Employee {employeeId} has unusual working hours",
+            _ => $"Attendance alert for employee {employeeId}"
+        };
+    }
+
+    private string DetermineAlertSeverity(AttendanceAlertType alertType)
+    {
+        return alertType switch
+        {
+            AttendanceAlertType.MissedCheckIn or AttendanceAlertType.MissedCheckOut => "High",
+            AttendanceAlertType.ConsecutiveAbsences or AttendanceAlertType.LowAttendancePercentage => "Critical",
+            AttendanceAlertType.LateArrival or AttendanceAlertType.EarlyDeparture => "Medium",
+            AttendanceAlertType.ExcessiveBreakTime or AttendanceAlertType.UnusualWorkingHours => "Medium",
+            AttendanceAlertType.OvertimeThreshold => "Low",
+            _ => "Medium"
+        };
     }
 }

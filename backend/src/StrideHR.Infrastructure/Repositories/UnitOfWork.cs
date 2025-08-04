@@ -18,6 +18,7 @@ public class UnitOfWork : IUnitOfWork
     private IRepository<Employee>? _employees;
     private IRepository<User>? _users;
     private IRepository<AttendanceRecord>? _attendanceRecords;
+    private IRepository<AttendanceAlert>? _attendanceAlerts;
     private IRepository<BreakRecord>? _breakRecords;
     private IRepository<Role>? _roles;
     private IRepository<Permission>? _permissions;
@@ -82,6 +83,9 @@ public class UnitOfWork : IUnitOfWork
 
     public IRepository<AttendanceRecord> AttendanceRecords =>
         _attendanceRecords ??= new Repository<AttendanceRecord>(_context);
+
+    public IRepository<AttendanceAlert> AttendanceAlerts =>
+        _attendanceAlerts ??= new Repository<AttendanceAlert>(_context);
 
     public IRepository<BreakRecord> BreakRecords =>
         _breakRecords ??= new Repository<BreakRecord>(_context);

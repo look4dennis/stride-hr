@@ -10,6 +10,13 @@ export interface AttendanceRecord {
   status: AttendanceStatusType;
   location?: string;
   notes?: string;
+  correctionReason?: string;
+  correctedBy?: number;
+  correctedAt?: Date;
+  isLate: boolean;
+  lateBy?: string;
+  isEarlyOut: boolean;
+  earlyOutBy?: string;
   employee?: {
     id: number;
     employeeId: string;
@@ -159,3 +166,160 @@ export const AttendanceStatusColors = {
   [AttendanceStatusType.HalfDay]: 'secondary',
   [AttendanceStatusType.OnLeave]: 'primary'
 };
+
+// New models for attendance management and reporting
+export interface AttendanceReportRequest {
+  startDate: Date;
+  endDate: Date;
+  employeeId?: number;
+  branchId?: number;
+  departmentId?: number;
+  reportType?: string;
+  format?: string;
+  includeBreakDetails?: boolean;
+  includeOvertimeDetails?: boolean;
+  includeLateArrivals?: boolean;
+  includeEarlyDepartures?: boolean;
+}
+
+export interface AttendanceReportResponse {
+  reportType: string;
+  startDate: Date;
+  endDate: Date;
+  generatedAt: Date;
+  totalEmployees: number;
+  items: AttendanceReportItem[];
+  summary: AttendanceReportSummary;
+}
+
+export interface AttendanceReportItem {
+  employeeId: number;
+  employeeName: string;
+  employeeCode: string;
+  department: string;
+  totalWorkingDays: number;
+  presentDays: number;
+  absentDays: number;
+  lateDays: number;
+  earlyDepartures: number;
+  totalWorkingHours: string;
+  totalOvertimeHours: string;
+  totalBreakTime: string;
+  attendancePercentage: number;
+  details?: AttendanceDetailItem[];
+}
+
+export interface AttendanceDetailItem {
+  date: Date;
+  checkInTime?: Date;
+  checkOutTime?: Date;
+  workingHours?: string;
+  breakDuration?: string;
+  overtimeHours?: string;
+  status: string;
+  isLate: boolean;
+  lateBy?: string;
+  isEarlyOut: boolean;
+  earlyOutBy?: string;
+  notes?: string;
+}
+
+export interface AttendanceReportSummary {
+  totalEmployees: number;
+  totalWorkingDays: number;
+  averageAttendancePercentage: number;
+  totalPresentDays: number;
+  totalAbsentDays: number;
+  totalLateDays: number;
+  totalEarlyDepartures: number;
+  totalWorkingHours: string;
+  totalOvertimeHours: string;
+  averageWorkingHoursPerDay: string;
+  averageOvertimePerDay: string;
+}
+
+export interface AttendanceCalendarResponse {
+  year: number;
+  month: number;
+  days: AttendanceCalendarDay[];
+  summary: AttendanceCalendarSummary;
+}
+
+export interface AttendanceCalendarDay {
+  date: Date;
+  status: AttendanceStatusType;
+  checkInTime?: Date;
+  checkOutTime?: Date;
+  workingHours?: string;
+  breakDuration?: string;
+  overtimeHours?: string;
+  isLate: boolean;
+  lateBy?: string;
+  isEarlyOut: boolean;
+  earlyOutBy?: string;
+  isWeekend: boolean;
+  isHoliday: boolean;
+  holidayName?: string;
+  notes?: string;
+  breaks: AttendanceCalendarBreak[];
+}
+
+export interface AttendanceCalendarBreak {
+  type: BreakType;
+  startTime: Date;
+  endTime?: Date;
+  duration?: string;
+}
+
+export interface AttendanceCalendarSummary {
+  totalWorkingDays: number;
+  presentDays: number;
+  absentDays: number;
+  lateDays: number;
+  earlyDepartures: number;
+  weekends: number;
+  holidays: number;
+  totalWorkingHours: string;
+  totalOvertimeHours: string;
+  attendancePercentage: number;
+}
+
+export interface AttendanceCorrectionRequest {
+  checkInTime?: Date;
+  checkOutTime?: Date;
+  reason: string;
+}
+
+export interface AddMissingAttendanceRequest {
+  employeeId: number;
+  date: Date;
+  checkInTime: Date;
+  checkOutTime?: Date;
+  reason: string;
+}
+
+export interface AttendanceAlertResponse {
+  id: number;
+  alertType: AttendanceAlertType;
+  alertMessage: string;
+  employeeId?: number;
+  employeeName?: string;
+  branchId?: number;
+  branchName?: string;
+  createdAt: Date;
+  isRead: boolean;
+  severity: string;
+  metadata: { [key: string]: any };
+}
+
+export enum AttendanceAlertType {
+  LateArrival = 'LateArrival',
+  EarlyDeparture = 'EarlyDeparture',
+  MissedCheckIn = 'MissedCheckIn',
+  MissedCheckOut = 'MissedCheckOut',
+  ExcessiveBreakTime = 'ExcessiveBreakTime',
+  ConsecutiveAbsences = 'ConsecutiveAbsences',
+  LowAttendancePercentage = 'LowAttendancePercentage',
+  OvertimeThreshold = 'OvertimeThreshold',
+  UnusualWorkingHours = 'UnusualWorkingHours'
+}

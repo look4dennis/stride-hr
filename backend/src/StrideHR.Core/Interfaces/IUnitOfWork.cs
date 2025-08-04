@@ -10,6 +10,7 @@ public interface IUnitOfWork : IDisposable
     IRepository<Employee> Employees { get; }
     IRepository<User> Users { get; }
     IRepository<AttendanceRecord> AttendanceRecords { get; }
+    IRepository<AttendanceAlert> AttendanceAlerts { get; }
     IRepository<BreakRecord> BreakRecords { get; }
     IRepository<Role> Roles { get; }
     IRepository<Permission> Permissions { get; }

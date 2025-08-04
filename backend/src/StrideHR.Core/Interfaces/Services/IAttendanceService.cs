@@ -1,5 +1,6 @@
 using StrideHR.Core.Entities;
 using StrideHR.Core.Enums;
+using StrideHR.Core.Models.Attendance;
 
 namespace StrideHR.Core.Interfaces.Services;
 
@@ -35,4 +36,13 @@ public interface IAttendanceService
     Task<TimeSpan> GetAverageWorkingHoursAsync(int employeeId, DateTime startDate, DateTime endDate);
     Task<int> GetLateCountAsync(int employeeId, DateTime startDate, DateTime endDate);
     Task<TimeSpan> GetTotalOvertimeAsync(int employeeId, DateTime startDate, DateTime endDate);
+    
+    // Attendance reporting and management
+    Task<AttendanceReportResponse> GenerateAttendanceReportAsync(AttendanceReportRequest request);
+    Task<AttendanceCalendarResponse> GetAttendanceCalendarAsync(int employeeId, int year, int month);
+    Task<IEnumerable<AttendanceAlertResponse>> GetAttendanceAlertsAsync(int? branchId = null, bool unreadOnly = false);
+    Task<AttendanceAlertResponse> CreateAttendanceAlertAsync(AttendanceAlertRequest request);
+    Task<bool> MarkAlertAsReadAsync(int alertId);
+    Task<IEnumerable<AttendanceRecord>> GetAttendanceRecordsForCorrectionAsync(int branchId, DateTime? startDate = null, DateTime? endDate = null);
+    Task<byte[]> ExportAttendanceReportAsync(AttendanceReportRequest request, string format = "excel");
 }

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using StrideHR.API.Models;
 using StrideHR.Core.Interfaces.Services;
 using StrideHR.Core.Models.Attendance;
+using StrideHR.Core.Entities;
 using StrideHR.Core.Enums;
 using System.Security.Claims;
 
@@ -407,6 +408,178 @@ public class AttendanceController : BaseController
         {
             _logger.LogError(ex, "Error retrieving attendance analytics for employee {EmployeeId}", employeeId);
             return BadRequest(ApiResponse<object>.CreateFailure("Failed to retrieve attendance analytics"));
+        }
+    }
+
+    /// <summary>
+    /// Generate attendance report (HR/Manager access)
+    /// </summary>
+    [HttpPost("reports/generate")]
+    [Authorize(Roles = "HR,Manager,Admin")]
+    public async Task<ActionResult<ApiResponse<AttendanceReportResponse>>> GenerateAttendanceReport([FromBody] AttendanceReportRequest request)
+    {
+        try
+        {
+            var report = await _attendanceService.GenerateAttendanceReportAsync(request);
+            return Ok(ApiResponse<AttendanceReportResponse>.CreateSuccess(report, "Attendance report generated successfully"));
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error generating attendance report");
+            return BadRequest(ApiResponse<AttendanceReportResponse>.CreateFailure("Failed to generate attendance report"));
+        }
+    }
+
+    /// <summary>
+    /// Export attendance report (HR/Manager access)
+    /// </summary>
+    [HttpPost("reports/export")]
+    [Authorize(Roles = "HR,Manager,Admin")]
+    public async Task<IActionResult> ExportAttendanceReport([FromBody] AttendanceReportRequest request, [FromQuery] string format = "excel")
+    {
+        try
+        {
+            var data = await _attendanceService.ExportAttendanceReportAsync(request, format);
+            var contentType = format.ToLower() switch
+            {
+                "excel" => "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                "pdf" => "application/pdf",
+                _ => "application/json"
+            };
+            
+            var fileName = $"attendance_report_{DateTime.Now:yyyyMMdd_HHmmss}.{format}";
+            return File(data, contentType, fileName);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error exporting attendance report");
+            return BadRequest(ApiResponse<object>.CreateFailure("Failed to export attendance report"));
+        }
+    }
+
+    /// <summary>
+    /// Get attendance calendar for an employee
+    /// </summary>
+    [HttpGet("calendar/{employeeId}/{year}/{month}")]
+    [Authorize(Roles = "HR,Manager,Admin")]
+    public async Task<ActionResult<ApiResponse<AttendanceCalendarResponse>>> GetAttendanceCalendar(int employeeId, int year, int month)
+    {
+        try
+        {
+            var calendar = await _attendanceService.GetAttendanceCalendarAsync(employeeId, year, month);
+            return Ok(ApiResponse<AttendanceCalendarResponse>.CreateSuccess(calendar, "Attendance calendar retrieved successfully"));
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error retrieving attendance calendar for employee {EmployeeId}", employeeId);
+            return BadRequest(ApiResponse<AttendanceCalendarResponse>.CreateFailure("Failed to retrieve attendance calendar"));
+        }
+    }
+
+    /// <summary>
+    /// Get current employee's attendance calendar
+    /// </summary>
+    [HttpGet("calendar/{year}/{month}")]
+    public async Task<ActionResult<ApiResponse<AttendanceCalendarResponse>>> GetMyAttendanceCalendar(int year, int month)
+    {
+        try
+        {
+            var employeeId = GetCurrentEmployeeId();
+            var calendar = await _attendanceService.GetAttendanceCalendarAsync(employeeId, year, month);
+            return Ok(ApiResponse<AttendanceCalendarResponse>.CreateSuccess(calendar, "Attendance calendar retrieved successfully"));
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error retrieving attendance calendar for current employee");
+            return BadRequest(ApiResponse<AttendanceCalendarResponse>.CreateFailure("Failed to retrieve attendance calendar"));
+        }
+    }
+
+    /// <summary>
+    /// Get attendance alerts (HR/Manager access)
+    /// </summary>
+    [HttpGet("alerts")]
+    [Authorize(Roles = "HR,Manager,Admin")]
+    public async Task<ActionResult<ApiResponse<IEnumerable<AttendanceAlertResponse>>>> GetAttendanceAlerts(
+        [FromQuery] int? branchId = null,
+        [FromQuery] bool unreadOnly = false)
+    {
+        try
+        {
+            var alerts = await _attendanceService.GetAttendanceAlertsAsync(branchId, unreadOnly);
+            return Ok(ApiResponse<IEnumerable<AttendanceAlertResponse>>.CreateSuccess(alerts, "Attendance alerts retrieved successfully"));
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error retrieving attendance alerts");
+            return BadRequest(ApiResponse<IEnumerable<AttendanceAlertResponse>>.CreateFailure("Failed to retrieve attendance alerts"));
+        }
+    }
+
+    /// <summary>
+    /// Create attendance alert (HR/Manager access)
+    /// </summary>
+    [HttpPost("alerts")]
+    [Authorize(Roles = "HR,Manager,Admin")]
+    public async Task<ActionResult<ApiResponse<AttendanceAlertResponse>>> CreateAttendanceAlert([FromBody] AttendanceAlertRequest request)
+    {
+        try
+        {
+            var alert = await _attendanceService.CreateAttendanceAlertAsync(request);
+            return Ok(ApiResponse<AttendanceAlertResponse>.CreateSuccess(alert, "Attendance alert created successfully"));
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error creating attendance alert");
+            return BadRequest(ApiResponse<AttendanceAlertResponse>.CreateFailure("Failed to create attendance alert"));
+        }
+    }
+
+    /// <summary>
+    /// Mark attendance alert as read (HR/Manager access)
+    /// </summary>
+    [HttpPut("alerts/{alertId}/read")]
+    [Authorize(Roles = "HR,Manager,Admin")]
+    public async Task<ActionResult<ApiResponse<bool>>> MarkAlertAsRead(int alertId)
+    {
+        try
+        {
+            var result = await _attendanceService.MarkAlertAsReadAsync(alertId);
+            if (result)
+            {
+                return Ok(ApiResponse<bool>.CreateSuccess(true, "Alert marked as read successfully"));
+            }
+            else
+            {
+                return NotFound(ApiResponse<bool>.CreateFailure("Alert not found"));
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error marking alert as read");
+            return BadRequest(ApiResponse<bool>.CreateFailure("Failed to mark alert as read"));
+        }
+    }
+
+    /// <summary>
+    /// Get attendance records that need correction (HR access)
+    /// </summary>
+    [HttpGet("corrections/pending")]
+    [Authorize(Roles = "HR,Admin")]
+    public async Task<ActionResult<ApiResponse<IEnumerable<AttendanceRecord>>>> GetPendingCorrections(
+        [FromQuery] int branchId,
+        [FromQuery] DateTime? startDate = null,
+        [FromQuery] DateTime? endDate = null)
+    {
+        try
+        {
+            var records = await _attendanceService.GetAttendanceRecordsForCorrectionAsync(branchId, startDate, endDate);
+            return Ok(ApiResponse<IEnumerable<AttendanceRecord>>.CreateSuccess(records, "Pending corrections retrieved successfully"));
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error retrieving pending corrections");
+            return BadRequest(ApiResponse<IEnumerable<AttendanceRecord>>.CreateFailure("Failed to retrieve pending corrections"));
         }
     }
 

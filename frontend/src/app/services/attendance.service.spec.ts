@@ -1,7 +1,7 @@
-import { TestBed } from '@angular/core/testing';
+import { TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { AttendanceService } from './attendance.service';
-import { 
+import {
   AttendanceRecord,
   AttendanceStatus,
   AttendanceStatusType,
@@ -11,7 +11,13 @@ import {
   StartBreakDto,
   EndBreakDto,
   AttendanceReportCriteria,
-  TodayAttendanceOverview
+  TodayAttendanceOverview,
+  AttendanceReportRequest,
+  AttendanceReportResponse,
+  AttendanceCalendarResponse,
+  AttendanceAlertResponse,
+  AttendanceCorrectionRequest,
+  AddMissingAttendanceRequest
 } from '../models/attendance.models';
 import { of } from 'rxjs';
 
@@ -26,7 +32,9 @@ describe('AttendanceService', () => {
     date: '2025-01-08',
     checkInTime: '2025-01-08T09:15:00Z',
     status: AttendanceStatusType.Present,
-    location: '40.7128,-74.0060'
+    location: '40.7128,-74.0060',
+    isLate: false,
+    isEarlyOut: false
   };
 
   const mockAttendanceStatus: AttendanceStatus = {
@@ -44,7 +52,7 @@ describe('AttendanceService', () => {
       imports: [HttpClientTestingModule],
       providers: [AttendanceService]
     });
-    
+
     service = TestBed.inject(AttendanceService);
     httpMock = TestBed.inject(HttpTestingController);
   });
@@ -64,55 +72,72 @@ describe('AttendanceService', () => {
   });
 
   describe('Check-in functionality', () => {
-    it('should perform check-in with location', (done) => {
+    it('should perform check-in with location', fakeAsync(() => {
       const checkInDto: CheckInDto = { location: 'Office' };
-      
+
       // Mock geolocation
       spyOn(service as any, 'getCurrentLocation').and.returnValue(
         Promise.resolve({ latitude: 40.7128, longitude: -74.0060 })
       );
 
+      let result: AttendanceRecord | undefined;
       service.checkIn(checkInDto).subscribe(record => {
-        expect(record).toEqual(mockAttendanceRecord);
-        done();
+        result = record;
       });
+
+      tick(); // Wait for geolocation promise to resolve
 
       const req = httpMock.expectOne(`${API_URL}/attendance/checkin`);
       expect(req.request.method).toBe('POST');
       expect(req.request.body.location).toBeDefined();
       req.flush(mockAttendanceRecord);
-    });
 
-    it('should perform check-in without location when geolocation fails', (done) => {
+      expect(result).toEqual(mockAttendanceRecord);
+    }));
+
+    it('should perform check-in without location when geolocation fails', fakeAsync(() => {
       const checkInDto: CheckInDto = {};
-      
+
       // Mock geolocation failure
       spyOn(service as any, 'getCurrentLocation').and.returnValue(
         Promise.reject(new Error('Geolocation failed'))
       );
 
+      let result: AttendanceRecord | undefined;
       service.checkIn(checkInDto).subscribe(record => {
-        expect(record).toEqual(mockAttendanceRecord);
-        done();
+        result = record;
       });
+
+      tick(); // Wait for geolocation promise to reject
 
       const req = httpMock.expectOne(`${API_URL}/attendance/checkin`);
       expect(req.request.method).toBe('POST');
       req.flush(mockAttendanceRecord);
-    });
 
-    it('should handle check-in error', (done) => {
+      expect(result).toEqual(mockAttendanceRecord);
+    }));
+
+    it('should handle check-in error', fakeAsync(() => {
+      // Mock geolocation to resolve quickly
+      spyOn(service as any, 'getCurrentLocation').and.returnValue(
+        Promise.resolve({ latitude: 40.7128, longitude: -74.0060 })
+      );
+
+      let error: any;
       service.checkIn().subscribe({
         next: () => fail('Should have failed'),
-        error: (error) => {
-          expect(error).toBeDefined();
-          done();
+        error: (err) => {
+          error = err;
         }
       });
 
+      tick(); // Wait for geolocation promise to resolve
+
       const req = httpMock.expectOne(`${API_URL}/attendance/checkin`);
       req.flush('Check-in failed', { status: 400, statusText: 'Bad Request' });
-    });
+
+      expect(error).toBeDefined();
+    }));
   });
 
   describe('Check-out functionality', () => {
@@ -137,7 +162,7 @@ describe('AttendanceService', () => {
       });
 
       const req = httpMock.expectOne(`${API_URL}/attendance/checkout`);
-      req.flush('Check-out failed', { status:400, statusText: 'Bad Request' });
+      req.flush('Check-out failed', { status: 400, statusText: 'Bad Request' });
     });
   });
 
@@ -282,7 +307,7 @@ describe('AttendanceService', () => {
   describe('Mock data methods', () => {
     it('should return mock attendance status', () => {
       const mockStatus = service.getMockAttendanceStatus();
-      
+
       expect(mockStatus.employeeId).toBe(1);
       expect(mockStatus.isCheckedIn).toBe(true);
       expect(mockStatus.currentStatus).toBe(AttendanceStatusType.Present);
@@ -290,7 +315,7 @@ describe('AttendanceService', () => {
 
     it('should return mock today overview', () => {
       const mockOverview = service.getMockTodayOverview();
-      
+
       expect(mockOverview.branchId).toBe(1);
       expect(mockOverview.summary.totalEmployees).toBe(4);
       expect(mockOverview.employeeStatuses.length).toBeGreaterThan(0);
@@ -312,7 +337,7 @@ describe('AttendanceService', () => {
       });
 
       const location = await service['getCurrentLocation']();
-      
+
       expect(location.latitude).toBe(40.7128);
       expect(location.longitude).toBe(-74.0060);
       expect(location.accuracy).toBe(10);
@@ -332,9 +357,8 @@ describe('AttendanceService', () => {
     });
 
     it('should handle unsupported geolocation', async () => {
-      // Mock unsupported geolocation
-      const originalGeolocation = navigator.geolocation;
-      (navigator as any).geolocation = undefined;
+      // Mock unsupported geolocation by spying on the property
+      const geolocationSpy = spyOnProperty(navigator, 'geolocation', 'get').and.returnValue(undefined as any);
 
       try {
         await service['getCurrentLocation']();
@@ -342,8 +366,343 @@ describe('AttendanceService', () => {
       } catch (error: any) {
         expect(error.message).toContain('not supported');
       } finally {
-        (navigator as any).geolocation = originalGeolocation;
+        geolocationSpy.and.callThrough();
       }
+    });
+  });
+
+  // New tests for attendance management and reporting
+  describe('Attendance Management and Reporting', () => {
+    it('should generate attendance report', () => {
+      const request: AttendanceReportRequest = {
+        startDate: new Date('2025-01-01'),
+        endDate: new Date('2025-01-31'),
+        reportType: 'summary'
+      };
+
+      const mockResponse: AttendanceReportResponse = {
+        reportType: 'summary',
+        startDate: new Date('2025-01-01'),
+        endDate: new Date('2025-01-31'),
+        generatedAt: new Date(),
+        totalEmployees: 5,
+        items: [],
+        summary: {
+          totalEmployees: 5,
+          totalWorkingDays: 22,
+          averageAttendancePercentage: 95.5,
+          totalPresentDays: 105,
+          totalAbsentDays: 5,
+          totalLateDays: 3,
+          totalEarlyDepartures: 1,
+          totalWorkingHours: '880:00:00',
+          totalOvertimeHours: '15:30:00',
+          averageWorkingHoursPerDay: '08:00:00',
+          averageOvertimePerDay: '00:15:00'
+        }
+      };
+
+      service.generateAttendanceReport(request).subscribe(response => {
+        expect(response).toEqual(mockResponse);
+        expect(response.totalEmployees).toBe(5);
+        expect(response.summary.averageAttendancePercentage).toBe(95.5);
+      });
+
+      const req = httpMock.expectOne(`${API_URL}/attendance/reports/generate`);
+      expect(req.request.method).toBe('POST');
+      expect(req.request.body).toEqual(request);
+      req.flush(mockResponse);
+    });
+
+    it('should export attendance report', () => {
+      const request: AttendanceReportRequest = {
+        startDate: new Date('2025-01-01'),
+        endDate: new Date('2025-01-31'),
+        reportType: 'detailed'
+      };
+      const format = 'excel';
+      const mockBlob = new Blob(['mock excel data'], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+
+      service.exportAttendanceReport(request, format).subscribe(response => {
+        expect(response).toEqual(mockBlob);
+      });
+
+      const req = httpMock.expectOne(`${API_URL}/attendance/reports/export?format=${format}`);
+      expect(req.request.method).toBe('POST');
+      expect(req.request.body).toEqual(request);
+      req.flush(mockBlob);
+    });
+
+    it('should get attendance calendar', () => {
+      const employeeId = 1;
+      const year = 2025;
+      const month = 1;
+
+      const mockResponse: AttendanceCalendarResponse = {
+        year: 2025,
+        month: 1,
+        days: [
+          {
+            date: new Date('2025-01-01'),
+            status: AttendanceStatusType.Present,
+            checkInTime: new Date('2025-01-01T09:00:00Z'),
+            checkOutTime: new Date('2025-01-01T17:00:00Z'),
+            workingHours: '08:00:00',
+            isLate: false,
+            isEarlyOut: false,
+            isWeekend: false,
+            isHoliday: false,
+            breaks: []
+          }
+        ],
+        summary: {
+          totalWorkingDays: 22,
+          presentDays: 20,
+          absentDays: 2,
+          lateDays: 1,
+          earlyDepartures: 0,
+          weekends: 8,
+          holidays: 1,
+          totalWorkingHours: '160:00:00',
+          totalOvertimeHours: '05:30:00',
+          attendancePercentage: 90.9
+        }
+      };
+
+      service.getAttendanceCalendar(employeeId, year, month).subscribe(response => {
+        expect(response).toEqual(mockResponse);
+        expect(response.year).toBe(2025);
+        expect(response.month).toBe(1);
+        expect(response.days.length).toBe(1);
+      });
+
+      const req = httpMock.expectOne(`${API_URL}/attendance/calendar/${employeeId}/${year}/${month}`);
+      expect(req.request.method).toBe('GET');
+      req.flush(mockResponse);
+    });
+
+    it('should get my attendance calendar', () => {
+      const year = 2025;
+      const month = 1;
+
+      const mockResponse: AttendanceCalendarResponse = {
+        year: 2025,
+        month: 1,
+        days: [],
+        summary: {
+          totalWorkingDays: 22,
+          presentDays: 20,
+          absentDays: 2,
+          lateDays: 1,
+          earlyDepartures: 0,
+          weekends: 8,
+          holidays: 1,
+          totalWorkingHours: '160:00:00',
+          totalOvertimeHours: '05:30:00',
+          attendancePercentage: 90.9
+        }
+      };
+
+      service.getMyAttendanceCalendar(year, month).subscribe(response => {
+        expect(response).toEqual(mockResponse);
+      });
+
+      const req = httpMock.expectOne(`${API_URL}/attendance/calendar/${year}/${month}`);
+      expect(req.request.method).toBe('GET');
+      req.flush(mockResponse);
+    });
+
+    it('should get attendance alerts', () => {
+      const branchId = 1;
+      const unreadOnly = true;
+
+      const mockResponse: AttendanceAlertResponse[] = [
+        {
+          id: 1,
+          alertType: 'LateArrival' as any,
+          alertMessage: 'Employee 1 arrived late',
+          employeeId: 1,
+          employeeName: 'John Doe',
+          branchId: 1,
+          branchName: 'Main Branch',
+          createdAt: new Date(),
+          isRead: false,
+          severity: 'Medium',
+          metadata: {}
+        }
+      ];
+
+      service.getAttendanceAlerts(branchId, unreadOnly).subscribe(response => {
+        expect(response).toEqual(mockResponse);
+        expect(response.length).toBe(1);
+        expect(response[0].isRead).toBe(false);
+      });
+
+      const req = httpMock.expectOne(`${API_URL}/attendance/alerts?unreadOnly=true&branchId=1`);
+      expect(req.request.method).toBe('GET');
+      req.flush(mockResponse);
+    });
+
+    it('should get attendance alerts without filters', () => {
+      service.getAttendanceAlerts().subscribe();
+
+      const req = httpMock.expectOne(`${API_URL}/attendance/alerts?unreadOnly=false`);
+      expect(req.request.method).toBe('GET');
+      req.flush([]);
+    });
+
+    it('should mark alert as read', () => {
+      const alertId = 1;
+
+      service.markAlertAsRead(alertId).subscribe(response => {
+        expect(response).toBe(true);
+      });
+
+      const req = httpMock.expectOne(`${API_URL}/attendance/alerts/${alertId}/read`);
+      expect(req.request.method).toBe('PUT');
+      req.flush(true);
+    });
+
+    it('should get pending corrections', () => {
+      const branchId = 1;
+      const startDate = new Date('2025-01-01');
+      const endDate = new Date('2025-01-31');
+
+      const mockResponse: AttendanceRecord[] = [
+        {
+          id: 1,
+          employeeId: 1,
+          date: '2025-01-08',
+          checkInTime: undefined,
+          checkOutTime: undefined,
+          status: AttendanceStatusType.Absent,
+          isLate: false,
+          isEarlyOut: false,
+          employee: {
+            id: 1,
+            employeeId: 'EMP001',
+            firstName: 'John',
+            lastName: 'Doe',
+            designation: 'Developer',
+            department: 'IT'
+          }
+        }
+      ];
+
+      service.getPendingCorrections(branchId, startDate, endDate).subscribe(response => {
+        expect(response).toEqual(mockResponse);
+        expect(response.length).toBe(1);
+        expect(response[0].checkInTime).toBeUndefined();
+      });
+
+      const req = httpMock.expectOne(`${API_URL}/attendance/corrections/pending?branchId=1&startDate=2025-01-01&endDate=2025-01-31`);
+      expect(req.request.method).toBe('GET');
+      req.flush(mockResponse);
+    });
+
+    it('should get pending corrections without date filters', () => {
+      const branchId = 1;
+
+      service.getPendingCorrections(branchId).subscribe();
+
+      const req = httpMock.expectOne(`${API_URL}/attendance/corrections/pending?branchId=1`);
+      expect(req.request.method).toBe('GET');
+      req.flush([]);
+    });
+
+    it('should correct attendance', () => {
+      const attendanceRecordId = 1;
+      const request: AttendanceCorrectionRequest = {
+        checkInTime: new Date('2025-01-08T09:00:00Z'),
+        checkOutTime: new Date('2025-01-08T17:00:00Z'),
+        reason: 'System error correction'
+      };
+
+      const mockResponse: AttendanceRecord = {
+        id: 1,
+        employeeId: 1,
+        date: '2025-01-08',
+        checkInTime: '2025-01-08T09:00:00Z',
+        checkOutTime: '2025-01-08T17:00:00Z',
+        correctionReason: 'System error correction',
+        correctedBy: 2,
+        correctedAt: new Date(),
+        status: AttendanceStatusType.Present,
+        isLate: false,
+        isEarlyOut: false
+      };
+
+      service.correctAttendance(attendanceRecordId, request).subscribe(response => {
+        expect(response).toEqual(mockResponse);
+        expect(response.correctionReason).toBe('System error correction');
+      });
+
+      const req = httpMock.expectOne(`${API_URL}/attendance/${attendanceRecordId}/correct`);
+      expect(req.request.method).toBe('PUT');
+      expect(req.request.body).toEqual(request);
+      req.flush(mockResponse);
+    });
+
+    it('should add missing attendance', () => {
+      const request: AddMissingAttendanceRequest = {
+        employeeId: 1,
+        date: new Date('2025-01-08'),
+        checkInTime: new Date('2025-01-08T09:00:00Z'),
+        checkOutTime: new Date('2025-01-08T17:00:00Z'),
+        reason: 'Employee forgot to check in'
+      };
+
+      const mockResponse: AttendanceRecord = {
+        id: 1,
+        employeeId: 1,
+        date: '2025-01-08',
+        checkInTime: '2025-01-08T09:00:00Z',
+        checkOutTime: '2025-01-08T17:00:00Z',
+        correctionReason: 'Employee forgot to check in',
+        correctedBy: 2,
+        correctedAt: new Date(),
+        status: AttendanceStatusType.Present,
+        isLate: false,
+        isEarlyOut: false
+      };
+
+      service.addMissingAttendance(request).subscribe(response => {
+        expect(response).toEqual(mockResponse);
+        expect(response.correctionReason).toBe('Employee forgot to check in');
+      });
+
+      const req = httpMock.expectOne(`${API_URL}/attendance/add-missing`);
+      expect(req.request.method).toBe('POST');
+      expect(req.request.body).toEqual(request);
+      req.flush(mockResponse);
+    });
+
+    it('should delete attendance record', () => {
+      const attendanceRecordId = 1;
+      const reason = 'Duplicate entry';
+
+      service.deleteAttendanceRecord(attendanceRecordId, reason).subscribe(response => {
+        expect(response).toBe(true);
+      });
+
+      const req = httpMock.expectOne(`${API_URL}/attendance/${attendanceRecordId}?reason=${encodeURIComponent(reason)}`);
+      expect(req.request.method).toBe('DELETE');
+      req.flush(true);
+    });
+
+    it('should handle attendance management errors', () => {
+      const request: AttendanceReportRequest = {
+        startDate: new Date('2025-01-01'),
+        endDate: new Date('2025-01-31')
+      };
+
+      service.generateAttendanceReport(request).subscribe({
+        next: () => fail('Should have failed'),
+        error: (error) => expect(error).toBeDefined()
+      });
+
+      const req = httpMock.expectOne(`${API_URL}/attendance/reports/generate`);
+      req.flush('Report generation failed', { status: 500, statusText: 'Internal Server Error' });
     });
   });
 });
