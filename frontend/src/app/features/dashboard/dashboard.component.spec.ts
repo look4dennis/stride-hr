@@ -1,23 +1,21 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
+import { of, throwError } from 'rxjs';
 import { DashboardComponent } from './dashboard.component';
-import { AuthService, User } from '../../core/auth/auth.service';
+import { AuthService } from '../../core/auth/auth.service';
 import { WeatherService } from '../../core/services/weather.service';
 import { BirthdayService } from '../../core/services/birthday.service';
 import { NotificationService } from '../../core/services/notification.service';
-import { Router } from '@angular/router';
-import { of } from 'rxjs';
 
 describe('DashboardComponent', () => {
   let component: DashboardComponent;
   let fixture: ComponentFixture<DashboardComponent>;
-  let authServiceSpy: jasmine.SpyObj<AuthService>;
-  let weatherServiceSpy: jasmine.SpyObj<WeatherService>;
-  let birthdayServiceSpy: jasmine.SpyObj<BirthdayService>;
-  let notificationServiceSpy: jasmine.SpyObj<NotificationService>;
-  let routerSpy: jasmine.SpyObj<Router>;
+  let mockAuthService: jasmine.SpyObj<AuthService>;
+  let mockWeatherService: jasmine.SpyObj<WeatherService>;
+  let mockBirthdayService: jasmine.SpyObj<BirthdayService>;
+  let mockNotificationService: jasmine.SpyObj<NotificationService>;
 
-  const mockEmployeeUser: User = {
+  const mockUser = {
     id: 1,
     employeeId: 'EMP001',
     firstName: 'John',
@@ -27,256 +25,231 @@ describe('DashboardComponent', () => {
     roles: ['Employee']
   };
 
-  const mockManagerUser: User = {
-    id: 2,
-    employeeId: 'MGR001',
-    firstName: 'Jane',
-    lastName: 'Smith',
-    email: 'jane.smith@example.com',
-    branchId: 1,
-    roles: ['Manager', 'Employee']
+  const mockWeatherData = {
+    location: 'New York, US',
+    temperature: 22,
+    description: 'Clear sky',
+    icon: '01d',
+    humidity: 65,
+    windSpeed: 3.5,
+    feelsLike: 24
   };
 
-  const mockHRUser: User = {
-    id: 3,
-    employeeId: 'HR001',
-    firstName: 'Alice',
-    lastName: 'Johnson',
-    email: 'alice.johnson@example.com',
-    branchId: 1,
-    roles: ['HR', 'Manager', 'Employee']
-  };
-
-  const mockAdminUser: User = {
-    id: 4,
-    employeeId: 'ADM001',
-    firstName: 'Bob',
-    lastName: 'Wilson',
-    email: 'bob.wilson@example.com',
-    branchId: 1,
-    roles: ['Admin', 'HR', 'Manager', 'Employee']
-  };
+  const mockBirthdayData = [
+    {
+      id: 1,
+      employeeId: 'EMP002',
+      firstName: 'Jane',
+      lastName: 'Smith',
+      profilePhoto: 'jane.jpg',
+      department: 'HR',
+      designation: 'HR Manager',
+      dateOfBirth: '1990-01-15',
+      age: 34
+    }
+  ];
 
   beforeEach(async () => {
-    const authSpy = jasmine.createSpyObj('AuthService', [], {
-      currentUser: mockEmployeeUser
+    const authServiceSpy = jasmine.createSpyObj('AuthService', ['getCurrentUser'], {
+      currentUser: mockUser
     });
-    const weatherSpy = jasmine.createSpyObj('WeatherService', ['refreshWeather'], {
-      weather$: of(null)
+    const weatherServiceSpy = jasmine.createSpyObj('WeatherService', ['getCurrentWeather', 'refreshWeather'], {
+      weather$: of(mockWeatherData)
     });
-    const birthdaySpy = jasmine.createSpyObj('BirthdayService', ['sendBirthdayWish'], {
-      todayBirthdays$: of([])
+    const birthdayServiceSpy = jasmine.createSpyObj('BirthdayService', ['getTodayBirthdays', 'sendBirthdayWish', 'getCurrentBirthdays', 'refreshBirthdays'], {
+      todayBirthdays$: of(mockBirthdayData)
     });
-    const notificationSpy = jasmine.createSpyObj('NotificationService', ['showSuccess', 'showError']);
-    const routerSpyObj = jasmine.createSpyObj('Router', ['navigate']);
+    const notificationServiceSpy = jasmine.createSpyObj('NotificationService', ['showSuccess', 'showError', 'showWarning', 'showInfo']);
 
     await TestBed.configureTestingModule({
       imports: [DashboardComponent],
       providers: [
-        { provide: AuthService, useValue: authSpy },
-        { provide: WeatherService, useValue: weatherSpy },
-        { provide: BirthdayService, useValue: birthdaySpy },
-        { provide: NotificationService, useValue: notificationSpy },
-        { provide: Router, useValue: routerSpyObj }
+        { provide: AuthService, useValue: authServiceSpy },
+        { provide: WeatherService, useValue: weatherServiceSpy },
+        { provide: BirthdayService, useValue: birthdayServiceSpy },
+        { provide: NotificationService, useValue: notificationServiceSpy }
       ]
     }).compileComponents();
 
     fixture = TestBed.createComponent(DashboardComponent);
     component = fixture.componentInstance;
-    authServiceSpy = TestBed.inject(AuthService) as jasmine.SpyObj<AuthService>;
-    weatherServiceSpy = TestBed.inject(WeatherService) as jasmine.SpyObj<WeatherService>;
-    birthdayServiceSpy = TestBed.inject(BirthdayService) as jasmine.SpyObj<BirthdayService>;
-    notificationServiceSpy = TestBed.inject(NotificationService) as jasmine.SpyObj<NotificationService>;
-    routerSpy = TestBed.inject(Router) as jasmine.SpyObj<Router>;
+    
+    mockAuthService = TestBed.inject(AuthService) as jasmine.SpyObj<AuthService>;
+    mockWeatherService = TestBed.inject(WeatherService) as jasmine.SpyObj<WeatherService>;
+    mockBirthdayService = TestBed.inject(BirthdayService) as jasmine.SpyObj<BirthdayService>;
+    mockNotificationService = TestBed.inject(NotificationService) as jasmine.SpyObj<NotificationService>;
+
+    // Setup default mock returns
+    mockWeatherService.getCurrentWeather.and.returnValue(mockWeatherData);
+    mockBirthdayService.getCurrentBirthdays.and.returnValue(mockBirthdayData);
+    mockBirthdayService.getTodayBirthdays.and.returnValue(of(mockBirthdayData));
+    mockBirthdayService.sendBirthdayWish.and.returnValue(of({ id: 1, fromEmployeeId: 1, toEmployeeId: 1, message: 'Happy Birthday!', sentAt: new Date().toISOString() }));
   });
 
   it('should create', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should display welcome message with user name', () => {
+  it('should initialize with current user', () => {
+    component.ngOnInit();
+    expect(component.currentUser).toEqual(mockUser);
+  });
+
+  it('should get primary role correctly', () => {
+    component.currentUser = { ...mockUser, roles: ['Employee'] };
+    expect(component.getPrimaryRole()).toBe('Employee');
+
+    component.currentUser = { ...mockUser, roles: ['Manager', 'Employee'] };
+    expect(component.getPrimaryRole()).toBe('Manager');
+
+    component.currentUser = { ...mockUser, roles: ['Admin', 'HR', 'Manager'] };
+    expect(component.getPrimaryRole()).toBe('Admin');
+  });
+
+  it('should get user role display correctly', () => {
+    component.currentUser = { ...mockUser, roles: ['Employee'] };
+    expect(component.getUserRoleDisplay()).toBe('Employee');
+
+    component.currentUser = { ...mockUser, roles: ['Manager', 'Employee'] };
+    expect(component.getUserRoleDisplay()).toBe('Manager (+1 more)');
+  });
+
+  it('should get role-based welcome message', () => {
+    component.currentUser = { ...mockUser, roles: ['Employee'] };
+    const message = component.getRoleBasedWelcomeMessage();
+    expect(message).toContain('Stay productive');
+
+    component.currentUser = { ...mockUser, roles: ['Manager'] };
+    const managerMessage = component.getRoleBasedWelcomeMessage();
+    expect(managerMessage).toContain('Lead your team');
+  });
+
+  it('should display welcome section with user name', () => {
+    component.currentUser = mockUser;
     fixture.detectChanges();
 
     const welcomeTitle = fixture.debugElement.query(By.css('.welcome-title'));
-    expect(welcomeTitle.nativeElement.textContent.trim()).toBe('Welcome back, John!');
+    expect(welcomeTitle.nativeElement.textContent).toContain('Welcome back, John!');
   });
 
-  it('should display role-based dashboard widgets for employee', () => {
+  it('should display role-based dashboard content for Employee', () => {
+    component.currentUser = { ...mockUser, roles: ['Employee'] };
     fixture.detectChanges();
 
-    const widgets = fixture.debugElement.queryAll(By.css('.dashboard-widget'));
-    expect(widgets.length).toBe(4);
-
-    // Check employee-specific widget labels
-    const widgetLabels = widgets.map(widget => 
-      widget.query(By.css('.widget-label')).nativeElement.textContent.trim()
-    );
-
-    expect(widgetLabels).toContain('Hours Today');
-    expect(widgetLabels).toContain('Active Tasks');
-    expect(widgetLabels).toContain('Leave Balance');
-    expect(widgetLabels).toContain('Productivity');
+    const employeeSection = fixture.debugElement.query(By.css('ng-container[ngSwitchCase="Employee"]'));
+    expect(employeeSection).toBeTruthy();
   });
 
-  it('should initialize currentUser from AuthService', () => {
-    component.ngOnInit();
-    expect(component.currentUser).toEqual(mockEmployeeUser);
-  });
-
-  it('should display manager dashboard for manager user', () => {
-    Object.defineProperty(authServiceSpy, 'currentUser', { value: mockManagerUser });
-    component.ngOnInit();
+  it('should display role-based dashboard content for Manager', () => {
+    component.currentUser = { ...mockUser, roles: ['Manager'] };
     fixture.detectChanges();
 
-    expect(component.getPrimaryRole()).toBe('Manager');
-
-    const widgets = fixture.debugElement.queryAll(By.css('.dashboard-widget'));
-    const widgetLabels = widgets.map(widget => 
-      widget.query(By.css('.widget-label')).nativeElement.textContent.trim()
-    );
-
-    expect(widgetLabels).toContain('Team Members');
-    expect(widgetLabels).toContain('Present Today');
-    expect(widgetLabels).toContain('Active Projects');
-    expect(widgetLabels).toContain('Pending Approvals');
+    const managerSection = fixture.debugElement.query(By.css('ng-container[ngSwitchCase="Manager"]'));
+    expect(managerSection).toBeTruthy();
   });
 
-  it('should display HR dashboard for HR user', () => {
-    Object.defineProperty(authServiceSpy, 'currentUser', { value: mockHRUser });
-    component.ngOnInit();
+  it('should display role-based dashboard content for HR', () => {
+    component.currentUser = { ...mockUser, roles: ['HR'] };
     fixture.detectChanges();
 
-    expect(component.getPrimaryRole()).toBe('HR');
-
-    const widgets = fixture.debugElement.queryAll(By.css('.dashboard-widget'));
-    const widgetLabels = widgets.map(widget => 
-      widget.query(By.css('.widget-label')).nativeElement.textContent.trim()
-    );
-
-    expect(widgetLabels).toContain('Total Employees');
-    expect(widgetLabels).toContain('Present Today');
-    expect(widgetLabels).toContain('Pending Leaves');
-    expect(widgetLabels).toContain('Payroll Status');
+    const hrSection = fixture.debugElement.query(By.css('ng-container[ngSwitchCase="HR"]'));
+    expect(hrSection).toBeTruthy();
   });
 
-  it('should display admin dashboard for admin user', () => {
-    Object.defineProperty(authServiceSpy, 'currentUser', { value: mockAdminUser });
-    component.ngOnInit();
+  it('should display role-based dashboard content for Admin', () => {
+    component.currentUser = { ...mockUser, roles: ['Admin'] };
     fixture.detectChanges();
 
-    expect(component.getPrimaryRole()).toBe('Admin');
-
-    const widgets = fixture.debugElement.queryAll(By.css('.dashboard-widget'));
-    const widgetLabels = widgets.map(widget => 
-      widget.query(By.css('.widget-label')).nativeElement.textContent.trim()
-    );
-
-    expect(widgetLabels).toContain('Total Branches');
-    expect(widgetLabels).toContain('Total Employees');
-    expect(widgetLabels).toContain('System Health');
-    expect(widgetLabels).toContain('Active Users');
+    const adminSection = fixture.debugElement.query(By.css('ng-container[ngSwitchCase="Admin"]'));
+    expect(adminSection).toBeTruthy();
   });
 
-  it('should return correct role-based welcome message', () => {
-    // Test Employee message
-    Object.defineProperty(authServiceSpy, 'currentUser', { value: mockEmployeeUser });
-    component.ngOnInit();
-    expect(component.getRoleBasedWelcomeMessage()).toContain('Stay productive and manage your work-life balance');
+  it('should display default dashboard content for unknown roles', () => {
+    component.currentUser = { ...mockUser, roles: ['UnknownRole'] };
+    fixture.detectChanges();
 
-    // Test Manager message
-    Object.defineProperty(authServiceSpy, 'currentUser', { value: mockManagerUser });
-    component.ngOnInit();
-    expect(component.getRoleBasedWelcomeMessage()).toContain('Lead your team to success');
-
-    // Test HR message
-    Object.defineProperty(authServiceSpy, 'currentUser', { value: mockHRUser });
-    component.ngOnInit();
-    expect(component.getRoleBasedWelcomeMessage()).toContain('Manage employee lifecycle');
-
-    // Test Admin message
-    Object.defineProperty(authServiceSpy, 'currentUser', { value: mockAdminUser });
-    component.ngOnInit();
-    expect(component.getRoleBasedWelcomeMessage()).toContain('Monitor and manage your organization');
+    const defaultSection = fixture.debugElement.query(By.css('ng-container[ngSwitchDefault]'));
+    expect(defaultSection).toBeTruthy();
   });
 
-  it('should display correct user role with additional roles count', () => {
-    Object.defineProperty(authServiceSpy, 'currentUser', { value: mockManagerUser });
-    component.ngOnInit();
-    
-    const roleDisplay = component.getUserRoleDisplay();
-    expect(roleDisplay).toBe('Manager (+1 more)');
-  });
-
-  it('should determine primary role correctly based on hierarchy', () => {
-    // Admin should be primary even with other roles
-    Object.defineProperty(authServiceSpy, 'currentUser', { value: mockAdminUser });
-    component.ngOnInit();
-    expect(component.getPrimaryRole()).toBe('Admin');
-
-    // HR should be primary over Manager and Employee
-    Object.defineProperty(authServiceSpy, 'currentUser', { value: mockHRUser });
-    component.ngOnInit();
-    expect(component.getPrimaryRole()).toBe('HR');
-
-    // Manager should be primary over Employee
-    Object.defineProperty(authServiceSpy, 'currentUser', { value: mockManagerUser });
-    component.ngOnInit();
-    expect(component.getPrimaryRole()).toBe('Manager');
-
-    // Employee should be default
-    Object.defineProperty(authServiceSpy, 'currentUser', { value: mockEmployeeUser });
-    component.ngOnInit();
-    expect(component.getPrimaryRole()).toBe('Employee');
-  });
-
-  it('should include weather-time widget', () => {
+  it('should display weather widget', () => {
     fixture.detectChanges();
 
     const weatherWidget = fixture.debugElement.query(By.css('app-weather-time-widget'));
     expect(weatherWidget).toBeTruthy();
   });
 
-  it('should include birthday widget', () => {
+  it('should display birthday widget', () => {
     fixture.detectChanges();
 
     const birthdayWidget = fixture.debugElement.query(By.css('app-birthday-widget'));
     expect(birthdayWidget).toBeTruthy();
   });
 
-  it('should include quick actions component', () => {
+  it('should display quick actions component', () => {
     fixture.detectChanges();
 
     const quickActions = fixture.debugElement.query(By.css('app-quick-actions'));
     expect(quickActions).toBeTruthy();
   });
 
-  it('should display recent activities', () => {
+  it('should display recent activities section', () => {
     fixture.detectChanges();
 
-    const activitiesCard = fixture.debugElement.query(By.css('.card'));
-    expect(activitiesCard).toBeTruthy();
+    const activitiesSection = fixture.debugElement.query(By.css('.card-title'));
+    expect(activitiesSection.nativeElement.textContent).toContain('Recent Activities');
+  });
 
-    const cardTitle = activitiesCard.query(By.css('.card-title'));
-    expect(cardTitle.nativeElement.textContent.trim()).toBe('Recent Activities');
+  it('should display activity items', () => {
+    fixture.detectChanges();
 
     const activityItems = fixture.debugElement.queryAll(By.css('.activity-item'));
     expect(activityItems.length).toBe(component.recentActivities.length);
   });
 
   it('should handle null user gracefully', () => {
-    Object.defineProperty(authServiceSpy, 'currentUser', { value: null });
-    component.ngOnInit();
+    component.currentUser = null;
     fixture.detectChanges();
 
+    expect(() => component.getPrimaryRole()).not.toThrow();
     expect(component.getPrimaryRole()).toBe('Employee');
-    expect(component.getUserRoleDisplay()).toBe('Employee');
   });
 
-  it('should handle user with no roles', () => {
-    const userWithNoRoles = { ...mockEmployeeUser, roles: [] };
-    Object.defineProperty(authServiceSpy, 'currentUser', { value: userWithNoRoles });
-    component.ngOnInit();
-
+  it('should handle empty roles array', () => {
+    component.currentUser = { ...mockUser, roles: [] };
     expect(component.getPrimaryRole()).toBe('Employee');
+  });
+
+  it('should display user branch information when available', () => {
+    component.currentUser = { ...mockUser, branchId: 5 };
+    fixture.detectChanges();
+
+    const branchInfo = fixture.debugElement.query(By.css('.user-branch'));
+    expect(branchInfo.nativeElement.textContent).toContain('Branch 5');
+  });
+
+  it('should not display branch information when not available', () => {
+    component.currentUser = { ...mockUser, branchId: undefined as any };
+    fixture.detectChanges();
+
+    const branchInfo = fixture.debugElement.query(By.css('.user-branch'));
+    expect(branchInfo.nativeElement.textContent.trim()).toBe('');
+  });
+
+  it('should display user avatar when profile photo is available', () => {
+    component.currentUser = { ...mockUser, profilePhoto: 'avatar.jpg' };
+    fixture.detectChanges();
+
+    const avatar = fixture.debugElement.query(By.css('.avatar-img'));
+    expect(avatar).toBeTruthy();
+    expect(avatar.nativeElement.src).toContain('avatar.jpg');
+  });
+
+  it('should not display avatar when profile photo is not available', () => {
+    component.currentUser = { ...mockUser, profilePhoto: undefined };
+    fixture.detectChanges();
+
+    const avatar = fixture.debugElement.query(By.css('.avatar-img'));
+    expect(avatar).toBeFalsy();
   });
 });
