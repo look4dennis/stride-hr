@@ -43,13 +43,15 @@ export interface ReportSorting {
 }
 
 export interface ReportChartConfiguration {
-  type: ChartType;
-  title: string;
-  xAxisColumn: string;
-  yAxisColumn: string;
+  type: string;
+  title?: string;
+  xAxisColumn?: string;
+  yAxisColumn?: string;
   seriesColumn?: string;
-  options: { [key: string]: any };
-  colors: string[];
+  enableAnimation?: boolean;
+  showLegend?: boolean;
+  options?: { [key: string]: any };
+  colors?: string[];
 }
 
 export interface ReportPagination {
