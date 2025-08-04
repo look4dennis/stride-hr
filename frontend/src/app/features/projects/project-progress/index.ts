@@ -1,0 +1,1 @@
+export { ProjectProgressComponent } from './project-progress.component';

@@ -1,0 +1,1 @@
+export { TaskModalComponent } from './task-modal.component';
