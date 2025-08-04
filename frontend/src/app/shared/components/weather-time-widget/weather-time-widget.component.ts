@@ -4,10 +4,9 @@ import { WeatherService, WeatherData } from '../../../core/services/weather.serv
 import { Subscription, interval } from 'rxjs';
 
 @Component({
-  selector: 'app-weather-time-widget',
-  standalone: true,
-  imports: [CommonModule],
-  template: `
+    selector: 'app-weather-time-widget',
+    imports: [CommonModule],
+    template: `
     <div class="weather-time-widget">
       <div class="time-section">
         <div class="current-time">{{ currentTime }}</div>
@@ -56,7 +55,7 @@ import { Subscription, interval } from 'rxjs';
       </div>
     </div>
   `,
-  styles: [`
+    styles: [`
     .weather-time-widget {
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       color: white;

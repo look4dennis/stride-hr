@@ -17,19 +17,18 @@ import { KanbanBoardComponent } from '../kanban-board/kanban-board.component';
 import { ProjectProgressComponent } from '../project-progress/project-progress.component';
 
 @Component({
-  selector: 'app-project-list',
-  standalone: true,
-  imports: [
-    CommonModule, 
-    FormsModule, 
-    RouterModule,
-    NgbDropdownModule, 
-    NgbTooltipModule, 
-    NgbPaginationModule,
-    KanbanBoardComponent,
-    ProjectProgressComponent
-  ],
-  template: `
+    selector: 'app-project-list',
+    imports: [
+        CommonModule,
+        FormsModule,
+        RouterModule,
+        NgbDropdownModule,
+        NgbTooltipModule,
+        NgbPaginationModule,
+        KanbanBoardComponent,
+        ProjectProgressComponent
+    ],
+    template: `
     <div class="page-header d-flex justify-content-between align-items-center mb-4">
       <div>
         <h1>Project Management</h1>
@@ -355,7 +354,7 @@ import { ProjectProgressComponent } from '../project-progress/project-progress.c
       </div>
     </div>
   `,
-  styles: [`
+    styles: [`
     .page-header h1 {
       font-size: 2rem;
       font-weight: 700;

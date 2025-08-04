@@ -19,17 +19,16 @@ import { TaskCardComponent } from '../task-card/task-card.component';
 import { TaskModalComponent } from '../task-modal/task-modal.component';
 
 @Component({
-  selector: 'app-kanban-board',
-  standalone: true,
-  imports: [
-    CommonModule, 
-    FormsModule, 
-    DragDropModule, 
-    NgbDropdownModule, 
-    NgbTooltipModule,
-    TaskCardComponent
-  ],
-  template: `
+    selector: 'app-kanban-board',
+    imports: [
+        CommonModule,
+        FormsModule,
+        DragDropModule,
+        NgbDropdownModule,
+        NgbTooltipModule,
+        TaskCardComponent
+    ],
+    template: `
     <div class="kanban-container">
       <!-- Header with controls -->
       <div class="kanban-header d-flex justify-content-between align-items-center mb-4">
@@ -275,7 +274,7 @@ import { TaskModalComponent } from '../task-modal/task-modal.component';
       </div>
     </div>
   `,
-  styles: [`
+    styles: [`
     .kanban-container {
       height: calc(100vh - 200px);
       overflow: hidden;

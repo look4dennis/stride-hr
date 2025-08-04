@@ -3,10 +3,9 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 
 @Component({
-  selector: 'app-unauthorized',
-  standalone: true,
-  imports: [CommonModule, RouterModule],
-  template: `
+    selector: 'app-unauthorized',
+    imports: [CommonModule, RouterModule],
+    template: `
     <div class="error-container">
       <div class="error-content">
         <div class="error-icon">
@@ -31,7 +30,7 @@ import { RouterModule } from '@angular/router';
       </div>
     </div>
   `,
-  styles: [`
+    styles: [`
     .error-container {
       min-height: 100vh;
       display: flex;

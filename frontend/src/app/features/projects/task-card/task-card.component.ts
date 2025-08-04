@@ -4,10 +4,9 @@ import { NgbTooltipModule, NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap'
 import { Task, Project, TaskPriority, TaskStatus } from '../../../models/project.models';
 
 @Component({
-  selector: 'app-task-card',
-  standalone: true,
-  imports: [CommonModule, NgbTooltipModule, NgbDropdownModule],
-  template: `
+    selector: 'app-task-card',
+    imports: [CommonModule, NgbTooltipModule, NgbDropdownModule],
+    template: `
     <div class="task-card" 
          [class.high-priority]="task.priority === 'High' || task.priority === 'Critical'"
          [class.overdue]="isOverdue()"
@@ -126,7 +125,7 @@ import { Task, Project, TaskPriority, TaskStatus } from '../../../models/project
       </div>
     </div>
   `,
-  styles: [`
+    styles: [`
     .task-card {
       background: white;
       border: 1px solid #e9ecef;

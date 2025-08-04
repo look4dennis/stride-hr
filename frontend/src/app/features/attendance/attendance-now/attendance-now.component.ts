@@ -13,10 +13,9 @@ import {
 } from '../../../models/attendance.models';
 
 @Component({
-  selector: 'app-attendance-now',
-  standalone: true,
-  imports: [CommonModule, FormsModule],
-  template: `
+    selector: 'app-attendance-now',
+    imports: [CommonModule, FormsModule],
+    template: `
     <div class="page-header d-flex justify-content-between align-items-center">
       <div>
         <h1>Attendance Now</h1>
@@ -275,7 +274,7 @@ import {
       </div>
     </div>
   `,
-  styles: [`
+    styles: [`
     .page-header {
       margin-bottom: 2rem;
     }

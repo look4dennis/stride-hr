@@ -4,10 +4,9 @@ import { Subscription } from 'rxjs';
 import { LoadingService } from '../../../core/services/loading.service';
 
 @Component({
-  selector: 'app-loading',
-  standalone: true,
-  imports: [CommonModule],
-  template: `
+    selector: 'app-loading',
+    imports: [CommonModule],
+    template: `
     <div *ngIf="isLoading" class="loading-overlay">
       <div class="loading-spinner">
         <div class="spinner-border text-primary" role="status">
@@ -19,7 +18,7 @@ import { LoadingService } from '../../../core/services/loading.service';
       </div>
     </div>
   `,
-  styles: [`
+    styles: [`
     .loading-overlay {
       position: fixed;
       top: 0;

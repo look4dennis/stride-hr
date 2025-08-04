@@ -8,10 +8,9 @@ import { NotificationService } from '../../../core/services/notification.service
 import { LoadingService } from '../../../core/services/loading.service';
 
 @Component({
-  selector: 'app-employee-list',
-  standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule],
-  template: `
+    selector: 'app-employee-list',
+    imports: [CommonModule, FormsModule, ReactiveFormsModule],
+    template: `
     <div class="page-header d-flex justify-content-between align-items-center">
       <div>
         <h1>Employee Management</h1>
@@ -286,7 +285,7 @@ import { LoadingService } from '../../../core/services/loading.service';
       </div>
     </div>
   `,
-  styles: [`
+    styles: [`
     .page-header {
       margin-bottom: 2rem;
     }

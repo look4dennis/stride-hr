@@ -16,15 +16,14 @@ import {
 import { Employee } from '../../../models/employee.models';
 
 @Component({
-  selector: 'app-task-modal',
-  standalone: true,
-  imports: [
-    CommonModule, 
-    FormsModule, 
-    ReactiveFormsModule, 
-    NgbDatepickerModule
-  ],
-  template: `
+    selector: 'app-task-modal',
+    imports: [
+        CommonModule,
+        FormsModule,
+        ReactiveFormsModule,
+        NgbDatepickerModule
+    ],
+    template: `
     <div class="modal-header">
       <h4 class="modal-title">
         <i class="fas fa-tasks me-2"></i>
@@ -250,7 +249,7 @@ import { Employee } from '../../../models/employee.models';
       </div>
     </form>
   `,
-  styles: [`
+    styles: [`
     .modal-header {
       background: linear-gradient(135deg, #0d6efd 0%, #0b5ed7 100%);
       color: white;

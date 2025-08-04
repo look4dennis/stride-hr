@@ -7,10 +7,9 @@ import { ProjectService } from '../../../services/project.service';
 import { Project, ProjectProgress, TaskStatus } from '../../../models/project.models';
 
 @Component({
-  selector: 'app-project-progress',
-  standalone: true,
-  imports: [CommonModule, NgbProgressbarModule, NgbTooltipModule],
-  template: `
+    selector: 'app-project-progress',
+    imports: [CommonModule, NgbProgressbarModule, NgbTooltipModule],
+    template: `
     <div class="project-progress-container">
       <!-- Progress Header -->
       <div class="progress-header d-flex justify-content-between align-items-center mb-3">
@@ -239,7 +238,7 @@ import { Project, ProjectProgress, TaskStatus } from '../../../models/project.mo
       </div>
     </div>
   `,
-  styles: [`
+    styles: [`
     .project-progress-container {
       background: white;
       border-radius: 12px;

@@ -15,10 +15,9 @@ import {
 import { NotificationService } from '../../../core/services/notification.service';
 
 @Component({
-  selector: 'app-employee-exit',
-  standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterModule],
-  template: `
+    selector: 'app-employee-exit',
+    imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterModule],
+    template: `
     <div class="page-header">
       <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
@@ -336,7 +335,7 @@ import { NotificationService } from '../../../core/services/notification.service
       <p class="mt-2 text-muted">Loading exit process information...</p>
     </div>
   `,
-  styles: [`
+    styles: [`
     .profile-photo {
       width: 100px;
       height: 100px;

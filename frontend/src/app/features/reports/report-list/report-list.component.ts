@@ -2,10 +2,9 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 @Component({
-  selector: 'app-report-list',
-  standalone: true,
-  imports: [CommonModule],
-  template: `
+    selector: 'app-report-list',
+    imports: [CommonModule],
+    template: `
     <div class="page-header">
       <h1>Reports & Analytics</h1>
       <p class="text-muted">Generate and view comprehensive reports</p>
@@ -19,7 +18,7 @@ import { CommonModule } from '@angular/common';
       </div>
     </div>
   `,
-  styles: [`
+    styles: [`
     .page-header {
       margin-bottom: 2rem;
     }

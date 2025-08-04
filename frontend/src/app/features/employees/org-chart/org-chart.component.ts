@@ -8,10 +8,9 @@ import { NotificationService } from '../../../core/services/notification.service
 
 // Org Node Component for Tree View
 @Component({
-  selector: 'app-org-node',
-  standalone: true,
-  imports: [CommonModule],
-  template: `
+    selector: 'app-org-node',
+    imports: [CommonModule],
+    template: `
     <div class="org-node">
       <div class="employee-card" (click)="onEmployeeClick()">
         <img [src]="getProfilePhoto()" 
@@ -35,7 +34,7 @@ import { NotificationService } from '../../../core/services/notification.service
       </div>
     </div>
   `,
-  styles: [`
+    styles: [`
     .org-node {
       display: flex;
       flex-direction: column;
@@ -148,10 +147,9 @@ export class OrgNodeComponent {
 }
 
 @Component({
-  selector: 'app-org-chart',
-  standalone: true,
-  imports: [CommonModule, FormsModule, OrgNodeComponent],
-  template: `
+    selector: 'app-org-chart',
+    imports: [CommonModule, FormsModule, OrgNodeComponent],
+    template: `
     <div class="page-header d-flex justify-content-between align-items-center">
       <div>
         <h1>Organizational Chart</h1>
@@ -228,7 +226,7 @@ export class OrgNodeComponent {
       <p class="mt-2 text-muted">Loading organizational chart...</p>
     </div>
   `,
-  styles: [`
+    styles: [`
     .org-chart-container {
       overflow-x: auto;
       padding: 2rem;

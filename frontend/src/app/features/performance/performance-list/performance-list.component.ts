@@ -2,10 +2,9 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 @Component({
-  selector: 'app-performance-list',
-  standalone: true,
-  imports: [CommonModule],
-  template: `
+    selector: 'app-performance-list',
+    imports: [CommonModule],
+    template: `
     <div class="page-header">
       <h1>Performance Management</h1>
       <p class="text-muted">Track and manage employee performance</p>
@@ -19,7 +18,7 @@ import { CommonModule } from '@angular/common';
       </div>
     </div>
   `,
-  styles: [`
+    styles: [`
     .page-header {
       margin-bottom: 2rem;
     }

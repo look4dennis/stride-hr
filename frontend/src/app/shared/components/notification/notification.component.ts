@@ -4,10 +4,9 @@ import { Subscription } from 'rxjs';
 import { NotificationService, Notification } from '../../../core/services/notification.service';
 
 @Component({
-  selector: 'app-notification',
-  standalone: true,
-  imports: [CommonModule],
-  template: `
+    selector: 'app-notification',
+    imports: [CommonModule],
+    template: `
     <div class="notification-container">
       <div 
         *ngFor="let notification of notifications" 
@@ -31,7 +30,7 @@ import { NotificationService, Notification } from '../../../core/services/notifi
       </div>
     </div>
   `,
-  styles: [`
+    styles: [`
     .notification-container {
       position: fixed;
       top: 20px;

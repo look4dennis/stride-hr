@@ -16,10 +16,9 @@ export interface QuickAction {
 }
 
 @Component({
-  selector: 'app-quick-actions',
-  standalone: true,
-  imports: [CommonModule],
-  template: `
+    selector: 'app-quick-actions',
+    imports: [CommonModule],
+    template: `
     <div class="quick-actions-widget">
       <div class="widget-header">
         <h5 class="widget-title">
@@ -71,7 +70,7 @@ export interface QuickAction {
       </div>
     </div>
   `,
-  styles: [`
+    styles: [`
     .quick-actions-widget {
       background: white;
       border-radius: 16px;

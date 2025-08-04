@@ -2,10 +2,9 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 @Component({
-  selector: 'app-settings',
-  standalone: true,
-  imports: [CommonModule],
-  template: `
+    selector: 'app-settings',
+    imports: [CommonModule],
+    template: `
     <div class="page-header">
       <h1>System Settings</h1>
       <p class="text-muted">Configure system settings and preferences</p>
@@ -19,7 +18,7 @@ import { CommonModule } from '@angular/common';
       </div>
     </div>
   `,
-  styles: [`
+    styles: [`
     .page-header {
       margin-bottom: 2rem;
     }

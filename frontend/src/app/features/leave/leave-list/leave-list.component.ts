@@ -2,10 +2,9 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 @Component({
-  selector: 'app-leave-list',
-  standalone: true,
-  imports: [CommonModule],
-  template: `
+    selector: 'app-leave-list',
+    imports: [CommonModule],
+    template: `
     <div class="page-header">
       <h1>Leave Management</h1>
       <p class="text-muted">Request and manage employee leave</p>
@@ -19,7 +18,7 @@ import { CommonModule } from '@angular/common';
       </div>
     </div>
   `,
-  styles: [`
+    styles: [`
     .page-header {
       margin-bottom: 2rem;
     }

@@ -7,10 +7,9 @@ import { NotificationService } from '../../../core/services/notification.service
 import { Subscription } from 'rxjs';
 
 @Component({
-  selector: 'app-birthday-widget',
-  standalone: true,
-  imports: [CommonModule, FormsModule],
-  template: `
+    selector: 'app-birthday-widget',
+    imports: [CommonModule, FormsModule],
+    template: `
     <div class="birthday-widget" *ngIf="todayBirthdays.length > 0">
       <div class="widget-header">
         <h5 class="widget-title">
@@ -132,7 +131,7 @@ import { Subscription } from 'rxjs';
       </div>
     </div>
   `,
-  styles: [`
+    styles: [`
     .birthday-widget {
       background: white;
       border-radius: 16px;

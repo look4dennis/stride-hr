@@ -6,10 +6,9 @@ import { Employee, EmployeeOnboarding, EmployeeOnboardingStep, OnboardingStatus 
 import { NotificationService } from '../../../core/services/notification.service';
 
 @Component({
-  selector: 'app-employee-onboarding',
-  standalone: true,
-  imports: [CommonModule, RouterModule],
-  template: `
+    selector: 'app-employee-onboarding',
+    imports: [CommonModule, RouterModule],
+    template: `
     <div class="page-header">
       <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
@@ -199,7 +198,7 @@ import { NotificationService } from '../../../core/services/notification.service
       <p class="mt-2 text-muted">Loading onboarding information...</p>
     </div>
   `,
-  styles: [`
+    styles: [`
     .profile-photo {
       width: 100px;
       height: 100px;

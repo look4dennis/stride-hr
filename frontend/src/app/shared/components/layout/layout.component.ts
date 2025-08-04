@@ -7,17 +7,16 @@ import { NotificationComponent } from '../notification/notification.component';
 import { LoadingComponent } from '../loading/loading.component';
 
 @Component({
-  selector: 'app-layout',
-  standalone: true,
-  imports: [
-    CommonModule,
-    RouterOutlet,
-    HeaderComponent,
-    SidebarComponent,
-    NotificationComponent,
-    LoadingComponent
-  ],
-  template: `
+    selector: 'app-layout',
+    imports: [
+        CommonModule,
+        RouterOutlet,
+        HeaderComponent,
+        SidebarComponent,
+        NotificationComponent,
+        LoadingComponent
+    ],
+    template: `
     <div class="app-layout">
       <app-header></app-header>
       <app-sidebar></app-sidebar>
@@ -32,7 +31,7 @@ import { LoadingComponent } from '../loading/loading.component';
       <app-loading></app-loading>
     </div>
   `,
-  styles: [`
+    styles: [`
     .app-layout {
       min-height: 100vh;
       background-color: var(--bg-secondary);

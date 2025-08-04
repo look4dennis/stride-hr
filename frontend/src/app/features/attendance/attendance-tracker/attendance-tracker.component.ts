@@ -13,10 +13,9 @@ import {
 } from '../../../models/attendance.models';
 
 @Component({
-  selector: 'app-attendance-tracker',
-  standalone: true,
-  imports: [CommonModule, FormsModule],
-  template: `
+    selector: 'app-attendance-tracker',
+    imports: [CommonModule, FormsModule],
+    template: `
     <div class="page-header d-flex justify-content-between align-items-center">
       <div>
         <h1>Attendance Tracking</h1>
@@ -190,7 +189,7 @@ import {
       <button type="button" class="btn-close" (click)="errorMessage = null"></button>
     </div>
   `,
-  styles: [`
+    styles: [`
     .page-header {
       margin-bottom: 2rem;
     }

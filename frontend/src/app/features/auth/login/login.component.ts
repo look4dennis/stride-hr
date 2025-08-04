@@ -7,10 +7,9 @@ import { NotificationService } from '../../../core/services/notification.service
 import { LoadingService } from '../../../core/services/loading.service';
 
 @Component({
-  selector: 'app-login',
-  standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
-  template: `
+    selector: 'app-login',
+    imports: [CommonModule, ReactiveFormsModule],
+    template: `
     <div class="login-container">
       <div class="login-card">
         <div class="login-header">
@@ -85,7 +84,7 @@ import { LoadingService } from '../../../core/services/loading.service';
       </div>
     </div>
   `,
-  styles: [`
+    styles: [`
     .login-container {
       min-height: 100vh;
       background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);

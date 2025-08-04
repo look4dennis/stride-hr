@@ -5,10 +5,9 @@ import { Subscription } from 'rxjs';
 import { AuthService, User } from '../../../core/auth/auth.service';
 
 @Component({
-  selector: 'app-header',
-  standalone: true,
-  imports: [CommonModule, RouterModule],
-  template: `
+    selector: 'app-header',
+    imports: [CommonModule, RouterModule],
+    template: `
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
       <div class="container-fluid">
         <a class="navbar-brand" routerLink="/">
@@ -102,7 +101,7 @@ import { AuthService, User } from '../../../core/auth/auth.service';
       </div>
     </nav>
   `,
-  styles: [`
+    styles: [`
     .navbar-brand {
       font-family: var(--font-headings);
       font-weight: 700;

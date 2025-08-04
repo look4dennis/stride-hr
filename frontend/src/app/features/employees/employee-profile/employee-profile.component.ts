@@ -7,10 +7,9 @@ import { Employee, UpdateEmployeeDto, EmployeeStatus } from '../../../models/emp
 import { NotificationService } from '../../../core/services/notification.service';
 
 @Component({
-  selector: 'app-employee-profile',
-  standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterModule],
-  template: `
+    selector: 'app-employee-profile',
+    imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterModule],
+    template: `
     <div class="page-header d-flex justify-content-between align-items-center">
       <div>
         <nav aria-label="breadcrumb">
@@ -237,7 +236,7 @@ import { NotificationService } from '../../../core/services/notification.service
       <p class="mt-2 text-muted">Loading employee profile...</p>
     </div>
   `,
-  styles: [`
+    styles: [`
     .profile-photo-container {
       position: relative;
       display: inline-block;

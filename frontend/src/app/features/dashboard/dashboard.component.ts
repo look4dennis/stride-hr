@@ -6,15 +6,14 @@ import { BirthdayWidgetComponent } from '../../shared/components/birthday-widget
 import { QuickActionsComponent } from '../../shared/components/quick-actions/quick-actions.component';
 
 @Component({
-  selector: 'app-dashboard',
-  standalone: true,
-  imports: [
-    CommonModule,
-    WeatherTimeWidgetComponent,
-    BirthdayWidgetComponent,
-    QuickActionsComponent
-  ],
-  template: `
+    selector: 'app-dashboard',
+    imports: [
+        CommonModule,
+        WeatherTimeWidgetComponent,
+        BirthdayWidgetComponent,
+        QuickActionsComponent
+    ],
+    template: `
     <div class="dashboard-container">
       <!-- Welcome Section with Weather Widget -->
       <div class="row mb-4">
@@ -331,7 +330,7 @@ import { QuickActionsComponent } from '../../shared/components/quick-actions/qui
       </div>
     </div>
   `,
-  styles: [`
+    styles: [`
     .dashboard-container {
       padding: 0;
     }

@@ -13,10 +13,9 @@ interface MenuItem {
 }
 
 @Component({
-  selector: 'app-sidebar',
-  standalone: true,
-  imports: [CommonModule, RouterModule],
-  template: `
+    selector: 'app-sidebar',
+    imports: [CommonModule, RouterModule],
+    template: `
     <div class="sidebar" [class.collapsed]="isCollapsed" *ngIf="currentUser">
       <div class="sidebar-header">
         <button 
@@ -53,7 +52,7 @@ interface MenuItem {
       (click)="closeSidebar()">
     </div>
   `,
-  styles: [`
+    styles: [`
     .sidebar {
       position: fixed;
       top: 56px; /* Height of navbar */
