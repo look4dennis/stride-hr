@@ -286,6 +286,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IPayslipTemplateRepository, PayslipTemplateRepository>();
         services.AddScoped<IPayslipGenerationRepository, PayslipGenerationRepository>();
         services.AddScoped<IExchangeRateRepository, ExchangeRateRepository>();
+        services.AddScoped<IBudgetRepository, BudgetRepository>();
         
         // Register leave management repositories
         services.AddScoped<ILeaveRequestRepository, LeaveRequestRepository>();
@@ -330,6 +331,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IPayslipDesignerService, PayslipDesignerService>();
         services.AddScoped<ICurrencyService, CurrencyService>();
         services.AddScoped<ITimeZoneService, TimeZoneService>();
+        services.AddScoped<IFinancialReportingService, FinancialReportingService>();
         
         // Register leave management services
         services.AddScoped<ILeaveManagementService, LeaveManagementService>();
