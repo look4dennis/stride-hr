@@ -2,9 +2,7 @@ using AutoMapper;
 using Microsoft.Extensions.Logging;
 using Moq;
 using StrideHR.Core.Entities;
-using StrideHR.Core.Enums;
 using StrideHR.Core.Interfaces.Repositories;
-using StrideHR.Core.Interfaces.Services;
 using StrideHR.Core.Models.Project;
 using StrideHR.Infrastructure.Services;
 using Xunit;
@@ -15,10 +13,9 @@ public class ProjectMonitoringServiceTests
 {
     private readonly Mock<IProjectRepository> _mockProjectRepository;
     private readonly Mock<IProjectAlertRepository> _mockAlertRepository;
-    private readonly Mock<IProjectAssignmentRepository> _mockAssignmentRepository;
-    private readonly Mock<IProjectTaskRepository> _mockTaskRepository;
+    private readonly Mock<IProjectRiskRepository> _mockRiskRepository;
     private readonly Mock<IDSRRepository> _mockDsrRepository;
-    private readonly Mock<IProjectService> _mockProjectService;
+    private readonly Mock<IProjectAssignmentRepository> _mockAssignmentRepository;
     private readonly Mock<IMapper> _mockMapper;
     private readonly Mock<ILogger<ProjectMonitoringService>> _mockLogger;
     private readonly ProjectMonitoringService _service;
@@ -27,26 +24,24 @@ public class ProjectMonitoringServiceTests
     {
         _mockProjectRepository = new Mock<IProjectRepository>();
         _mockAlertRepository = new Mock<IProjectAlertRepository>();
-        _mockAssignmentRepository = new Mock<IProjectAssignmentRepository>();
-        _mockTaskRepository = new Mock<IProjectTaskRepository>();
+        _mockRiskRepository = new Mock<IProjectRiskRepository>();
         _mockDsrRepository = new Mock<IDSRRepository>();
-        _mockProjectService = new Mock<IProjectService>();
+        _mockAssignmentRepository = new Mock<IProjectAssignmentRepository>();
         _mockMapper = new Mock<IMapper>();
         _mockLogger = new Mock<ILogger<ProjectMonitoringService>>();
 
         _service = new ProjectMonitoringService(
             _mockProjectRepository.Object,
             _mockAlertRepository.Object,
-            _mockAssignmentRepository.Object,
-            _mockTaskRepository.Object,
+            _mockRiskRepository.Object,
             _mockDsrRepository.Object,
-            _mockProjectService.Object,
+            _mockAssignmentRepository.Object,
             _mockMapper.Object,
             _mockLogger.Object);
     }
 
     [Fact]
-    public async Task GetProjectMonitoringDataAsync_ValidProjectId_ReturnsMonitoringData()
+    public async Task GetProjectHoursTrackingAsync_ValidProjectId_ReturnsHoursReport()
     {
         // Arrange
         var projectId = 1;
@@ -55,73 +50,49 @@ public class ProjectMonitoringServiceTests
             Id = projectId,
             Name = "Test Project",
             EstimatedHours = 100,
-            Status = ProjectStatus.Active
+            StartDate = DateTime.Today.AddDays(-30),
+            EndDate = DateTime.Today.AddDays(30)
         };
 
-        var progress = new ProjectProgressDto
+        var dsrRecords = new List<DSR>
         {
-            ProjectId = projectId,
-            TotalEstimatedHours = 100,
-            ActualHoursWorked = 80,
-            CompletionPercentage = 80,
-            IsOnTrack = true
+            new DSR { Id = 1, ProjectId = projectId, HoursWorked = 8, Date = DateTime.Today.AddDays(-1) },
+            new DSR { Id = 2, ProjectId = projectId, HoursWorked = 6, Date = DateTime.Today.AddDays(-2) }
         };
-
-        var variance = new ProjectVarianceDto
-        {
-            HoursVariance = -20,
-            IsOverBudget = false,
-            IsBehindSchedule = false
-        };
-
-        var alerts = new List<ProjectAlertDto>();
-        var teamMembers = new List<ProjectTeamMemberDto>();
 
         _mockProjectRepository.Setup(r => r.GetProjectWithDetailsAsync(projectId))
             .ReturnsAsync(project);
-
-        _mockProjectService.Setup(s => s.GetProjectProgressAsync(projectId))
-            .ReturnsAsync(progress);
-
-        _mockProjectService.Setup(s => s.GetProjectTeamMembersAsync(projectId))
-            .ReturnsAsync(teamMembers);
-
-        _mockAlertRepository.Setup(r => r.GetAlertsByProjectAsync(projectId))
-            .ReturnsAsync(new List<ProjectAlert>());
-
-        _mockMapper.Setup(m => m.Map<List<ProjectAlertDto>>(It.IsAny<IEnumerable<ProjectAlert>>()))
-            .Returns(alerts);
-
-        _mockDsrRepository.Setup(r => r.GetTotalHoursByProjectAsync(projectId, null, null))
-            .ReturnsAsync(80);
+        _mockDsrRepository.Setup(r => r.GetProjectDSRsAsync(projectId, It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+            .ReturnsAsync(dsrRecords);
+        _mockAssignmentRepository.Setup(r => r.GetProjectTeamMembersAsync(projectId))
+            .ReturnsAsync(new List<ProjectAssignment>());
 
         // Act
-        var result = await _service.GetProjectMonitoringDataAsync(projectId);
+        var result = await _service.GetProjectHoursTrackingAsync(projectId);
 
         // Assert
         Assert.NotNull(result);
         Assert.Equal(projectId, result.ProjectId);
         Assert.Equal("Test Project", result.ProjectName);
-        Assert.Equal(progress, result.Progress);
-        Assert.Equal(alerts, result.Alerts);
-        Assert.Equal(teamMembers, result.TeamMembers);
+        Assert.Equal(100, result.EstimatedHours);
+        Assert.Equal(14, result.TotalHoursWorked);
+        Assert.Equal(-86, result.HoursVariance);
     }
 
     [Fact]
-    public async Task GetProjectMonitoringDataAsync_InvalidProjectId_ThrowsArgumentException()
+    public async Task GetProjectHoursTrackingAsync_InvalidProjectId_ThrowsArgumentException()
     {
         // Arrange
         var projectId = 999;
         _mockProjectRepository.Setup(r => r.GetProjectWithDetailsAsync(projectId))
-            .ReturnsAsync((Project?)null);
+            .ReturnsAsync((Project)null);
 
         // Act & Assert
-        await Assert.ThrowsAsync<ArgumentException>(() => 
-            _service.GetProjectMonitoringDataAsync(projectId));
+        await Assert.ThrowsAsync<ArgumentException>(() => _service.GetProjectHoursTrackingAsync(projectId));
     }
 
     [Fact]
-    public async Task CalculateProjectVarianceAsync_ValidProject_ReturnsVariance()
+    public async Task GetProjectAnalyticsAsync_ValidProjectId_ReturnsAnalytics()
     {
         // Arrange
         var projectId = 1;
@@ -130,115 +101,53 @@ public class ProjectMonitoringServiceTests
             Id = projectId,
             Name = "Test Project",
             EstimatedHours = 100,
-            Budget = 5000,
-            EndDate = DateTime.Today.AddDays(5)
+            Budget = 10000,
+            Tasks = new List<ProjectTask>
+            {
+                new ProjectTask { Id = 1, Status = Core.Enums.ProjectTaskStatus.Completed },
+                new ProjectTask { Id = 2, Status = Core.Enums.ProjectTaskStatus.InProgress },
+                new ProjectTask { Id = 3, Status = Core.Enums.ProjectTaskStatus.Todo }
+            }
         };
 
-        var progress = new ProjectProgressDto
+        var dsrRecords = new List<DSR>
         {
-            ProjectId = projectId,
-            CompletionPercentage = 75
+            new DSR { Id = 1, ProjectId = projectId, HoursWorked = 8 },
+            new DSR { Id = 2, ProjectId = projectId, HoursWorked = 6 }
         };
+
+        var teamMembers = new List<ProjectAssignment>
+        {
+            new ProjectAssignment { Id = 1, ProjectId = projectId, EmployeeId = 1 },
+            new ProjectAssignment { Id = 2, ProjectId = projectId, EmployeeId = 2 }
+        };
+
+        var risks = new List<ProjectRisk>();
 
         _mockProjectRepository.Setup(r => r.GetProjectWithDetailsAsync(projectId))
             .ReturnsAsync(project);
-
-        _mockDsrRepository.Setup(r => r.GetTotalHoursByProjectAsync(projectId, null, null))
-            .ReturnsAsync(120);
-
-        _mockProjectService.Setup(s => s.GetProjectProgressAsync(projectId))
-            .ReturnsAsync(progress);
+        _mockDsrRepository.Setup(r => r.GetProjectDSRsAsync(projectId))
+            .ReturnsAsync(dsrRecords);
+        _mockAssignmentRepository.Setup(r => r.GetProjectTeamMembersAsync(projectId))
+            .ReturnsAsync(teamMembers);
+        _mockRiskRepository.Setup(r => r.GetProjectRisksAsync(projectId))
+            .ReturnsAsync(risks);
+        _mockMapper.Setup(m => m.Map<List<ProjectRiskDto>>(risks))
+            .Returns(new List<ProjectRiskDto>());
 
         // Act
-        var result = await _service.CalculateProjectVarianceAsync(projectId);
+        var result = await _service.GetProjectAnalyticsAsync(projectId);
 
         // Assert
         Assert.NotNull(result);
-        Assert.Equal(20, result.HoursVariance); // 120 - 100
-        Assert.True(result.IsOverBudget);
-        Assert.False(result.IsBehindSchedule); // End date is in future
-        Assert.Equal(1.2m, result.PerformanceIndex); // 120 / 100
-    }
-
-    [Fact]
-    public async Task GetTeamLeaderDashboardAsync_ValidTeamLeader_ReturnsDashboard()
-    {
-        // Arrange
-        var teamLeaderId = 1;
-        var project1Progress = new ProjectProgressDto { TotalEstimatedHours = 100, ActualHoursWorked = 80, IsOnTrack = true };
-        var project2Progress = new ProjectProgressDto { TotalEstimatedHours = 150, ActualHoursWorked = 180, IsOnTrack = false };
-        
-        var project1Variance = new ProjectVarianceDto { IsOverBudget = false, IsBehindSchedule = false };
-        var project2Variance = new ProjectVarianceDto { IsOverBudget = true, IsBehindSchedule = true };
-
-        var employee = new Employee
-        {
-            Id = teamLeaderId,
-            FirstName = "John",
-            LastName = "Doe"
-        };
-
-        _mockProjectRepository.Setup(r => r.GetProjectsByTeamLeadAsync(teamLeaderId))
-            .ReturnsAsync(new List<Project>
-            {
-                new Project { Id = 1, Name = "Project 1" },
-                new Project { Id = 2, Name = "Project 2" }
-            });
-
-        _mockProjectRepository.Setup(r => r.GetEmployeeAsync(teamLeaderId))
-            .ReturnsAsync(employee);
-
-        _mockAlertRepository.Setup(r => r.GetAlertsByTeamLeadAsync(teamLeaderId))
-            .ReturnsAsync(new List<ProjectAlert>());
-
-        _mockMapper.Setup(m => m.Map<List<ProjectAlertDto>>(It.IsAny<IEnumerable<ProjectAlert>>()))
-            .Returns(new List<ProjectAlertDto>());
-
-        // Mock the GetProjectMonitoringDataAsync calls for Project 1
-        _mockProjectRepository.Setup(r => r.GetProjectWithDetailsAsync(1))
-            .ReturnsAsync(new Project { Id = 1, Name = "Project 1", EstimatedHours = 100, EndDate = DateTime.Today.AddDays(5) });
-
-        _mockProjectService.Setup(s => s.GetProjectProgressAsync(1))
-            .ReturnsAsync(project1Progress);
-
-        _mockProjectService.Setup(s => s.GetProjectTeamMembersAsync(1))
-            .ReturnsAsync(new List<ProjectTeamMemberDto>());
-
-        _mockAlertRepository.Setup(r => r.GetAlertsByProjectAsync(1))
-            .ReturnsAsync(new List<ProjectAlert>());
-
-        _mockDsrRepository.Setup(r => r.GetTotalHoursByProjectAsync(1, null, null))
-            .ReturnsAsync(80);
-
-        // Mock the GetProjectMonitoringDataAsync calls for Project 2
-        _mockProjectRepository.Setup(r => r.GetProjectWithDetailsAsync(2))
-            .ReturnsAsync(new Project { Id = 2, Name = "Project 2", EstimatedHours = 150, EndDate = DateTime.Today.AddDays(-2) });
-
-        _mockProjectService.Setup(s => s.GetProjectProgressAsync(2))
-            .ReturnsAsync(project2Progress);
-
-        _mockProjectService.Setup(s => s.GetProjectTeamMembersAsync(2))
-            .ReturnsAsync(new List<ProjectTeamMemberDto>());
-
-        _mockAlertRepository.Setup(r => r.GetAlertsByProjectAsync(2))
-            .ReturnsAsync(new List<ProjectAlert>());
-
-        _mockDsrRepository.Setup(r => r.GetTotalHoursByProjectAsync(2, null, null))
-            .ReturnsAsync(180);
-
-        // Act
-        var result = await _service.GetTeamLeaderDashboardAsync(teamLeaderId);
-
-        // Assert
-        Assert.NotNull(result);
-        Assert.Equal(teamLeaderId, result.TeamLeaderId);
-        Assert.Equal("John Doe", result.TeamLeaderName);
-        Assert.Equal(2, result.Summary.TotalProjects);
-        Assert.Equal(1, result.Summary.OnTrackProjects);
-        Assert.Equal(1, result.Summary.DelayedProjects);
-        Assert.Equal(1, result.Summary.OverBudgetProjects);
-        Assert.Equal(250, result.Summary.TotalEstimatedHours); // 100 + 150
-        Assert.Equal(260, result.Summary.TotalActualHours); // 80 + 180
+        Assert.Equal(projectId, result.ProjectId);
+        Assert.Equal("Test Project", result.ProjectName);
+        Assert.NotNull(result.Metrics);
+        Assert.Equal(14, result.Metrics.TotalHoursWorked);
+        Assert.Equal(100, result.Metrics.EstimatedHours);
+        Assert.Equal(3, result.Metrics.TotalTasks);
+        Assert.Equal(1, result.Metrics.CompletedTasks);
+        Assert.Equal(2, result.Metrics.TeamMembersCount);
     }
 
     [Fact]
@@ -246,9 +155,9 @@ public class ProjectMonitoringServiceTests
     {
         // Arrange
         var projectId = 1;
-        var alertType = ProjectAlertType.ScheduleDelay;
-        var message = "Project is behind schedule";
-        var severity = AlertSeverity.High;
+        var alertType = "Budget Alert";
+        var message = "Project is over budget";
+        var severity = "High";
 
         var createdAlert = new ProjectAlert
         {
@@ -261,25 +170,19 @@ public class ProjectMonitoringServiceTests
             CreatedAt = DateTime.UtcNow
         };
 
-        var alertDto = new ProjectAlertDto
-        {
-            Id = 1,
-            ProjectId = projectId,
-            AlertType = alertType.ToString(),
-            Message = message,
-            Severity = severity.ToString(),
-            IsResolved = false,
-            CreatedAt = DateTime.UtcNow
-        };
-
         _mockAlertRepository.Setup(r => r.AddAsync(It.IsAny<ProjectAlert>()))
-            .ReturnsAsync(createdAlert);
-
+            .Returns(Task.CompletedTask);
         _mockAlertRepository.Setup(r => r.SaveChangesAsync())
-            .ReturnsAsync(true);
-
+            .Returns(Task.CompletedTask);
         _mockMapper.Setup(m => m.Map<ProjectAlertDto>(It.IsAny<ProjectAlert>()))
-            .Returns(alertDto);
+            .Returns(new ProjectAlertDto
+            {
+                Id = 1,
+                ProjectId = projectId,
+                AlertType = alertType,
+                Message = message,
+                Severity = severity
+            });
 
         // Act
         var result = await _service.CreateProjectAlertAsync(projectId, alertType, message, severity);
@@ -287,36 +190,128 @@ public class ProjectMonitoringServiceTests
         // Assert
         Assert.NotNull(result);
         Assert.Equal(projectId, result.ProjectId);
-        Assert.Equal(alertType.ToString(), result.AlertType);
+        Assert.Equal(alertType, result.AlertType);
         Assert.Equal(message, result.Message);
-        Assert.Equal(severity.ToString(), result.Severity);
-        Assert.False(result.IsResolved);
+        Assert.Equal(severity, result.Severity);
 
         _mockAlertRepository.Verify(r => r.AddAsync(It.IsAny<ProjectAlert>()), Times.Once);
         _mockAlertRepository.Verify(r => r.SaveChangesAsync(), Times.Once);
     }
 
     [Fact]
-    public async Task ResolveProjectAlertAsync_ValidAlert_ResolvesAlert()
+    public async Task ResolveProjectAlertAsync_ValidAlertId_ResolvesAlert()
     {
         // Arrange
         var alertId = 1;
-        var resolvedByEmployeeId = 2;
-        var resolutionNotes = "Issue resolved";
+        var resolvedBy = 123;
+        var alert = new ProjectAlert
+        {
+            Id = alertId,
+            ProjectId = 1,
+            AlertType = "Test Alert",
+            Message = "Test message",
+            Severity = "Medium",
+            IsResolved = false
+        };
 
-        _mockAlertRepository.Setup(r => r.ResolveAlertAsync(alertId, resolvedByEmployeeId, resolutionNotes))
-            .ReturnsAsync(true);
+        _mockAlertRepository.Setup(r => r.GetByIdAsync(alertId))
+            .ReturnsAsync(alert);
+        _mockAlertRepository.Setup(r => r.UpdateAsync(It.IsAny<ProjectAlert>()))
+            .Returns(Task.CompletedTask);
+        _mockAlertRepository.Setup(r => r.SaveChangesAsync())
+            .Returns(Task.CompletedTask);
 
         // Act
-        var result = await _service.ResolveProjectAlertAsync(alertId, resolvedByEmployeeId, resolutionNotes);
+        var result = await _service.ResolveProjectAlertAsync(alertId, resolvedBy);
 
         // Assert
         Assert.True(result);
-        _mockAlertRepository.Verify(r => r.ResolveAlertAsync(alertId, resolvedByEmployeeId, resolutionNotes), Times.Once);
+        Assert.True(alert.IsResolved);
+        Assert.Equal(resolvedBy, alert.ResolvedBy);
+        Assert.NotNull(alert.ResolvedAt);
+
+        _mockAlertRepository.Verify(r => r.UpdateAsync(alert), Times.Once);
+        _mockAlertRepository.Verify(r => r.SaveChangesAsync(), Times.Once);
     }
 
     [Fact]
-    public async Task CheckAndCreateAutomatedAlertsAsync_ProjectBehindSchedule_CreatesScheduleAlert()
+    public async Task ResolveProjectAlertAsync_InvalidAlertId_ReturnsFalse()
+    {
+        // Arrange
+        var alertId = 999;
+        var resolvedBy = 123;
+
+        _mockAlertRepository.Setup(r => r.GetByIdAsync(alertId))
+            .ReturnsAsync((ProjectAlert)null);
+
+        // Act
+        var result = await _service.ResolveProjectAlertAsync(alertId, resolvedBy);
+
+        // Assert
+        Assert.False(result);
+        _mockAlertRepository.Verify(r => r.UpdateAsync(It.IsAny<ProjectAlert>()), Times.Never);
+        _mockAlertRepository.Verify(r => r.SaveChangesAsync(), Times.Never);
+    }
+
+    [Fact]
+    public async Task CreateProjectRiskAsync_ValidData_CreatesRisk()
+    {
+        // Arrange
+        var projectId = 1;
+        var riskType = "Technical Risk";
+        var description = "Technology may become obsolete";
+        var severity = "High";
+        var probability = 0.3m;
+        var impact = 0.8m;
+
+        var createdRisk = new ProjectRisk
+        {
+            Id = 1,
+            ProjectId = projectId,
+            RiskType = riskType,
+            Description = description,
+            Severity = severity,
+            Probability = probability,
+            Impact = impact,
+            Status = "Identified",
+            IdentifiedAt = DateTime.UtcNow,
+            CreatedAt = DateTime.UtcNow
+        };
+
+        _mockRiskRepository.Setup(r => r.AddAsync(It.IsAny<ProjectRisk>()))
+            .Returns(Task.CompletedTask);
+        _mockRiskRepository.Setup(r => r.SaveChangesAsync())
+            .Returns(Task.CompletedTask);
+        _mockMapper.Setup(m => m.Map<ProjectRiskDto>(It.IsAny<ProjectRisk>()))
+            .Returns(new ProjectRiskDto
+            {
+                Id = 1,
+                ProjectId = projectId,
+                RiskType = riskType,
+                Description = description,
+                Severity = severity,
+                Probability = probability,
+                Impact = impact
+            });
+
+        // Act
+        var result = await _service.CreateProjectRiskAsync(projectId, riskType, description, severity, probability, impact);
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Equal(projectId, result.ProjectId);
+        Assert.Equal(riskType, result.RiskType);
+        Assert.Equal(description, result.Description);
+        Assert.Equal(severity, result.Severity);
+        Assert.Equal(probability, result.Probability);
+        Assert.Equal(impact, result.Impact);
+
+        _mockRiskRepository.Verify(r => r.AddAsync(It.IsAny<ProjectRisk>()), Times.Once);
+        _mockRiskRepository.Verify(r => r.SaveChangesAsync(), Times.Once);
+    }
+
+    [Fact]
+    public async Task CalculateProjectHealthScoreAsync_ValidProject_ReturnsHealthScore()
     {
         // Arrange
         var projectId = 1;
@@ -325,214 +320,123 @@ public class ProjectMonitoringServiceTests
             Id = projectId,
             Name = "Test Project",
             EstimatedHours = 100,
-            EndDate = DateTime.Today.AddDays(-5) // 5 days overdue
+            Budget = 10000,
+            StartDate = DateTime.Today.AddDays(-30),
+            EndDate = DateTime.Today.AddDays(30),
+            Tasks = new List<ProjectTask>
+            {
+                new ProjectTask { Id = 1, Status = Core.Enums.ProjectTaskStatus.Completed },
+                new ProjectTask { Id = 2, Status = Core.Enums.ProjectTaskStatus.InProgress }
+            },
+            ProjectAssignments = new List<ProjectAssignment>
+            {
+                new ProjectAssignment { Id = 1, EmployeeId = 1 },
+                new ProjectAssignment { Id = 2, EmployeeId = 2 }
+            }
         };
 
-        var progress = new ProjectProgressDto
+        var dsrRecords = new List<DSR>
         {
-            ProjectId = projectId,
-            CompletionPercentage = 70,
-            IsOnTrack = false
-        };
-
-        var variance = new ProjectVarianceDto
-        {
-            IsBehindSchedule = true,
-            ScheduleVarianceDays = 5, // 5 days behind (> 3)
-            IsOverBudget = false,
-            HoursVariance = -20
+            new DSR { Id = 1, ProjectId = projectId, HoursWorked = 40 }
         };
 
         _mockProjectRepository.Setup(r => r.GetProjectWithDetailsAsync(projectId))
             .ReturnsAsync(project);
+        _mockDsrRepository.Setup(r => r.GetProjectDSRsAsync(projectId))
+            .ReturnsAsync(dsrRecords);
 
-        _mockProjectService.Setup(s => s.GetProjectProgressAsync(projectId))
-            .ReturnsAsync(progress);
-
-        _mockDsrRepository.Setup(r => r.GetTotalHoursByProjectAsync(projectId, null, null))
-            .ReturnsAsync(80);
-
-        _mockTaskRepository.Setup(r => r.GetTasksByProjectAsync(projectId))
-            .ReturnsAsync(new List<ProjectTask>());
-
-        // Mock the CreateProjectAlertAsync method to capture the call
-        _mockAlertRepository.Setup(r => r.AddAsync(It.IsAny<ProjectAlert>()))
-            .ReturnsAsync(It.IsAny<ProjectAlert>());
-
-        _mockAlertRepository.Setup(r => r.SaveChangesAsync())
-            .ReturnsAsync(true);
-
-        _mockMapper.Setup(m => m.Map<ProjectAlertDto>(It.IsAny<ProjectAlert>()))
-            .Returns(new ProjectAlertDto());
-
-        // We need to create a partial mock or use a different approach
-        // Since CalculateProjectVarianceAsync is called internally, we need to mock its dependencies
-        // The variance calculation depends on the project end date and completion percentage
-        
         // Act
-        await _service.CheckAndCreateAutomatedAlertsAsync(projectId);
+        var result = await _service.CalculateProjectHealthScoreAsync(projectId);
 
-        // Assert - The alert should be created because:
-        // - Project end date is 5 days ago (behind schedule)
-        // - Completion percentage is 70% (< 100%)
-        // - Schedule variance days (5) > 3
-        // - Since variance days (5) < 7, severity should be Medium, not High
-        _mockAlertRepository.Verify(r => r.AddAsync(It.Is<ProjectAlert>(a => 
-            a.ProjectId == projectId && 
-            a.AlertType == ProjectAlertType.ScheduleDelay &&
-            a.Severity == AlertSeverity.Medium)), Times.Once);
+        // Assert
+        Assert.True(result >= 0);
+        Assert.True(result <= 10);
     }
 
     [Fact]
-    public async Task CheckAndCreateAutomatedAlertsAsync_ProjectOverBudget_CreatesBudgetAlert()
+    public async Task IsProjectAtRiskAsync_HealthyProject_ReturnsFalse()
     {
         // Arrange
         var projectId = 1;
         var project = new Project
         {
             Id = projectId,
-            Name = "Test Project",
+            Name = "Healthy Project",
             EstimatedHours = 100,
-            EndDate = DateTime.Today.AddDays(5)
+            Budget = 10000,
+            StartDate = DateTime.Today.AddDays(-10),
+            EndDate = DateTime.Today.AddDays(20),
+            Tasks = new List<ProjectTask>
+            {
+                new ProjectTask { Id = 1, Status = Core.Enums.ProjectTaskStatus.Completed },
+                new ProjectTask { Id = 2, Status = Core.Enums.ProjectTaskStatus.Completed }
+            },
+            ProjectAssignments = new List<ProjectAssignment>
+            {
+                new ProjectAssignment { Id = 1, EmployeeId = 1 }
+            }
         };
 
-        var progress = new ProjectProgressDto
+        var dsrRecords = new List<DSR>
         {
-            ProjectId = projectId,
-            CompletionPercentage = 80,
-            IsOnTrack = false
+            new DSR { Id = 1, ProjectId = projectId, HoursWorked = 30 }
         };
 
         _mockProjectRepository.Setup(r => r.GetProjectWithDetailsAsync(projectId))
             .ReturnsAsync(project);
-
-        _mockProjectService.Setup(s => s.GetProjectProgressAsync(projectId))
-            .ReturnsAsync(progress);
-
-        _mockDsrRepository.Setup(r => r.GetTotalHoursByProjectAsync(projectId, null, null))
-            .ReturnsAsync(130); // 30% over budget (30 hours over 100 estimated)
-
-        _mockTaskRepository.Setup(r => r.GetTasksByProjectAsync(projectId))
-            .ReturnsAsync(new List<ProjectTask>());
-
-        _mockAlertRepository.Setup(r => r.AddAsync(It.IsAny<ProjectAlert>()))
-            .ReturnsAsync(It.IsAny<ProjectAlert>());
-
-        _mockAlertRepository.Setup(r => r.SaveChangesAsync())
-            .ReturnsAsync(true);
-
-        _mockMapper.Setup(m => m.Map<ProjectAlertDto>(It.IsAny<ProjectAlert>()))
-            .Returns(new ProjectAlertDto());
-
-        // Act
-        await _service.CheckAndCreateAutomatedAlertsAsync(projectId);
-
-        // Assert - The alert should be created because:
-        // - Actual hours (130) > Estimated hours (100) -> IsOverBudget = true
-        // - Hours variance (30) > 10% of estimated hours (10) -> meets threshold
-        // - Since hours variance (30) > 20% of estimated hours (20), severity should be High
-        _mockAlertRepository.Verify(r => r.AddAsync(It.Is<ProjectAlert>(a => 
-            a.ProjectId == projectId && 
-            a.AlertType == ProjectAlertType.BudgetOverrun &&
-            a.Severity == AlertSeverity.High)), Times.Once);
-    }
-
-    [Fact]
-    public async Task CalculateProjectEfficiencyAsync_ValidProject_ReturnsEfficiency()
-    {
-        // Arrange
-        var projectId = 1;
-        var progress = new ProjectProgressDto
-        {
-            ProjectId = projectId,
-            TotalEstimatedHours = 100,
-            ActualHoursWorked = 80
-        };
-
-        _mockProjectService.Setup(s => s.GetProjectProgressAsync(projectId))
-            .ReturnsAsync(progress);
-
-        // Act
-        var result = await _service.CalculateProjectEfficiencyAsync(projectId);
-
-        // Assert
-        Assert.Equal(125m, result); // (100 / 80) * 100 = 125%
-    }
-
-    [Fact]
-    public async Task CalculateProjectEfficiencyAsync_NoActualHours_ReturnsZero()
-    {
-        // Arrange
-        var projectId = 1;
-        var progress = new ProjectProgressDto
-        {
-            ProjectId = projectId,
-            TotalEstimatedHours = 100,
-            ActualHoursWorked = 0
-        };
-
-        _mockProjectService.Setup(s => s.GetProjectProgressAsync(projectId))
-            .ReturnsAsync(progress);
-
-        // Act
-        var result = await _service.CalculateProjectEfficiencyAsync(projectId);
-
-        // Assert
-        Assert.Equal(0m, result);
-    }
-
-    [Fact]
-    public async Task IsProjectAtRiskAsync_ProjectOverBudgetAndBehindSchedule_ReturnsTrue()
-    {
-        // Arrange
-        var projectId = 1;
-        var variance = new ProjectVarianceDto
-        {
-            IsOverBudget = true,
-            IsBehindSchedule = true
-        };
-
-        _mockProjectRepository.Setup(r => r.GetProjectWithDetailsAsync(projectId))
-            .ReturnsAsync(new Project { Id = projectId, EstimatedHours = 100, EndDate = DateTime.Today.AddDays(-1) });
-
-        _mockDsrRepository.Setup(r => r.GetTotalHoursByProjectAsync(projectId, null, null))
-            .ReturnsAsync(120);
-
-        _mockProjectService.Setup(s => s.GetProjectProgressAsync(projectId))
-            .ReturnsAsync(new ProjectProgressDto { CompletionPercentage = 80 });
-
-        _mockAlertRepository.Setup(r => r.GetUnresolvedAlertCountAsync(projectId))
-            .ReturnsAsync(1);
-
-        // Act
-        var result = await _service.IsProjectAtRiskAsync(projectId);
-
-        // Assert
-        Assert.True(result);
-    }
-
-    [Fact]
-    public async Task IsProjectAtRiskAsync_ProjectOnTrack_ReturnsFalse()
-    {
-        // Arrange
-        var projectId = 1;
-
-        _mockProjectRepository.Setup(r => r.GetProjectWithDetailsAsync(projectId))
-            .ReturnsAsync(new Project { Id = projectId, EstimatedHours = 100, EndDate = DateTime.Today.AddDays(5) });
-
-        _mockDsrRepository.Setup(r => r.GetTotalHoursByProjectAsync(projectId, null, null))
-            .ReturnsAsync(80);
-
-        _mockProjectService.Setup(s => s.GetProjectProgressAsync(projectId))
-            .ReturnsAsync(new ProjectProgressDto { CompletionPercentage = 80 });
-
-        _mockAlertRepository.Setup(r => r.GetUnresolvedAlertCountAsync(projectId))
-            .ReturnsAsync(0);
+        _mockDsrRepository.Setup(r => r.GetProjectDSRsAsync(projectId))
+            .ReturnsAsync(dsrRecords);
 
         // Act
         var result = await _service.IsProjectAtRiskAsync(projectId);
 
         // Assert
         Assert.False(result);
+    }
+
+    [Fact]
+    public async Task CheckProjectHealthAsync_UnhealthyProject_CreatesAlerts()
+    {
+        // Arrange
+        var projectId = 1;
+        var project = new Project
+        {
+            Id = projectId,
+            Name = "Unhealthy Project",
+            EstimatedHours = 100,
+            Budget = 1000,
+            StartDate = DateTime.Today.AddDays(-60),
+            EndDate = DateTime.Today.AddDays(-10), // Overdue
+            Tasks = new List<ProjectTask>
+            {
+                new ProjectTask 
+                { 
+                    Id = 1, 
+                    Status = Core.Enums.ProjectTaskStatus.Todo,
+                    DueDate = DateTime.Today.AddDays(-5) // Overdue task
+                }
+            }
+        };
+
+        var dsrRecords = new List<DSR>
+        {
+            new DSR { Id = 1, ProjectId = projectId, HoursWorked = 150 } // Over budget
+        };
+
+        _mockProjectRepository.Setup(r => r.GetProjectWithDetailsAsync(projectId))
+            .ReturnsAsync(project);
+        _mockDsrRepository.Setup(r => r.GetProjectDSRsAsync(projectId))
+            .ReturnsAsync(dsrRecords);
+        _mockAlertRepository.Setup(r => r.AddAsync(It.IsAny<ProjectAlert>()))
+            .Returns(Task.CompletedTask);
+        _mockAlertRepository.Setup(r => r.SaveChangesAsync())
+            .Returns(Task.CompletedTask);
+
+        // Act
+        await _service.CheckProjectHealthAsync(projectId);
+
+        // Assert
+        _mockAlertRepository.Verify(r => r.AddAsync(It.IsAny<ProjectAlert>()), Times.AtLeastOnce);
+        _mockAlertRepository.Verify(r => r.SaveChangesAsync(), Times.AtLeastOnce);
     }
 }

@@ -32,7 +32,9 @@ describe('AttendanceTrackerComponent', () => {
     date: '2025-01-08',
     checkInTime: '2025-01-08T09:15:00Z',
     status: AttendanceStatusType.Present,
-    location: '40.7128,-74.0060'
+    location: '40.7128,-74.0060',
+    isLate: false,
+    isEarlyOut: false
   };
 
   beforeEach(async () => {

@@ -2,15 +2,11 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using StrideHR.Core.Interfaces.Services;
 using StrideHR.Core.Models.Project;
-using StrideHR.Core.Enums;
-using StrideHR.API.Models;
 
 namespace StrideHR.API.Controllers;
 
-[ApiController]
-[Route("api/[controller]")]
 [Authorize]
-public class ProjectMonitoringController : ControllerBase
+public class ProjectMonitoringController : BaseController
 {
     private readonly IProjectMonitoringService _monitoringService;
     private readonly ILogger<ProjectMonitoringController> _logger;
@@ -23,468 +19,388 @@ public class ProjectMonitoringController : ControllerBase
         _logger = logger;
     }
 
-    /// <summary>
-    /// Get real-time monitoring data for a specific project
-    /// </summary>
-    [HttpGet("{projectId}/monitoring")]
-    public async Task<ActionResult<ApiResponse<ProjectMonitoringDto>>> GetProjectMonitoringData(int projectId)
+    private int GetCurrentEmployeeId()
+    {
+        var employeeIdClaim = User.FindFirst("EmployeeId")?.Value;
+        return int.TryParse(employeeIdClaim, out var employeeId) ? employeeId : 0;
+    }
+
+    // Project Hours Tracking Dashboard
+    [HttpGet("projects/{projectId}/hours-tracking")]
+    public async Task<IActionResult> GetProjectHoursTracking(int projectId, [FromQuery] DateTime? startDate = null, [FromQuery] DateTime? endDate = null)
     {
         try
         {
-            var monitoringData = await _monitoringService.GetProjectMonitoringDataAsync(projectId);
-            return Ok(new ApiResponse<ProjectMonitoringDto>
-            {
-                Success = true,
-                Data = monitoringData,
-                Message = "Project monitoring data retrieved successfully"
-            });
+            var report = await _monitoringService.GetProjectHoursTrackingAsync(projectId, startDate, endDate);
+            return Success(report);
         }
         catch (ArgumentException ex)
         {
-            return NotFound(new ApiResponse<ProjectMonitoringDto>
-            {
-                Success = false,
-                Message = ex.Message
-            });
+            return Error(ex.Message);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error getting project monitoring data for project: {ProjectId}", projectId);
-            return StatusCode(500, new ApiResponse<ProjectMonitoringDto>
-            {
-                Success = false,
-                Message = "An error occurred while retrieving project monitoring data"
-            });
+            _logger.LogError(ex, "Error getting project hours tracking for project {ProjectId}", projectId);
+            return Error("Failed to get project hours tracking");
         }
     }
 
-    /// <summary>
-    /// Get monitoring data for multiple projects
-    /// </summary>
-    [HttpPost("monitoring/batch")]
-    public async Task<ActionResult<ApiResponse<List<ProjectMonitoringDto>>>> GetProjectsMonitoringData([FromBody] List<int> projectIds)
+    [HttpGet("team-hours-tracking")]
+    public async Task<IActionResult> GetTeamHoursTracking([FromQuery] DateTime? startDate = null, [FromQuery] DateTime? endDate = null)
     {
         try
         {
-            var monitoringData = await _monitoringService.GetProjectsMonitoringDataAsync(projectIds);
-            return Ok(new ApiResponse<List<ProjectMonitoringDto>>
-            {
-                Success = true,
-                Data = monitoringData,
-                Message = "Projects monitoring data retrieved successfully"
-            });
+            var currentEmployeeId = GetCurrentEmployeeId();
+            if (currentEmployeeId == 0)
+                return Error("Unable to identify current employee");
+
+            var reports = await _monitoringService.GetTeamHoursTrackingAsync(currentEmployeeId, startDate, endDate);
+            return Success(reports);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error getting monitoring data for multiple projects");
-            return StatusCode(500, new ApiResponse<List<ProjectMonitoringDto>>
-            {
-                Success = false,
-                Message = "An error occurred while retrieving projects monitoring data"
-            });
+            _logger.LogError(ex, "Error getting team hours tracking");
+            return Error("Failed to get team hours tracking");
         }
     }
 
-    /// <summary>
-    /// Get team leader dashboard with all projects and summary
-    /// </summary>
-    [HttpGet("team-leader/{teamLeaderId}/dashboard")]
-    public async Task<ActionResult<ApiResponse<TeamLeaderDashboardDto>>> GetTeamLeaderDashboard(int teamLeaderId)
+    [HttpGet("team-leader-dashboard")]
+    public async Task<IActionResult> GetTeamLeaderDashboard()
     {
         try
         {
-            var dashboard = await _monitoringService.GetTeamLeaderDashboardAsync(teamLeaderId);
-            return Ok(new ApiResponse<TeamLeaderDashboardDto>
-            {
-                Success = true,
-                Data = dashboard,
-                Message = "Team leader dashboard retrieved successfully"
-            });
+            var currentEmployeeId = GetCurrentEmployeeId();
+            if (currentEmployeeId == 0)
+                return Error("Unable to identify current employee");
+
+            var dashboard = await _monitoringService.GetTeamLeaderDashboardAsync(currentEmployeeId);
+            return Success(dashboard);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error getting team leader dashboard for: {TeamLeaderId}", teamLeaderId);
-            return StatusCode(500, new ApiResponse<TeamLeaderDashboardDto>
-            {
-                Success = false,
-                Message = "An error occurred while retrieving team leader dashboard"
-            });
+            _logger.LogError(ex, "Error getting team leader dashboard");
+            return Error("Failed to get team leader dashboard");
         }
     }
 
-    /// <summary>
-    /// Get project hours analysis and variance reporting
-    /// </summary>
-    [HttpGet("{projectId}/hours-analysis")]
-    public async Task<ActionResult<ApiResponse<List<ProjectHoursReportDto>>>> GetProjectHoursAnalysis(
-        int projectId, 
-        [FromQuery] DateTime? startDate = null, 
-        [FromQuery] DateTime? endDate = null)
+    // Project Analytics and Reporting
+    [HttpGet("projects/{projectId}/analytics")]
+    public async Task<IActionResult> GetProjectAnalytics(int projectId)
     {
         try
         {
-            var analysis = await _monitoringService.GetProjectHoursAnalysisAsync(projectId, startDate, endDate);
-            return Ok(new ApiResponse<List<ProjectHoursReportDto>>
-            {
-                Success = true,
-                Data = analysis,
-                Message = "Project hours analysis retrieved successfully"
-            });
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error getting project hours analysis for project: {ProjectId}", projectId);
-            return StatusCode(500, new ApiResponse<List<ProjectHoursReportDto>>
-            {
-                Success = false,
-                Message = "An error occurred while retrieving project hours analysis"
-            });
-        }
-    }
-
-    /// <summary>
-    /// Get team hours analysis for a team leader
-    /// </summary>
-    [HttpGet("team-leader/{teamLeaderId}/hours-analysis")]
-    public async Task<ActionResult<ApiResponse<List<ProjectHoursReportDto>>>> GetTeamHoursAnalysis(
-        int teamLeaderId, 
-        [FromQuery] DateTime? startDate = null, 
-        [FromQuery] DateTime? endDate = null)
-    {
-        try
-        {
-            var analysis = await _monitoringService.GetTeamHoursAnalysisAsync(teamLeaderId, startDate, endDate);
-            return Ok(new ApiResponse<List<ProjectHoursReportDto>>
-            {
-                Success = true,
-                Data = analysis,
-                Message = "Team hours analysis retrieved successfully"
-            });
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error getting team hours analysis for team leader: {TeamLeaderId}", teamLeaderId);
-            return StatusCode(500, new ApiResponse<List<ProjectHoursReportDto>>
-            {
-                Success = false,
-                Message = "An error occurred while retrieving team hours analysis"
-            });
-        }
-    }
-
-    /// <summary>
-    /// Get project variance report
-    /// </summary>
-    [HttpGet("{projectId}/variance")]
-    public async Task<ActionResult<ApiResponse<ProjectVarianceDto>>> GetProjectVarianceReport(int projectId)
-    {
-        try
-        {
-            var variance = await _monitoringService.GetProjectVarianceReportAsync(projectId);
-            return Ok(new ApiResponse<ProjectVarianceDto>
-            {
-                Success = true,
-                Data = variance,
-                Message = "Project variance report retrieved successfully"
-            });
+            var analytics = await _monitoringService.GetProjectAnalyticsAsync(projectId);
+            return Success(analytics);
         }
         catch (ArgumentException ex)
         {
-            return NotFound(new ApiResponse<ProjectVarianceDto>
-            {
-                Success = false,
-                Message = ex.Message
-            });
+            return Error(ex.Message);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error getting project variance report for project: {ProjectId}", projectId);
-            return StatusCode(500, new ApiResponse<ProjectVarianceDto>
-            {
-                Success = false,
-                Message = "An error occurred while retrieving project variance report"
-            });
+            _logger.LogError(ex, "Error getting project analytics for project {ProjectId}", projectId);
+            return Error("Failed to get project analytics");
         }
     }
 
-    /// <summary>
-    /// Get project alerts
-    /// </summary>
-    [HttpGet("{projectId}/alerts")]
-    public async Task<ActionResult<ApiResponse<List<ProjectAlertDto>>>> GetProjectAlerts(int projectId)
+    [HttpGet("team-project-analytics")]
+    public async Task<IActionResult> GetTeamProjectAnalytics()
+    {
+        try
+        {
+            var currentEmployeeId = GetCurrentEmployeeId();
+            if (currentEmployeeId == 0)
+                return Error("Unable to identify current employee");
+
+            var analytics = await _monitoringService.GetTeamProjectAnalyticsAsync(currentEmployeeId);
+            return Success(analytics);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error getting team project analytics");
+            return Error("Failed to get team project analytics");
+        }
+    }
+
+    [HttpGet("projects/{projectId}/performance")]
+    public async Task<IActionResult> GetProjectPerformance(int projectId)
+    {
+        try
+        {
+            var performance = await _monitoringService.GetProjectPerformanceAsync(projectId);
+            return Success(performance);
+        }
+        catch (ArgumentException ex)
+        {
+            return Error(ex.Message);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error getting project performance for project {ProjectId}", projectId);
+            return Error("Failed to get project performance");
+        }
+    }
+
+    [HttpGet("projects/{projectId}/trends")]
+    public async Task<IActionResult> GetProjectTrends(int projectId, [FromQuery] int days = 30)
+    {
+        try
+        {
+            var trends = await _monitoringService.GetProjectTrendsAsync(projectId, days);
+            return Success(trends);
+        }
+        catch (ArgumentException ex)
+        {
+            return Error(ex.Message);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error getting project trends for project {ProjectId}", projectId);
+            return Error("Failed to get project trends");
+        }
+    }
+
+    // Project Alerts and Notifications
+    [HttpGet("projects/{projectId}/alerts")]
+    public async Task<IActionResult> GetProjectAlerts(int projectId)
     {
         try
         {
             var alerts = await _monitoringService.GetProjectAlertsAsync(projectId);
-            return Ok(new ApiResponse<List<ProjectAlertDto>>
-            {
-                Success = true,
-                Data = alerts,
-                Message = "Project alerts retrieved successfully"
-            });
+            return Success(alerts);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error getting project alerts for project: {ProjectId}", projectId);
-            return StatusCode(500, new ApiResponse<List<ProjectAlertDto>>
-            {
-                Success = false,
-                Message = "An error occurred while retrieving project alerts"
-            });
+            _logger.LogError(ex, "Error getting project alerts for project {ProjectId}", projectId);
+            return Error("Failed to get project alerts");
         }
     }
 
-    /// <summary>
-    /// Get team leader alerts
-    /// </summary>
-    [HttpGet("team-leader/{teamLeaderId}/alerts")]
-    public async Task<ActionResult<ApiResponse<List<ProjectAlertDto>>>> GetTeamLeaderAlerts(int teamLeaderId)
+    [HttpGet("team-alerts")]
+    public async Task<IActionResult> GetTeamAlerts()
     {
         try
         {
-            var alerts = await _monitoringService.GetTeamLeaderAlertsAsync(teamLeaderId);
-            return Ok(new ApiResponse<List<ProjectAlertDto>>
-            {
-                Success = true,
-                Data = alerts,
-                Message = "Team leader alerts retrieved successfully"
-            });
+            var currentEmployeeId = GetCurrentEmployeeId();
+            if (currentEmployeeId == 0)
+                return Error("Unable to identify current employee");
+
+            var alerts = await _monitoringService.GetTeamAlertsAsync(currentEmployeeId);
+            return Success(alerts);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error getting team leader alerts for: {TeamLeaderId}", teamLeaderId);
-            return StatusCode(500, new ApiResponse<List<ProjectAlertDto>>
-            {
-                Success = false,
-                Message = "An error occurred while retrieving team leader alerts"
-            });
+            _logger.LogError(ex, "Error getting team alerts");
+            return Error("Failed to get team alerts");
         }
     }
 
-    /// <summary>
-    /// Create a project alert
-    /// </summary>
-    [HttpPost("{projectId}/alerts")]
-    public async Task<ActionResult<ApiResponse<ProjectAlertDto>>> CreateProjectAlert(
-        int projectId, 
-        [FromBody] CreateProjectAlertRequest request)
+    [HttpPost("projects/{projectId}/alerts")]
+    public async Task<IActionResult> CreateProjectAlert(int projectId, [FromBody] CreateProjectAlertRequest request)
     {
         try
         {
-            var alert = await _monitoringService.CreateProjectAlertAsync(
-                projectId, 
-                request.AlertType, 
-                request.Message, 
-                request.Severity);
-
-            return CreatedAtAction(
-                nameof(GetProjectAlerts), 
-                new { projectId }, 
-                new ApiResponse<ProjectAlertDto>
-                {
-                    Success = true,
-                    Data = alert,
-                    Message = "Project alert created successfully"
-                });
+            var alert = await _monitoringService.CreateProjectAlertAsync(projectId, request.AlertType, request.Message, request.Severity);
+            return Success(alert, "Project alert created successfully");
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error creating project alert for project: {ProjectId}", projectId);
-            return StatusCode(500, new ApiResponse<ProjectAlertDto>
-            {
-                Success = false,
-                Message = "An error occurred while creating project alert"
-            });
+            _logger.LogError(ex, "Error creating project alert for project {ProjectId}", projectId);
+            return Error("Failed to create project alert");
         }
     }
 
-    /// <summary>
-    /// Resolve a project alert
-    /// </summary>
     [HttpPut("alerts/{alertId}/resolve")]
-    public async Task<ActionResult<ApiResponse<bool>>> ResolveProjectAlert(
-        int alertId, 
-        [FromBody] ResolveAlertRequest request)
+    public async Task<IActionResult> ResolveProjectAlert(int alertId)
     {
         try
         {
-            var result = await _monitoringService.ResolveProjectAlertAsync(
-                alertId, 
-                request.ResolvedByEmployeeId, 
-                request.ResolutionNotes);
+            var currentEmployeeId = GetCurrentEmployeeId();
+            if (currentEmployeeId == 0)
+                return Error("Unable to identify current employee");
 
+            var result = await _monitoringService.ResolveProjectAlertAsync(alertId, currentEmployeeId);
             if (!result)
-            {
-                return NotFound(new ApiResponse<bool>
-                {
-                    Success = false,
-                    Message = "Alert not found or already resolved"
-                });
-            }
+                return Error("Alert not found or already resolved");
 
-            return Ok(new ApiResponse<bool>
-            {
-                Success = true,
-                Data = result,
-                Message = "Project alert resolved successfully"
-            });
+            return Success("Alert resolved successfully");
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error resolving project alert: {AlertId}", alertId);
-            return StatusCode(500, new ApiResponse<bool>
-            {
-                Success = false,
-                Message = "An error occurred while resolving project alert"
-            });
+            _logger.LogError(ex, "Error resolving project alert {AlertId}", alertId);
+            return Error("Failed to resolve project alert");
         }
     }
 
-    /// <summary>
-    /// Check and create automated alerts for a project
-    /// </summary>
-    [HttpPost("{projectId}/check-alerts")]
-    public async Task<ActionResult<ApiResponse<bool>>> CheckAutomatedAlerts(int projectId)
+    [HttpGet("critical-alerts")]
+    public async Task<IActionResult> GetCriticalAlerts()
     {
         try
         {
-            await _monitoringService.CheckAndCreateAutomatedAlertsAsync(projectId);
-            return Ok(new ApiResponse<bool>
-            {
-                Success = true,
-                Data = true,
-                Message = "Automated alerts check completed successfully"
-            });
+            var currentEmployeeId = GetCurrentEmployeeId();
+            if (currentEmployeeId == 0)
+                return Error("Unable to identify current employee");
+
+            var alerts = await _monitoringService.GetCriticalAlertsAsync(currentEmployeeId);
+            return Success(alerts);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error checking automated alerts for project: {ProjectId}", projectId);
-            return StatusCode(500, new ApiResponse<bool>
-            {
-                Success = false,
-                Message = "An error occurred while checking automated alerts"
-            });
+            _logger.LogError(ex, "Error getting critical alerts");
+            return Error("Failed to get critical alerts");
         }
     }
 
-    /// <summary>
-    /// Get project efficiency metrics
-    /// </summary>
-    [HttpGet("{projectId}/efficiency")]
-    public async Task<ActionResult<ApiResponse<decimal>>> GetProjectEfficiency(int projectId)
+    // Risk Management
+    [HttpGet("projects/{projectId}/risks")]
+    public async Task<IActionResult> GetProjectRisks(int projectId)
     {
         try
         {
-            var efficiency = await _monitoringService.CalculateProjectEfficiencyAsync(projectId);
-            return Ok(new ApiResponse<decimal>
-            {
-                Success = true,
-                Data = efficiency,
-                Message = "Project efficiency calculated successfully"
-            });
+            var risks = await _monitoringService.GetProjectRisksAsync(projectId);
+            return Success(risks);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error calculating project efficiency for project: {ProjectId}", projectId);
-            return StatusCode(500, new ApiResponse<decimal>
-            {
-                Success = false,
-                Message = "An error occurred while calculating project efficiency"
-            });
+            _logger.LogError(ex, "Error getting project risks for project {ProjectId}", projectId);
+            return Error("Failed to get project risks");
         }
     }
 
-    /// <summary>
-    /// Get team efficiency metrics
-    /// </summary>
-    [HttpGet("team-leader/{teamLeaderId}/efficiency")]
-    public async Task<ActionResult<ApiResponse<decimal>>> GetTeamEfficiency(int teamLeaderId)
+    [HttpPost("projects/{projectId}/risks")]
+    public async Task<IActionResult> CreateProjectRisk(int projectId, [FromBody] CreateProjectRiskRequest request)
     {
         try
         {
-            var efficiency = await _monitoringService.CalculateTeamEfficiencyAsync(teamLeaderId);
-            return Ok(new ApiResponse<decimal>
-            {
-                Success = true,
-                Data = efficiency,
-                Message = "Team efficiency calculated successfully"
-            });
+            var risk = await _monitoringService.CreateProjectRiskAsync(projectId, request.RiskType, request.Description, request.Severity, request.Probability, request.Impact);
+            return Success(risk, "Project risk created successfully");
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error calculating team efficiency for team leader: {TeamLeaderId}", teamLeaderId);
-            return StatusCode(500, new ApiResponse<decimal>
-            {
-                Success = false,
-                Message = "An error occurred while calculating team efficiency"
-            });
+            _logger.LogError(ex, "Error creating project risk for project {ProjectId}", projectId);
+            return Error("Failed to create project risk");
         }
     }
 
-    /// <summary>
-    /// Check if project is at risk
-    /// </summary>
-    [HttpGet("{projectId}/at-risk")]
-    public async Task<ActionResult<ApiResponse<bool>>> IsProjectAtRisk(int projectId)
+    [HttpPut("risks/{riskId}")]
+    public async Task<IActionResult> UpdateProjectRisk(int riskId, [FromBody] UpdateProjectRiskRequest request)
+    {
+        try
+        {
+            var result = await _monitoringService.UpdateProjectRiskAsync(riskId, request.MitigationPlan, request.Status, request.AssignedTo);
+            if (!result)
+                return Error("Risk not found");
+
+            return Success("Project risk updated successfully");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error updating project risk {RiskId}", riskId);
+            return Error("Failed to update project risk");
+        }
+    }
+
+    [HttpGet("high-risks")]
+    public async Task<IActionResult> GetHighRisks()
+    {
+        try
+        {
+            var currentEmployeeId = GetCurrentEmployeeId();
+            if (currentEmployeeId == 0)
+                return Error("Unable to identify current employee");
+
+            var risks = await _monitoringService.GetHighRisksAsync(currentEmployeeId);
+            return Success(risks);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error getting high risks");
+            return Error("Failed to get high risks");
+        }
+    }
+
+    // Automated Monitoring
+    [HttpPost("projects/{projectId}/check-health")]
+    public async Task<IActionResult> CheckProjectHealth(int projectId)
+    {
+        try
+        {
+            await _monitoringService.CheckProjectHealthAsync(projectId);
+            return Success("Project health check completed");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error checking project health for project {ProjectId}", projectId);
+            return Error("Failed to check project health");
+        }
+    }
+
+    [HttpPost("generate-automatic-alerts")]
+    public async Task<IActionResult> GenerateAutomaticAlerts()
+    {
+        try
+        {
+            await _monitoringService.GenerateAutomaticAlertsAsync();
+            return Success("Automatic alerts generated successfully");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error generating automatic alerts");
+            return Error("Failed to generate automatic alerts");
+        }
+    }
+
+    [HttpGet("projects/{projectId}/is-at-risk")]
+    public async Task<IActionResult> IsProjectAtRisk(int projectId)
     {
         try
         {
             var isAtRisk = await _monitoringService.IsProjectAtRiskAsync(projectId);
-            return Ok(new ApiResponse<bool>
-            {
-                Success = true,
-                Data = isAtRisk,
-                Message = "Project risk status retrieved successfully"
-            });
+            return Success(new { ProjectId = projectId, IsAtRisk = isAtRisk });
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error checking if project is at risk: {ProjectId}", projectId);
-            return StatusCode(500, new ApiResponse<bool>
-            {
-                Success = false,
-                Message = "An error occurred while checking project risk status"
-            });
+            _logger.LogError(ex, "Error checking if project is at risk {ProjectId}", projectId);
+            return Error("Failed to check project risk status");
         }
     }
 
-    /// <summary>
-    /// Get at-risk projects for a team leader
-    /// </summary>
-    [HttpGet("team-leader/{teamLeaderId}/at-risk-projects")]
-    public async Task<ActionResult<ApiResponse<List<int>>>> GetAtRiskProjects(int teamLeaderId)
+    [HttpGet("projects/{projectId}/health-score")]
+    public async Task<IActionResult> GetProjectHealthScore(int projectId)
     {
         try
         {
-            var atRiskProjects = await _monitoringService.GetAtRiskProjectsAsync(teamLeaderId);
-            return Ok(new ApiResponse<List<int>>
-            {
-                Success = true,
-                Data = atRiskProjects,
-                Message = "At-risk projects retrieved successfully"
-            });
+            var healthScore = await _monitoringService.CalculateProjectHealthScoreAsync(projectId);
+            return Success(new { ProjectId = projectId, HealthScore = healthScore });
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error getting at-risk projects for team leader: {TeamLeaderId}", teamLeaderId);
-            return StatusCode(500, new ApiResponse<List<int>>
-            {
-                Success = false,
-                Message = "An error occurred while retrieving at-risk projects"
-            });
+            _logger.LogError(ex, "Error getting project health score for project {ProjectId}", projectId);
+            return Error("Failed to get project health score");
         }
     }
 }
 
+// Request DTOs
 public class CreateProjectAlertRequest
 {
-    public ProjectAlertType AlertType { get; set; }
+    public string AlertType { get; set; } = string.Empty;
     public string Message { get; set; } = string.Empty;
-    public AlertSeverity Severity { get; set; }
+    public string Severity { get; set; } = string.Empty;
 }
 
-public class ResolveAlertRequest
+public class CreateProjectRiskRequest
 {
-    public int ResolvedByEmployeeId { get; set; }
-    public string? ResolutionNotes { get; set; }
+    public string RiskType { get; set; } = string.Empty;
+    public string Description { get; set; } = string.Empty;
+    public string Severity { get; set; } = string.Empty;
+    public decimal Probability { get; set; }
+    public decimal Impact { get; set; }
+}
+
+public class UpdateProjectRiskRequest
+{
+    public string MitigationPlan { get; set; } = string.Empty;
+    public string Status { get; set; } = string.Empty;
+    public int? AssignedTo { get; set; }
 }

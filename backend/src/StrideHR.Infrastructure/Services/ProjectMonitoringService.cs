@@ -12,217 +12,240 @@ public class ProjectMonitoringService : IProjectMonitoringService
 {
     private readonly IProjectRepository _projectRepository;
     private readonly IProjectAlertRepository _alertRepository;
-    private readonly IProjectAssignmentRepository _assignmentRepository;
-    private readonly IProjectTaskRepository _taskRepository;
+    private readonly IProjectRiskRepository _riskRepository;
     private readonly IDSRRepository _dsrRepository;
-    private readonly IProjectService _projectService;
+    private readonly IProjectAssignmentRepository _assignmentRepository;
     private readonly IMapper _mapper;
     private readonly ILogger<ProjectMonitoringService> _logger;
 
     public ProjectMonitoringService(
         IProjectRepository projectRepository,
         IProjectAlertRepository alertRepository,
-        IProjectAssignmentRepository assignmentRepository,
-        IProjectTaskRepository taskRepository,
+        IProjectRiskRepository riskRepository,
         IDSRRepository dsrRepository,
-        IProjectService projectService,
+        IProjectAssignmentRepository assignmentRepository,
         IMapper mapper,
         ILogger<ProjectMonitoringService> logger)
     {
         _projectRepository = projectRepository;
         _alertRepository = alertRepository;
-        _assignmentRepository = assignmentRepository;
-        _taskRepository = taskRepository;
+        _riskRepository = riskRepository;
         _dsrRepository = dsrRepository;
-        _projectService = projectService;
+        _assignmentRepository = assignmentRepository;
         _mapper = mapper;
         _logger = logger;
     }
 
-    public async Task<ProjectMonitoringDto> GetProjectMonitoringDataAsync(int projectId)
+    public async Task<ProjectHoursReportDto> GetProjectHoursTrackingAsync(int projectId, DateTime? startDate = null, DateTime? endDate = null)
     {
         try
         {
             var project = await _projectRepository.GetProjectWithDetailsAsync(projectId);
             if (project == null)
-                throw new ArgumentException($"Project with ID {projectId} not found");
+                throw new ArgumentException("Project not found");
 
-            var progress = await _projectService.GetProjectProgressAsync(projectId);
-            var variance = await CalculateProjectVarianceAsync(projectId);
-            var alerts = await GetProjectAlertsAsync(projectId);
-            var teamMembers = await _projectService.GetProjectTeamMembersAsync(projectId);
+            var start = startDate ?? DateTime.Today.AddDays(-30);
+            var end = endDate ?? DateTime.Today;
 
-            return new ProjectMonitoringDto
+            var dsrRecords = await _dsrRepository.GetProjectDSRsAsync(projectId, start, end);
+            var teamMembers = await _assignmentRepository.GetProjectTeamMembersAsync(projectId);
+
+            var report = new ProjectHoursReportDto
             {
                 ProjectId = projectId,
                 ProjectName = project.Name,
-                Progress = progress,
-                Variance = variance,
-                Alerts = alerts,
-                TeamMembers = teamMembers,
-                LastUpdated = DateTime.UtcNow
+                EstimatedHours = project.EstimatedHours,
+                TotalHoursWorked = dsrRecords.Sum(d => d.HoursWorked),
+                StartDate = start,
+                EndDate = end,
+                DailyHours = dsrRecords
+                    .GroupBy(d => d.Date.Date)
+                    .Select(g => new DailyHoursDto
+                    {
+                        Date = g.Key,
+                        HoursWorked = g.Sum(d => d.HoursWorked),
+                        TasksWorked = g.Select(d => d.TaskId).Distinct().Count()
+                    })
+                    .OrderBy(d => d.Date)
+                    .ToList()
             };
+
+            report.HoursVariance = report.TotalHoursWorked - report.EstimatedHours;
+
+            return report;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error getting project monitoring data for project: {ProjectId}", projectId);
+            _logger.LogError(ex, "Error getting project hours tracking for project {ProjectId}", projectId);
             throw;
         }
     }
 
-    public async Task<List<ProjectMonitoringDto>> GetProjectsMonitoringDataAsync(List<int> projectIds)
-    {
-        try
-        {
-            var monitoringData = new List<ProjectMonitoringDto>();
-
-            foreach (var projectId in projectIds)
-            {
-                var data = await GetProjectMonitoringDataAsync(projectId);
-                monitoringData.Add(data);
-            }
-
-            return monitoringData;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error getting monitoring data for multiple projects");
-            throw;
-        }
-    }
-
-    public async Task<ProjectVarianceDto> CalculateProjectVarianceAsync(int projectId)
-    {
-        try
-        {
-            var project = await _projectRepository.GetProjectWithDetailsAsync(projectId);
-            if (project == null)
-                throw new ArgumentException($"Project with ID {projectId} not found");
-
-            var actualHours = await _dsrRepository.GetTotalHoursByProjectAsync(projectId);
-            var progress = await _projectService.GetProjectProgressAsync(projectId);
-
-            var hoursVariance = actualHours - project.EstimatedHours;
-            var budgetVariance = (actualHours * 50) - project.Budget; // Assuming $50/hour rate
-            var scheduleVarianceDays = (DateTime.Today - project.EndDate).Days;
-            var performanceIndex = project.EstimatedHours > 0 ? actualHours / project.EstimatedHours : 0;
-
-            return new ProjectVarianceDto
-            {
-                HoursVariance = hoursVariance,
-                BudgetVariance = budgetVariance,
-                ScheduleVarianceDays = scheduleVarianceDays,
-                PerformanceIndex = performanceIndex,
-                IsOverBudget = hoursVariance > 0,
-                IsBehindSchedule = scheduleVarianceDays > 0 && progress.CompletionPercentage < 100,
-                VarianceReason = GetVarianceReason(hoursVariance, scheduleVarianceDays, progress.CompletionPercentage)
-            };
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error calculating project variance for project: {ProjectId}", projectId);
-            throw;
-        }
-    }
-
-    public async Task<TeamLeaderDashboardDto> GetTeamLeaderDashboardAsync(int teamLeaderId)
-    {
-        try
-        {
-            var projects = await GetProjectsForTeamLeaderAsync(teamLeaderId);
-            var criticalAlerts = await GetTeamLeaderAlertsAsync(teamLeaderId);
-            
-            var summary = new ProjectSummaryDto
-            {
-                TotalProjects = projects.Count,
-                OnTrackProjects = projects.Count(p => p.Progress.IsOnTrack),
-                DelayedProjects = projects.Count(p => p.Variance.IsBehindSchedule),
-                OverBudgetProjects = projects.Count(p => p.Variance.IsOverBudget),
-                TotalEstimatedHours = projects.Sum(p => p.Progress.TotalEstimatedHours),
-                TotalActualHours = projects.Sum(p => p.Progress.ActualHoursWorked),
-                TotalTeamMembers = projects.SelectMany(p => p.TeamMembers).Select(tm => tm.EmployeeId).Distinct().Count()
-            };
-
-            summary.OverallEfficiency = summary.TotalEstimatedHours > 0 
-                ? (summary.TotalEstimatedHours / summary.TotalActualHours) * 100 
-                : 0;
-
-            var teamLeader = await _projectRepository.GetEmployeeAsync(teamLeaderId);
-            var teamLeaderName = teamLeader != null ? $"{teamLeader.FirstName} {teamLeader.LastName}" : "Unknown";
-
-            return new TeamLeaderDashboardDto
-            {
-                TeamLeaderId = teamLeaderId,
-                TeamLeaderName = teamLeaderName,
-                Projects = projects,
-                Summary = summary,
-                CriticalAlerts = criticalAlerts.Where(a => a.Severity == "Critical" || a.Severity == "High").ToList()
-            };
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error getting team leader dashboard for: {TeamLeaderId}", teamLeaderId);
-            throw;
-        }
-    }
-
-    public async Task<List<ProjectMonitoringDto>> GetProjectsForTeamLeaderAsync(int teamLeaderId)
+    public async Task<List<ProjectHoursReportDto>> GetTeamHoursTrackingAsync(int teamLeaderId, DateTime? startDate = null, DateTime? endDate = null)
     {
         try
         {
             var projects = await _projectRepository.GetProjectsByTeamLeadAsync(teamLeaderId);
-            var monitoringData = new List<ProjectMonitoringDto>();
+            var reports = new List<ProjectHoursReportDto>();
 
             foreach (var project in projects)
             {
-                var data = await GetProjectMonitoringDataAsync(project.Id);
-                monitoringData.Add(data);
+                var report = await GetProjectHoursTrackingAsync(project.Id, startDate, endDate);
+                reports.Add(report);
             }
 
-            return monitoringData;
+            return reports;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error getting projects for team leader: {TeamLeaderId}", teamLeaderId);
+            _logger.LogError(ex, "Error getting team hours tracking for team lead {TeamLeaderId}", teamLeaderId);
             throw;
         }
     }
 
-    public async Task<List<ProjectHoursReportDto>> GetProjectHoursAnalysisAsync(int projectId, DateTime? startDate = null, DateTime? endDate = null)
+    public async Task<ProjectDashboardDto> GetTeamLeaderDashboardAsync(int teamLeaderId)
     {
         try
         {
-            return (await _projectService.GetProjectHoursReportAsync(projectId, startDate, endDate)).ToList();
+            var projects = await _projectRepository.GetProjectsByTeamLeadAsync(teamLeaderId);
+            var projectIds = projects.Select(p => p.Id).ToList();
+
+            var analytics = new List<ProjectAnalyticsDto>();
+            foreach (var project in projects)
+            {
+                var analytic = await GetProjectAnalyticsAsync(project.Id);
+                analytics.Add(analytic);
+            }
+
+            var criticalAlerts = await _alertRepository.GetCriticalAlertsAsync(projectIds);
+            var highRisks = await _riskRepository.GetHighRisksAsync(projectIds);
+
+            var teamOverview = new TeamOverviewDto
+            {
+                TotalProjects = projects.Count,
+                ActiveProjects = projects.Count(p => p.Status == Core.Enums.ProjectStatus.InProgress),
+                CompletedProjects = projects.Count(p => p.Status == Core.Enums.ProjectStatus.Completed),
+                DelayedProjects = projects.Count(p => p.EndDate < DateTime.Today && p.Status != Core.Enums.ProjectStatus.Completed),
+                TotalBudget = projects.Sum(p => p.Budget),
+                BudgetUtilized = analytics.Sum(a => a.Metrics.BudgetUtilized),
+                TotalTeamMembers = analytics.Sum(a => a.Metrics.TeamMembersCount),
+                OverallProductivity = analytics.Any() ? analytics.Average(a => a.Performance.OverallEfficiency) : 0,
+                AverageProjectHealth = analytics.Any() ? analytics.Average(a => CalculateHealthScore(a.Metrics)) : 0
+            };
+
+            var employee = await _projectRepository.GetEmployeeAsync(teamLeaderId);
+
+            return new ProjectDashboardDto
+            {
+                TeamLeaderId = teamLeaderId,
+                TeamLeaderName = employee?.FirstName + " " + employee?.LastName ?? "Unknown",
+                ProjectAnalytics = analytics,
+                TeamOverview = teamOverview,
+                CriticalAlerts = _mapper.Map<List<ProjectAlertDto>>(criticalAlerts),
+                HighRisks = _mapper.Map<List<ProjectRiskDto>>(highRisks)
+            };
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error getting project hours analysis for project: {ProjectId}", projectId);
+            _logger.LogError(ex, "Error getting team leader dashboard for {TeamLeaderId}", teamLeaderId);
             throw;
         }
     }
 
-    public async Task<List<ProjectHoursReportDto>> GetTeamHoursAnalysisAsync(int teamLeaderId, DateTime? startDate = null, DateTime? endDate = null)
+    public async Task<ProjectAnalyticsDto> GetProjectAnalyticsAsync(int projectId)
     {
         try
         {
-            return (await _projectService.GetHoursTrackingReportAsync(teamLeaderId)).ToList();
+            var project = await _projectRepository.GetProjectWithDetailsAsync(projectId);
+            if (project == null)
+                throw new ArgumentException("Project not found");
+
+            var dsrRecords = await _dsrRepository.GetProjectDSRsAsync(projectId);
+            var teamMembers = await _assignmentRepository.GetProjectTeamMembersAsync(projectId);
+            var risks = await _riskRepository.GetProjectRisksAsync(projectId);
+
+            var metrics = new ProjectMetricsDto
+            {
+                TotalHoursWorked = dsrRecords.Sum(d => d.HoursWorked),
+                EstimatedHours = project.EstimatedHours,
+                BudgetUtilized = CalculateBudgetUtilized(project, dsrRecords),
+                CompletionPercentage = CalculateCompletionPercentage(project),
+                TotalTasks = project.Tasks.Count,
+                CompletedTasks = project.Tasks.Count(t => t.Status == Core.Enums.ProjectTaskStatus.Completed),
+                OverdueTasks = project.Tasks.Count(t => t.DueDate < DateTime.Today && t.Status != Core.Enums.ProjectTaskStatus.Completed),
+                TeamMembersCount = teamMembers.Count,
+                AverageTaskCompletionTime = CalculateAverageTaskCompletionTime(project.Tasks)
+            };
+
+            metrics.HoursVariance = metrics.TotalHoursWorked - metrics.EstimatedHours;
+            metrics.BudgetVariance = metrics.BudgetUtilized - project.Budget;
+
+            var trends = await GetProjectTrendsInternalAsync(projectId, 30);
+            var performance = CalculateProjectPerformance(metrics, project);
+
+            return new ProjectAnalyticsDto
+            {
+                ProjectId = projectId,
+                ProjectName = project.Name,
+                Metrics = metrics,
+                Trends = trends.FirstOrDefault() ?? new ProjectTrendsDto(),
+                Performance = performance,
+                Risks = _mapper.Map<List<ProjectRiskDto>>(risks),
+                GeneratedAt = DateTime.UtcNow
+            };
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error getting team hours analysis for team leader: {TeamLeaderId}", teamLeaderId);
+            _logger.LogError(ex, "Error getting project analytics for project {ProjectId}", projectId);
             throw;
         }
     }
 
-    public async Task<ProjectVarianceDto> GetProjectVarianceReportAsync(int projectId)
+    public async Task<List<ProjectAnalyticsDto>> GetTeamProjectAnalyticsAsync(int teamLeaderId)
     {
         try
         {
-            return await CalculateProjectVarianceAsync(projectId);
+            var projects = await _projectRepository.GetProjectsByTeamLeadAsync(teamLeaderId);
+            var analytics = new List<ProjectAnalyticsDto>();
+
+            foreach (var project in projects)
+            {
+                var analytic = await GetProjectAnalyticsAsync(project.Id);
+                analytics.Add(analytic);
+            }
+
+            return analytics;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error getting project variance report for project: {ProjectId}", projectId);
+            _logger.LogError(ex, "Error getting team project analytics for team lead {TeamLeaderId}", teamLeaderId);
+            throw;
+        }
+    }
+
+    public async Task<ProjectPerformanceDto> GetProjectPerformanceAsync(int projectId)
+    {
+        try
+        {
+            var analytics = await GetProjectAnalyticsAsync(projectId);
+            return analytics.Performance;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error getting project performance for project {ProjectId}", projectId);
+            throw;
+        }
+    }
+
+    public async Task<List<ProjectTrendsDto>> GetProjectTrendsAsync(int projectId, int days = 30)
+    {
+        try
+        {
+            return await GetProjectTrendsInternalAsync(projectId, days);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error getting project trends for project {ProjectId}", projectId);
             throw;
         }
     }
@@ -232,39 +255,46 @@ public class ProjectMonitoringService : IProjectMonitoringService
         try
         {
             var alerts = await _alertRepository.GetAlertsByProjectAsync(projectId);
-            return _mapper.Map<List<ProjectAlertDto>>(alerts);
+            return _mapper.Map<List<ProjectAlertDto>>(alerts.ToList());
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error getting project alerts for project: {ProjectId}", projectId);
+            _logger.LogError(ex, "Error getting project alerts for project {ProjectId}", projectId);
             throw;
         }
     }
 
-    public async Task<List<ProjectAlertDto>> GetTeamLeaderAlertsAsync(int teamLeaderId)
+    public async Task<List<ProjectAlertDto>> GetTeamAlertsAsync(int teamLeaderId)
     {
         try
         {
             var alerts = await _alertRepository.GetAlertsByTeamLeadAsync(teamLeaderId);
-            return _mapper.Map<List<ProjectAlertDto>>(alerts);
+            return _mapper.Map<List<ProjectAlertDto>>(alerts.ToList());
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error getting team leader alerts for: {TeamLeaderId}", teamLeaderId);
+            _logger.LogError(ex, "Error getting team alerts for team lead {TeamLeaderId}", teamLeaderId);
             throw;
         }
     }
 
-    public async Task<ProjectAlertDto> CreateProjectAlertAsync(int projectId, ProjectAlertType alertType, string message, AlertSeverity severity)
+    public async Task<ProjectAlertDto> CreateProjectAlertAsync(int projectId, string alertType, string message, string severity)
     {
         try
         {
+            // Parse the enum values
+            if (!Enum.TryParse<ProjectAlertType>(alertType, out var alertTypeEnum))
+                alertTypeEnum = ProjectAlertType.QualityIssue;
+            
+            if (!Enum.TryParse<AlertSeverity>(severity, out var severityEnum))
+                severityEnum = AlertSeverity.Medium;
+
             var alert = new ProjectAlert
             {
                 ProjectId = projectId,
-                AlertType = alertType,
+                AlertType = alertTypeEnum,
                 Message = message,
-                Severity = severity,
+                Severity = severityEnum,
                 IsResolved = false,
                 CreatedAt = DateTime.UtcNow
             };
@@ -272,152 +302,203 @@ public class ProjectMonitoringService : IProjectMonitoringService
             await _alertRepository.AddAsync(alert);
             await _alertRepository.SaveChangesAsync();
 
-            _logger.LogInformation("Project alert created: {ProjectId}, Type: {AlertType}, Severity: {Severity}", 
-                projectId, alertType, severity);
+            _logger.LogInformation("Project alert created for project {ProjectId}: {AlertType}", projectId, alertType);
 
             return _mapper.Map<ProjectAlertDto>(alert);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error creating project alert for project: {ProjectId}", projectId);
+            _logger.LogError(ex, "Error creating project alert for project {ProjectId}", projectId);
             throw;
         }
     }
 
-    public async Task<bool> ResolveProjectAlertAsync(int alertId, int resolvedByEmployeeId, string? resolutionNotes = null)
+    public async Task<bool> ResolveProjectAlertAsync(int alertId, int resolvedBy)
     {
         try
         {
-            var result = await _alertRepository.ResolveAlertAsync(alertId, resolvedByEmployeeId, resolutionNotes);
+            var result = await _alertRepository.ResolveAlertAsync(alertId, resolvedBy);
             
             if (result)
             {
-                _logger.LogInformation("Project alert resolved: {AlertId} by employee: {EmployeeId}", 
-                    alertId, resolvedByEmployeeId);
+                _logger.LogInformation("Project alert {AlertId} resolved by employee {EmployeeId}", alertId, resolvedBy);
             }
 
             return result;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error resolving project alert: {AlertId}", alertId);
+            _logger.LogError(ex, "Error resolving project alert {AlertId}", alertId);
             throw;
         }
     }
 
-    public async Task CheckAndCreateAutomatedAlertsAsync(int projectId)
+    public async Task<List<ProjectAlertDto>> GetCriticalAlertsAsync(int teamLeaderId)
+    {
+        try
+        {
+            var criticalAlerts = await _alertRepository.GetAlertsBySeverityAsync(AlertSeverity.Critical);
+            var highAlerts = await _alertRepository.GetAlertsBySeverityAsync(AlertSeverity.High);
+            var allAlerts = criticalAlerts.Concat(highAlerts).Where(a => !a.IsResolved);
+            return _mapper.Map<List<ProjectAlertDto>>(allAlerts.ToList());
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error getting critical alerts for team lead {TeamLeaderId}", teamLeaderId);
+            throw;
+        }
+    }
+
+    public async Task<List<ProjectRiskDto>> GetProjectRisksAsync(int projectId)
+    {
+        try
+        {
+            var risks = await _riskRepository.GetProjectRisksAsync(projectId);
+            return _mapper.Map<List<ProjectRiskDto>>(risks);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error getting project risks for project {ProjectId}", projectId);
+            throw;
+        }
+    }
+
+    public async Task<ProjectRiskDto> CreateProjectRiskAsync(int projectId, string riskType, string description, string severity, decimal probability, decimal impact)
+    {
+        try
+        {
+            var risk = new ProjectRisk
+            {
+                ProjectId = projectId,
+                RiskType = riskType,
+                Description = description,
+                Severity = severity,
+                Probability = probability,
+                Impact = impact,
+                Status = "Identified",
+                IdentifiedAt = DateTime.UtcNow,
+                CreatedAt = DateTime.UtcNow
+            };
+
+            await _riskRepository.AddAsync(risk);
+            await _riskRepository.SaveChangesAsync();
+
+            _logger.LogInformation("Project risk created for project {ProjectId}: {RiskType}", projectId, riskType);
+
+            return _mapper.Map<ProjectRiskDto>(risk);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error creating project risk for project {ProjectId}", projectId);
+            throw;
+        }
+    }
+
+    public async Task<bool> UpdateProjectRiskAsync(int riskId, string mitigationPlan, string status, int? assignedTo)
+    {
+        try
+        {
+            var risk = await _riskRepository.GetByIdAsync(riskId);
+            if (risk == null)
+                return false;
+
+            risk.MitigationPlan = mitigationPlan;
+            risk.Status = status;
+            risk.AssignedTo = assignedTo;
+
+            if (status == "Resolved")
+                risk.ResolvedAt = DateTime.UtcNow;
+
+            await _riskRepository.UpdateAsync(risk);
+            await _riskRepository.SaveChangesAsync();
+
+            _logger.LogInformation("Project risk {RiskId} updated with status {Status}", riskId, status);
+
+            return true;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error updating project risk {RiskId}", riskId);
+            throw;
+        }
+    }
+
+    public async Task<List<ProjectRiskDto>> GetHighRisksAsync(int teamLeaderId)
+    {
+        try
+        {
+            var projects = await _projectRepository.GetProjectsByTeamLeadAsync(teamLeaderId);
+            var projectIds = projects.Select(p => p.Id).ToList();
+            var risks = await _riskRepository.GetHighRisksAsync(projectIds);
+            return _mapper.Map<List<ProjectRiskDto>>(risks);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error getting high risks for team lead {TeamLeaderId}", teamLeaderId);
+            throw;
+        }
+    }
+
+    public async Task CheckProjectHealthAsync(int projectId)
     {
         try
         {
             var project = await _projectRepository.GetProjectWithDetailsAsync(projectId);
-            if (project == null) return;
+            if (project == null)
+                return;
 
-            var progress = await _projectService.GetProjectProgressAsync(projectId);
-            var variance = await CalculateProjectVarianceAsync(projectId);
+            var healthScore = await CalculateProjectHealthScoreAsync(projectId);
+            var isAtRisk = await IsProjectAtRiskAsync(projectId);
 
-            // Check for schedule delays
-            if (variance.IsBehindSchedule && variance.ScheduleVarianceDays > 3)
+            if (isAtRisk)
             {
-                await CreateProjectAlertAsync(projectId, ProjectAlertType.ScheduleDelay,
-                    $"Project is {variance.ScheduleVarianceDays} days behind schedule",
-                    variance.ScheduleVarianceDays > 7 ? AlertSeverity.High : AlertSeverity.Medium);
-            }
-
-            // Check for budget overruns
-            if (variance.IsOverBudget && variance.HoursVariance > project.EstimatedHours * 0.1m)
-            {
-                await CreateProjectAlertAsync(projectId, ProjectAlertType.BudgetOverrun,
-                    $"Project is over budget by {variance.HoursVariance:F1} hours",
-                    variance.HoursVariance > project.EstimatedHours * 0.2m ? AlertSeverity.High : AlertSeverity.Medium);
+                await CreateProjectAlertAsync(projectId, "LowProductivity", 
+                    $"Project health score is low ({healthScore:F1}/10). Immediate attention required.", 
+                    healthScore < 3 ? "Critical" : "High");
             }
 
             // Check for overdue tasks
-            var tasks = await _taskRepository.GetTasksByProjectAsync(projectId);
-            var overdueTasks = tasks.Where(t => t.DueDate.HasValue && t.DueDate.Value < DateTime.Today && 
-                                               t.Status != ProjectTaskStatus.Done).ToList();
-
-            if (overdueTasks.Any())
+            var overdueTasks = project.Tasks.Count(t => t.DueDate < DateTime.Today && t.Status != Core.Enums.ProjectTaskStatus.Completed);
+            if (overdueTasks > 0)
             {
-                await CreateProjectAlertAsync(projectId, ProjectAlertType.TaskOverdue,
-                    $"{overdueTasks.Count} tasks are overdue",
-                    overdueTasks.Count > 3 ? AlertSeverity.High : AlertSeverity.Medium);
+                await CreateProjectAlertAsync(projectId, "TaskOverdue", 
+                    $"{overdueTasks} task(s) are overdue and need immediate attention.", 
+                    overdueTasks > 5 ? "Critical" : "High");
             }
 
-            // Check for low productivity
-            if (progress.CompletionPercentage < 50 && variance.PerformanceIndex < 0.8m)
+            // Check budget variance
+            var dsrRecords = await _dsrRepository.GetProjectDSRsAsync(projectId);
+            var budgetUtilized = CalculateBudgetUtilized(project, dsrRecords);
+            if (budgetUtilized > project.Budget * 0.9m)
             {
-                await CreateProjectAlertAsync(projectId, ProjectAlertType.LowProductivity,
-                    "Project productivity is below expected levels",
-                    AlertSeverity.Medium);
+                await CreateProjectAlertAsync(projectId, "BudgetOverrun", 
+                    $"Project has utilized {(budgetUtilized / project.Budget * 100):F1}% of budget.", 
+                    budgetUtilized > project.Budget ? "Critical" : "High");
             }
-
-            _logger.LogInformation("Automated alerts check completed for project: {ProjectId}", projectId);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error checking automated alerts for project: {ProjectId}", projectId);
+            _logger.LogError(ex, "Error checking project health for project {ProjectId}", projectId);
             throw;
         }
     }
 
-    public async Task CheckAndCreateAutomatedAlertsForAllProjectsAsync()
+    public async Task GenerateAutomaticAlertsAsync()
     {
         try
         {
             var activeProjects = await _projectRepository.GetActiveProjectsAsync();
-            
+
             foreach (var project in activeProjects)
             {
-                await CheckAndCreateAutomatedAlertsAsync(project.Id);
+                await CheckProjectHealthAsync(project.Id);
             }
 
-            _logger.LogInformation("Automated alerts check completed for all active projects");
+            _logger.LogInformation("Automatic alerts generated for {ProjectCount} active projects", activeProjects.Count);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error checking automated alerts for all projects");
-            throw;
-        }
-    }
-
-    public async Task<decimal> CalculateProjectEfficiencyAsync(int projectId)
-    {
-        try
-        {
-            var progress = await _projectService.GetProjectProgressAsync(projectId);
-            
-            if (progress.ActualHoursWorked == 0)
-                return 0;
-
-            return (progress.TotalEstimatedHours / progress.ActualHoursWorked) * 100;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error calculating project efficiency for project: {ProjectId}", projectId);
-            throw;
-        }
-    }
-
-    public async Task<decimal> CalculateTeamEfficiencyAsync(int teamLeaderId)
-    {
-        try
-        {
-            var projects = await GetProjectsForTeamLeaderAsync(teamLeaderId);
-            
-            if (!projects.Any())
-                return 0;
-
-            var totalEstimated = projects.Sum(p => p.Progress.TotalEstimatedHours);
-            var totalActual = projects.Sum(p => p.Progress.ActualHoursWorked);
-
-            if (totalActual == 0)
-                return 0;
-
-            return (totalEstimated / totalActual) * 100;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error calculating team efficiency for team leader: {TeamLeaderId}", teamLeaderId);
+            _logger.LogError(ex, "Error generating automatic alerts");
             throw;
         }
     }
@@ -426,56 +507,330 @@ public class ProjectMonitoringService : IProjectMonitoringService
     {
         try
         {
-            var variance = await CalculateProjectVarianceAsync(projectId);
-            var alertCount = await _alertRepository.GetUnresolvedAlertCountAsync(projectId);
-
-            return variance.IsOverBudget || variance.IsBehindSchedule || alertCount > 2;
+            var healthScore = await CalculateProjectHealthScoreAsync(projectId);
+            return healthScore < 5; // Projects with health score below 5 are considered at risk
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error checking if project is at risk: {ProjectId}", projectId);
+            _logger.LogError(ex, "Error checking if project is at risk {ProjectId}", projectId);
             throw;
         }
     }
 
-    public async Task<List<int>> GetAtRiskProjectsAsync(int teamLeaderId)
+    public async Task<decimal> CalculateProjectHealthScoreAsync(int projectId)
     {
         try
         {
-            var projects = await _projectRepository.GetProjectsByTeamLeadAsync(teamLeaderId);
-            var atRiskProjects = new List<int>();
+            var project = await _projectRepository.GetProjectWithDetailsAsync(projectId);
+            if (project == null)
+                return 0;
 
-            foreach (var project in projects)
-            {
-                if (await IsProjectAtRiskAsync(project.Id))
-                {
-                    atRiskProjects.Add(project.Id);
-                }
-            }
+            var dsrRecords = await _dsrRepository.GetProjectDSRsAsync(projectId);
+            
+            // Calculate various health factors (0-10 scale)
+            var timelineScore = CalculateTimelineScore(project);
+            var budgetScore = CalculateBudgetScore(project, dsrRecords);
+            var progressScore = CalculateProgressScore(project);
+            var teamScore = CalculateTeamScore(project);
 
-            return atRiskProjects;
+            // Weighted average
+            var healthScore = (timelineScore * 0.3m + budgetScore * 0.3m + progressScore * 0.3m + teamScore * 0.1m);
+
+            return Math.Max(0, Math.Min(10, healthScore));
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error getting at-risk projects for team leader: {TeamLeaderId}", teamLeaderId);
+            _logger.LogError(ex, "Error calculating project health score for project {ProjectId}", projectId);
             throw;
         }
     }
 
-    private string GetVarianceReason(decimal hoursVariance, int scheduleVarianceDays, decimal completionPercentage)
+    // Private helper methods
+    private async Task<List<ProjectTrendsDto>> GetProjectTrendsInternalAsync(int projectId, int days)
     {
-        if (hoursVariance > 0 && scheduleVarianceDays > 0)
-            return "Project is both over budget and behind schedule";
+        var endDate = DateTime.Today;
+        var startDate = endDate.AddDays(-days);
+
+        var dsrRecords = await _dsrRepository.GetProjectDSRsAsync(projectId, startDate, endDate);
+        var project = await _projectRepository.GetProjectWithDetailsAsync(projectId);
+
+        var dailyProgress = dsrRecords
+            .GroupBy(d => d.Date.Date)
+            .Select(g => new DailyProgressDto
+            {
+                Date = g.Key,
+                HoursWorked = g.Sum(d => d.HoursWorked),
+                TasksCompleted = g.Count(d => d.Task?.Status == Core.Enums.ProjectTaskStatus.Completed),
+                CompletionPercentage = CalculateCompletionPercentage(project)
+            })
+            .OrderBy(d => d.Date)
+            .ToList();
+
+        var trends = new ProjectTrendsDto
+        {
+            DailyProgress = dailyProgress,
+            WeeklyHours = CalculateWeeklyHours(dsrRecords),
+            TeamProductivity = await CalculateTeamProductivity(projectId),
+            TaskStatusTrends = CalculateTaskStatusTrends(project, days)
+        };
+
+        return new List<ProjectTrendsDto> { trends };
+    }
+
+    private decimal CalculateBudgetUtilized(Project project, List<DSR> dsrRecords)
+    {
+        // Simplified calculation - in real scenario, this would include actual costs
+        var totalHours = dsrRecords.Sum(d => d.HoursWorked);
+        var averageHourlyRate = project.Budget / Math.Max(project.EstimatedHours, 1);
+        return totalHours * averageHourlyRate;
+    }
+
+    private decimal CalculateCompletionPercentage(Project project)
+    {
+        if (project.Tasks.Count == 0)
+            return 0;
+
+        var completedTasks = project.Tasks.Count(t => t.Status == Core.Enums.ProjectTaskStatus.Completed);
+        return (decimal)completedTasks / project.Tasks.Count * 100;
+    }
+
+    private decimal CalculateAverageTaskCompletionTime(ICollection<ProjectTask> tasks)
+    {
+        var completedTasks = tasks.Where(t => t.Status == Core.Enums.ProjectTaskStatus.Completed && t.UpdatedAt.HasValue).ToList();
         
-        if (hoursVariance > 0)
-            return "Project is over the estimated hours";
+        if (completedTasks.Count == 0)
+            return 0;
+
+        var totalDays = completedTasks.Sum(t => (t.UpdatedAt!.Value - t.CreatedAt).TotalDays);
+        return (decimal)(totalDays / completedTasks.Count);
+    }
+
+    private ProjectPerformanceDto CalculateProjectPerformance(ProjectMetricsDto metrics, Project project)
+    {
+        var efficiency = metrics.EstimatedHours > 0 ? (metrics.EstimatedHours / Math.Max(metrics.TotalHoursWorked, 1)) * 100 : 100;
+        var timelineAdherence = CalculateTimelineAdherence(project);
+        var budgetAdherence = project.Budget > 0 ? Math.Max(0, (project.Budget - metrics.BudgetUtilized) / project.Budget * 100) : 100;
+
+        return new ProjectPerformanceDto
+        {
+            OverallEfficiency = Math.Min(100, efficiency),
+            QualityScore = CalculateQualityScore(metrics),
+            TimelineAdherence = timelineAdherence,
+            BudgetAdherence = budgetAdherence,
+            TeamSatisfaction = 85, // This would come from surveys in real implementation
+            PerformanceGrade = CalculatePerformanceGrade(efficiency, timelineAdherence, budgetAdherence),
+            StrengthAreas = IdentifyStrengthAreas(metrics),
+            ImprovementAreas = IdentifyImprovementAreas(metrics)
+        };
+    }
+
+    private decimal CalculateHealthScore(ProjectMetricsDto metrics)
+    {
+        var completionScore = metrics.CompletionPercentage / 10;
+        var efficiencyScore = metrics.EstimatedHours > 0 ? (metrics.EstimatedHours / Math.Max(metrics.TotalHoursWorked, 1)) * 10 : 10;
+        var taskScore = metrics.TotalTasks > 0 ? (decimal)metrics.CompletedTasks / metrics.TotalTasks * 10 : 10;
         
-        if (scheduleVarianceDays > 0)
-            return "Project is behind the planned schedule";
+        return (completionScore + efficiencyScore + taskScore) / 3;
+    }
+
+    private decimal CalculateTimelineScore(Project project)
+    {
+        var totalDays = (project.EndDate - project.StartDate).TotalDays;
+        var elapsedDays = (DateTime.Today - project.StartDate).TotalDays;
+        var progressRatio = elapsedDays / totalDays;
+        var completionRatio = CalculateCompletionPercentage(project) / 100;
+
+        if (progressRatio <= 0) return 10;
         
-        if (completionPercentage < 50)
-            return "Project progress is slower than expected";
-        
-        return "Project is on track";
+        var timelineScore = (completionRatio / progressRatio) * 10;
+        return Math.Max(0, Math.Min(10, timelineScore));
+    }
+
+    private decimal CalculateBudgetScore(Project project, List<DSR> dsrRecords)
+    {
+        var budgetUtilized = CalculateBudgetUtilized(project, dsrRecords);
+        var utilizationRatio = project.Budget > 0 ? budgetUtilized / project.Budget : 0;
+
+        if (utilizationRatio <= 0.8m) return 10;
+        if (utilizationRatio <= 1.0m) return 7;
+        if (utilizationRatio <= 1.2m) return 4;
+        return 1;
+    }
+
+    private decimal CalculateProgressScore(Project project)
+    {
+        var completionPercentage = CalculateCompletionPercentage(project);
+        return completionPercentage / 10;
+    }
+
+    private decimal CalculateTeamScore(Project project)
+    {
+        // Simplified team score based on task distribution
+        var teamMembers = project.ProjectAssignments.Count;
+        if (teamMembers == 0) return 5;
+
+        var tasksPerMember = (decimal)project.Tasks.Count / teamMembers;
+        if (tasksPerMember >= 3 && tasksPerMember <= 8) return 10;
+        if (tasksPerMember >= 1 && tasksPerMember <= 10) return 7;
+        return 4;
+    }
+
+    private List<WeeklyHoursDto> CalculateWeeklyHours(List<DSR> dsrRecords)
+    {
+        return dsrRecords
+            .GroupBy(d => GetWeekStartDate(d.Date))
+            .Select(g => new WeeklyHoursDto
+            {
+                WeekStartDate = g.Key,
+                ActualHours = g.Sum(d => d.HoursWorked),
+                PlannedHours = 40, // Simplified - would come from project planning
+                Variance = g.Sum(d => d.HoursWorked) - 40
+            })
+            .OrderBy(w => w.WeekStartDate)
+            .ToList();
+    }
+
+    private async Task<List<TeamMemberProductivityDto>> CalculateTeamProductivity(int projectId)
+    {
+        var teamMembers = await _assignmentRepository.GetProjectTeamMembersAsync(projectId);
+        var dsrRecords = await _dsrRepository.GetProjectDSRsAsync(projectId);
+
+        return teamMembers.Select(tm => new TeamMemberProductivityDto
+        {
+            EmployeeId = tm.EmployeeId,
+            EmployeeName = tm.EmployeeName,
+            HoursWorked = dsrRecords.Where(d => d.EmployeeId == tm.EmployeeId).Sum(d => d.HoursWorked),
+            TasksCompleted = dsrRecords.Where(d => d.EmployeeId == tm.EmployeeId).Count(),
+            ProductivityScore = CalculateProductivityScore(tm.EmployeeId, dsrRecords),
+            EfficiencyRating = CalculateEfficiencyRating(tm.EmployeeId, dsrRecords)
+        }).ToList();
+    }
+
+    private List<TaskStatusTrendDto> CalculateTaskStatusTrends(Project project, int days)
+    {
+        var trends = new List<TaskStatusTrendDto>();
+        var endDate = DateTime.Today;
+
+        for (int i = 0; i < days; i++)
+        {
+            var date = endDate.AddDays(-i);
+            trends.Add(new TaskStatusTrendDto
+            {
+                Date = date,
+                TodoTasks = project.Tasks.Count(t => t.Status == Core.Enums.ProjectTaskStatus.Todo),
+                InProgressTasks = project.Tasks.Count(t => t.Status == Core.Enums.ProjectTaskStatus.InProgress),
+                CompletedTasks = project.Tasks.Count(t => t.Status == Core.Enums.ProjectTaskStatus.Completed),
+                OverdueTasks = project.Tasks.Count(t => t.DueDate < date && t.Status != Core.Enums.ProjectTaskStatus.Completed)
+            });
+        }
+
+        return trends.OrderBy(t => t.Date).ToList();
+    }
+
+    private decimal CalculateTimelineAdherence(Project project)
+    {
+        var totalDays = (project.EndDate - project.StartDate).TotalDays;
+        var elapsedDays = (DateTime.Today - project.StartDate).TotalDays;
+        var completionPercentage = CalculateCompletionPercentage(project);
+
+        if (totalDays <= 0) return 100;
+
+        var expectedProgress = (elapsedDays / totalDays) * 100;
+        var adherence = (completionPercentage / Math.Max(expectedProgress, 1)) * 100;
+
+        return Math.Max(0, Math.Min(100, adherence));
+    }
+
+    private decimal CalculateQualityScore(ProjectMetricsDto metrics)
+    {
+        // Simplified quality score based on task completion ratio and overdue tasks
+        var completionRatio = metrics.TotalTasks > 0 ? (decimal)metrics.CompletedTasks / metrics.TotalTasks : 1;
+        var overdueRatio = metrics.TotalTasks > 0 ? (decimal)metrics.OverdueTasks / metrics.TotalTasks : 0;
+
+        var qualityScore = (completionRatio * 100) - (overdueRatio * 50);
+        return Math.Max(0, Math.Min(100, qualityScore));
+    }
+
+    private string CalculatePerformanceGrade(decimal efficiency, decimal timelineAdherence, decimal budgetAdherence)
+    {
+        var averageScore = (efficiency + timelineAdherence + budgetAdherence) / 3;
+
+        return averageScore switch
+        {
+            >= 90 => "A+",
+            >= 80 => "A",
+            >= 70 => "B+",
+            >= 60 => "B",
+            >= 50 => "C+",
+            >= 40 => "C",
+            _ => "D"
+        };
+    }
+
+    private List<string> IdentifyStrengthAreas(ProjectMetricsDto metrics)
+    {
+        var strengths = new List<string>();
+
+        if (metrics.CompletionPercentage >= 80)
+            strengths.Add("High task completion rate");
+
+        if (metrics.HoursVariance <= 0)
+            strengths.Add("Efficient time management");
+
+        if (metrics.OverdueTasks == 0)
+            strengths.Add("Excellent deadline adherence");
+
+        if (metrics.TeamMembersCount > 0 && metrics.CompletedTasks / metrics.TeamMembersCount >= 5)
+            strengths.Add("Strong team productivity");
+
+        return strengths;
+    }
+
+    private List<string> IdentifyImprovementAreas(ProjectMetricsDto metrics)
+    {
+        var improvements = new List<string>();
+
+        if (metrics.CompletionPercentage < 50)
+            improvements.Add("Task completion rate needs improvement");
+
+        if (metrics.HoursVariance > metrics.EstimatedHours * 0.2m)
+            improvements.Add("Time estimation and management");
+
+        if (metrics.OverdueTasks > 0)
+            improvements.Add("Deadline management and planning");
+
+        if (metrics.BudgetVariance > 0)
+            improvements.Add("Budget control and monitoring");
+
+        return improvements;
+    }
+
+    private DateTime GetWeekStartDate(DateTime date)
+    {
+        var diff = (7 + (date.DayOfWeek - DayOfWeek.Monday)) % 7;
+        return date.AddDays(-1 * diff).Date;
+    }
+
+    private decimal CalculateProductivityScore(int employeeId, List<DSR> dsrRecords)
+    {
+        var employeeDsrs = dsrRecords.Where(d => d.EmployeeId == employeeId).ToList();
+        if (employeeDsrs.Count == 0) return 0;
+
+        var averageHoursPerDay = employeeDsrs.Average(d => d.HoursWorked);
+        return Math.Min(100, (averageHoursPerDay / 8) * 100); // Assuming 8 hours as full productivity
+    }
+
+    private decimal CalculateEfficiencyRating(int employeeId, List<DSR> dsrRecords)
+    {
+        var employeeDsrs = dsrRecords.Where(d => d.EmployeeId == employeeId).ToList();
+        if (employeeDsrs.Count == 0) return 0;
+
+        var totalHours = employeeDsrs.Sum(d => d.HoursWorked);
+        var totalTasks = employeeDsrs.Count;
+
+        if (totalTasks == 0) return 0;
+
+        var hoursPerTask = totalHours / totalTasks;
+        return Math.Min(100, (8 / Math.Max(hoursPerTask, 1)) * 100); // Assuming 8 hours per task as baseline
     }
 }

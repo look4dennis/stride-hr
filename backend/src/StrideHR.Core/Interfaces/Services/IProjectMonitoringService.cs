@@ -1,35 +1,36 @@
 using StrideHR.Core.Models.Project;
-using StrideHR.Core.Enums;
 
 namespace StrideHR.Core.Interfaces.Services;
 
 public interface IProjectMonitoringService
 {
-    // Real-time Project Progress Tracking
-    Task<ProjectMonitoringDto> GetProjectMonitoringDataAsync(int projectId);
-    Task<List<ProjectMonitoringDto>> GetProjectsMonitoringDataAsync(List<int> projectIds);
-    Task<ProjectVarianceDto> CalculateProjectVarianceAsync(int projectId);
+    // Project Hours Tracking Dashboard
+    Task<ProjectHoursReportDto> GetProjectHoursTrackingAsync(int projectId, DateTime? startDate = null, DateTime? endDate = null);
+    Task<List<ProjectHoursReportDto>> GetTeamHoursTrackingAsync(int teamLeaderId, DateTime? startDate = null, DateTime? endDate = null);
+    Task<ProjectDashboardDto> GetTeamLeaderDashboardAsync(int teamLeaderId);
     
-    // Team Leader Dashboard
-    Task<TeamLeaderDashboardDto> GetTeamLeaderDashboardAsync(int teamLeaderId);
-    Task<List<ProjectMonitoringDto>> GetProjectsForTeamLeaderAsync(int teamLeaderId);
+    // Project Analytics and Reporting
+    Task<ProjectAnalyticsDto> GetProjectAnalyticsAsync(int projectId);
+    Task<List<ProjectAnalyticsDto>> GetTeamProjectAnalyticsAsync(int teamLeaderId);
+    Task<ProjectPerformanceDto> GetProjectPerformanceAsync(int projectId);
+    Task<List<ProjectTrendsDto>> GetProjectTrendsAsync(int projectId, int days = 30);
     
-    // Project Hours Analysis and Variance Reporting
-    Task<List<ProjectHoursReportDto>> GetProjectHoursAnalysisAsync(int projectId, DateTime? startDate = null, DateTime? endDate = null);
-    Task<List<ProjectHoursReportDto>> GetTeamHoursAnalysisAsync(int teamLeaderId, DateTime? startDate = null, DateTime? endDate = null);
-    Task<ProjectVarianceDto> GetProjectVarianceReportAsync(int projectId);
-    
-    // Automated Alerts for Project Delays
+    // Project Alerts and Notifications
     Task<List<ProjectAlertDto>> GetProjectAlertsAsync(int projectId);
-    Task<List<ProjectAlertDto>> GetTeamLeaderAlertsAsync(int teamLeaderId);
-    Task<ProjectAlertDto> CreateProjectAlertAsync(int projectId, ProjectAlertType alertType, string message, AlertSeverity severity);
-    Task<bool> ResolveProjectAlertAsync(int alertId, int resolvedByEmployeeId, string? resolutionNotes = null);
-    Task CheckAndCreateAutomatedAlertsAsync(int projectId);
-    Task CheckAndCreateAutomatedAlertsForAllProjectsAsync();
+    Task<List<ProjectAlertDto>> GetTeamAlertsAsync(int teamLeaderId);
+    Task<ProjectAlertDto> CreateProjectAlertAsync(int projectId, string alertType, string message, string severity);
+    Task<bool> ResolveProjectAlertAsync(int alertId, int resolvedBy);
+    Task<List<ProjectAlertDto>> GetCriticalAlertsAsync(int teamLeaderId);
     
-    // Performance Metrics
-    Task<decimal> CalculateProjectEfficiencyAsync(int projectId);
-    Task<decimal> CalculateTeamEfficiencyAsync(int teamLeaderId);
+    // Risk Management
+    Task<List<ProjectRiskDto>> GetProjectRisksAsync(int projectId);
+    Task<ProjectRiskDto> CreateProjectRiskAsync(int projectId, string riskType, string description, string severity, decimal probability, decimal impact);
+    Task<bool> UpdateProjectRiskAsync(int riskId, string mitigationPlan, string status, int? assignedTo);
+    Task<List<ProjectRiskDto>> GetHighRisksAsync(int teamLeaderId);
+    
+    // Automated Monitoring
+    Task CheckProjectHealthAsync(int projectId);
+    Task GenerateAutomaticAlertsAsync();
     Task<bool> IsProjectAtRiskAsync(int projectId);
-    Task<List<int>> GetAtRiskProjectsAsync(int teamLeaderId);
+    Task<decimal> CalculateProjectHealthScoreAsync(int projectId);
 }

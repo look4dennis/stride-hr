@@ -41,6 +41,10 @@ public class StrideHRDbContext : DbContext
     public DbSet<TaskAssignment> TaskAssignments { get; set; }
     public DbSet<DSR> DSRs { get; set; }
     public DbSet<ProjectAlert> ProjectAlerts { get; set; }
+    public DbSet<ProjectComment> ProjectComments { get; set; }
+    public DbSet<ProjectCommentReply> ProjectCommentReplies { get; set; }
+    public DbSet<ProjectActivity> ProjectActivities { get; set; }
+    public DbSet<ProjectRisk> ProjectRisks { get; set; }
     
     // Payroll Management DbSets
     public DbSet<PayrollRecord> PayrollRecords { get; set; }

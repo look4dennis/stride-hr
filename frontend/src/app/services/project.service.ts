@@ -177,4 +177,103 @@ export class ProjectService {
     formData.append('file', file);
     return this.http.post<void>(`${this.taskApiUrl}/${taskId}/attachments`, formData);
   }
+
+  // Project Monitoring Methods
+  getTeamLeaderDashboard(): Observable<any> {
+    return this.http.get<any>('/api/project-monitoring/team-leader-dashboard');
+  }
+
+  getTeamHoursTracking(startDate?: Date, endDate?: Date): Observable<any[]> {
+    let params = new HttpParams();
+    if (startDate) params = params.set('startDate', startDate.toISOString());
+    if (endDate) params = params.set('endDate', endDate.toISOString());
+    
+    return this.http.get<any[]>('/api/project-monitoring/team-hours-tracking', { params });
+  }
+
+  getProjectAnalytics(projectId: number): Observable<any> {
+    return this.http.get<any>(`/api/project-monitoring/projects/${projectId}/analytics`);
+  }
+
+  getProjectPerformance(projectId: number): Observable<any> {
+    return this.http.get<any>(`/api/project-monitoring/projects/${projectId}/performance`);
+  }
+
+  getProjectAlerts(projectId: number): Observable<any[]> {
+    return this.http.get<any[]>(`/api/project-monitoring/projects/${projectId}/alerts`);
+  }
+
+  createProjectAlert(projectId: number, alertType: string, message: string, severity: string): Observable<any> {
+    return this.http.post<any>(`/api/project-monitoring/projects/${projectId}/alerts`, {
+      alertType,
+      message,
+      severity
+    });
+  }
+
+  resolveProjectAlert(alertId: number): Observable<void> {
+    return this.http.put<void>(`/api/project-monitoring/alerts/${alertId}/resolve`, {});
+  }
+
+  getProjectRisks(projectId: number): Observable<any[]> {
+    return this.http.get<any[]>(`/api/project-monitoring/projects/${projectId}/risks`);
+  }
+
+  createProjectRisk(projectId: number, riskType: string, description: string, severity: string, probability: number, impact: number): Observable<any> {
+    return this.http.post<any>(`/api/project-monitoring/projects/${projectId}/risks`, {
+      riskType,
+      description,
+      severity,
+      probability,
+      impact
+    });
+  }
+
+  // Project Collaboration Methods
+  getProjectCollaboration(projectId: number): Observable<any> {
+    return this.http.get<any>(`/api/project-collaboration/projects/${projectId}/collaboration`);
+  }
+
+  getProjectComments(projectId: number): Observable<any[]> {
+    return this.http.get<any[]>(`/api/project-collaboration/projects/${projectId}/comments`);
+  }
+
+  addProjectComment(comment: any): Observable<any> {
+    return this.http.post<any>('/api/project-collaboration/comments', comment);
+  }
+
+  addCommentReply(reply: any): Observable<any> {
+    return this.http.post<any>('/api/project-collaboration/comments/replies', reply);
+  }
+
+  deleteComment(commentId: number): Observable<void> {
+    return this.http.delete<void>(`/api/project-collaboration/comments/${commentId}`);
+  }
+
+  deleteCommentReply(replyId: number): Observable<void> {
+    return this.http.delete<void>(`/api/project-collaboration/comments/replies/${replyId}`);
+  }
+
+  getProjectActivities(projectId: number, limit: number = 50): Observable<any[]> {
+    return this.http.get<any[]>(`/api/project-collaboration/projects/${projectId}/activities?limit=${limit}`);
+  }
+
+  logProjectActivity(projectId: number, activityType: string, description: string, details: string = ''): Observable<any> {
+    return this.http.post<any>(`/api/project-collaboration/projects/${projectId}/activities`, {
+      activityType,
+      description,
+      details
+    });
+  }
+
+  getProjectCommunicationStats(projectId: number): Observable<any> {
+    return this.http.get<any>(`/api/project-collaboration/projects/${projectId}/communication-stats`);
+  }
+
+  notifyTeamMembers(projectId: number, message: string, notificationType: string): Observable<void> {
+    return this.http.post<void>(`/api/project-collaboration/projects/${projectId}/notify-team`, {
+      message,
+      notificationType
+    });
+  }
 }

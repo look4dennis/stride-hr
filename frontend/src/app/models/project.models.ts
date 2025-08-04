@@ -187,3 +187,205 @@ export interface ProjectMemberHours {
     tasksCompleted: number;
     productivity: number;
 }
+
+// Project Monitoring Models
+export interface ProjectAnalytics {
+    projectId: number;
+    projectName: string;
+    metrics: ProjectMetrics;
+    trends: ProjectTrends;
+    performance: ProjectPerformance;
+    risks: ProjectRisk[];
+    generatedAt: Date;
+}
+
+export interface ProjectMetrics {
+    totalHoursWorked: number;
+    estimatedHours: number;
+    hoursVariance: number;
+    budgetUtilized: number;
+    budgetVariance: number;
+    completionPercentage: number;
+    totalTasks: number;
+    completedTasks: number;
+    overdueTasks: number;
+    teamMembersCount: number;
+    averageTaskCompletionTime: number;
+}
+
+export interface ProjectTrends {
+    dailyProgress: DailyProgress[];
+    weeklyHours: WeeklyHours[];
+    teamProductivity: TeamMemberProductivity[];
+    taskStatusTrends: TaskStatusTrend[];
+}
+
+export interface DailyProgress {
+    date: Date;
+    hoursWorked: number;
+    tasksCompleted: number;
+    completionPercentage: number;
+}
+
+export interface WeeklyHours {
+    weekStartDate: Date;
+    plannedHours: number;
+    actualHours: number;
+    variance: number;
+}
+
+export interface TeamMemberProductivity {
+    employeeId: number;
+    employeeName: string;
+    hoursWorked: number;
+    tasksCompleted: number;
+    productivityScore: number;
+    efficiencyRating: number;
+}
+
+export interface TaskStatusTrend {
+    date: Date;
+    todoTasks: number;
+    inProgressTasks: number;
+    completedTasks: number;
+    overdueTasks: number;
+}
+
+export interface ProjectPerformance {
+    overallEfficiency: number;
+    qualityScore: number;
+    timelineAdherence: number;
+    budgetAdherence: number;
+    teamSatisfaction: number;
+    performanceGrade: string;
+    strengthAreas: string[];
+    improvementAreas: string[];
+}
+
+export interface ProjectAlert {
+    id: number;
+    projectId: number;
+    alertType: string;
+    message: string;
+    severity: string;
+    createdAt: Date;
+    isResolved: boolean;
+    resolvedBy?: number;
+    resolvedAt?: Date;
+}
+
+export interface ProjectRisk {
+    id: number;
+    projectId: number;
+    riskType: string;
+    description: string;
+    severity: string;
+    probability: number;
+    impact: number;
+    mitigationPlan: string;
+    status: string;
+    assignedTo?: number;
+    assignedToName?: string;
+    identifiedAt: Date;
+    resolvedAt?: Date;
+}
+
+export interface ProjectDashboard {
+    teamLeaderId: number;
+    teamLeaderName: string;
+    projectAnalytics: ProjectAnalytics[];
+    teamOverview: TeamOverview;
+    criticalAlerts: ProjectAlert[];
+    highRisks: ProjectRisk[];
+}
+
+export interface TeamOverview {
+    totalProjects: number;
+    activeProjects: number;
+    completedProjects: number;
+    delayedProjects: number;
+    totalBudget: number;
+    budgetUtilized: number;
+    totalTeamMembers: number;
+    overallProductivity: number;
+    averageProjectHealth: number;
+}
+
+// Project Collaboration Models
+export interface ProjectCollaboration {
+    projectId: number;
+    projectName: string;
+    comments: ProjectComment[];
+    activities: ProjectActivity[];
+    teamMembers: ProjectTeamMember[];
+    communicationStats: ProjectCommunicationStats;
+}
+
+export interface ProjectComment {
+    id: number;
+    projectId: number;
+    taskId?: number;
+    employeeId: number;
+    employeeName: string;
+    employeePhoto: string;
+    comment: string;
+    createdAt: Date;
+    updatedAt?: Date;
+    replies: ProjectCommentReply[];
+}
+
+export interface ProjectCommentReply {
+    id: number;
+    commentId: number;
+    employeeId: number;
+    employeeName: string;
+    employeePhoto: string;
+    reply: string;
+    createdAt: Date;
+}
+
+export interface ProjectActivity {
+    id: number;
+    projectId: number;
+    employeeId: number;
+    employeeName: string;
+    activityType: string;
+    description: string;
+    details: string;
+    createdAt: Date;
+}
+
+export interface ProjectTeamMember {
+    employeeId: number;
+    employeeName: string;
+    employeePhoto: string;
+    role: string;
+    joinedAt: Date;
+}
+
+export interface ProjectCommunicationStats {
+    totalComments: number;
+    totalActivities: number;
+    activeTeamMembers: number;
+    lastActivity: Date;
+    memberActivities: TeamMemberActivity[];
+}
+
+export interface TeamMemberActivity {
+    employeeId: number;
+    employeeName: string;
+    commentsCount: number;
+    activitiesCount: number;
+    lastActivity: Date;
+}
+
+export interface CreateProjectComment {
+    projectId: number;
+    taskId?: number;
+    comment: string;
+}
+
+export interface CreateCommentReply {
+    commentId: number;
+    reply: string;
+}
