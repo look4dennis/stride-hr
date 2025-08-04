@@ -126,13 +126,60 @@ interface MenuItem {
       z-index: 999;
     }
 
+    /* Mobile-first sidebar design */
     @media (max-width: 768px) {
       .sidebar {
         transform: translateX(-100%);
+        width: 280px; /* Slightly wider on mobile for better touch targets */
+        z-index: 1050; /* Higher z-index for mobile overlay */
       }
       
       .sidebar:not(.collapsed) {
         transform: translateX(0);
+      }
+      
+      .sidebar-content {
+        padding: 0.5rem 0;
+      }
+      
+      .nav-link {
+        padding: 1rem 1.5rem;
+        font-size: 1rem;
+      }
+      
+      .sidebar-header {
+        padding: 1.25rem 1.5rem;
+      }
+    }
+
+    /* Extra small screens */
+    @media (max-width: 576px) {
+      .sidebar {
+        width: 100vw;
+        max-width: 320px;
+      }
+    }
+
+    /* Improved touch interactions */
+    .nav-link {
+      -webkit-tap-highlight-color: rgba(255, 255, 255, 0.1);
+      touch-action: manipulation;
+    }
+
+    /* Better visual feedback for touch */
+    .nav-link:active {
+      background-color: rgba(255, 255, 255, 0.15);
+      transform: scale(0.98);
+    }
+
+    /* Smooth animations for mobile */
+    @media (max-width: 768px) {
+      .sidebar {
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      
+      .sidebar-overlay {
+        transition: opacity 0.3s ease;
       }
     }
   `]

@@ -522,6 +522,111 @@ import { QuickActionsComponent } from '../../shared/components/quick-actions/qui
       border-color: var(--primary);
       transform: translateY(-1px);
     }
+
+    /* Mobile-responsive dashboard */
+    @media (max-width: 768px) {
+      .dashboard-container {
+        padding: 0;
+      }
+      
+      .welcome-content {
+        flex-direction: column;
+        text-align: center;
+        gap: 1rem;
+      }
+      
+      .welcome-text {
+        order: 2;
+      }
+      
+      .welcome-avatar {
+        order: 1;
+        margin-left: 0;
+      }
+      
+      .welcome-title {
+        font-size: 1.5rem;
+      }
+      
+      .welcome-subtitle {
+        font-size: 0.9rem;
+      }
+      
+      .user-info {
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+      }
+      
+      .dashboard-widget {
+        padding: 1rem;
+        margin-bottom: 1rem;
+      }
+      
+      .widget-icon {
+        width: 50px;
+        height: 50px;
+        font-size: 1.25rem;
+      }
+      
+      .widget-value {
+        font-size: 1.5rem;
+      }
+      
+      .activity-item {
+        padding: 0.75rem 0;
+      }
+      
+      .activity-icon {
+        width: 35px;
+        height: 35px;
+        font-size: 0.875rem;
+      }
+    }
+
+    /* Extra small screens */
+    @media (max-width: 576px) {
+      .welcome-card {
+        border-radius: 12px;
+      }
+      
+      .welcome-content {
+        padding: 1rem;
+      }
+      
+      .welcome-title {
+        font-size: 1.25rem;
+      }
+      
+      .dashboard-widget {
+        padding: 0.75rem;
+        flex-direction: column;
+        text-align: center;
+        gap: 0.75rem;
+      }
+      
+      .widget-content {
+        text-align: center;
+      }
+      
+      .card-header {
+        padding: 1rem;
+      }
+      
+      .card-body {
+        padding: 1rem;
+      }
+    }
+
+    /* Touch-friendly improvements */
+    .dashboard-widget {
+      cursor: pointer;
+      -webkit-tap-highlight-color: rgba(0, 0, 0, 0.05);
+    }
+
+    .dashboard-widget:active {
+      transform: translateY(-1px) scale(0.98);
+    }
   `]
 })
 export class DashboardComponent implements OnInit {

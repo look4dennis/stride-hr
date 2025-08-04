@@ -261,14 +261,117 @@ import {
       transform: translateX(4px);
     }
 
+    /* Mobile-responsive attendance tracker */
     @media (max-width: 768px) {
+      .page-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+      }
+      
+      .page-header .btn {
+        width: 100%;
+      }
+      
+      .card-body .row {
+        flex-direction: column;
+      }
+      
+      .status-indicator {
+        width: 50px;
+        height: 50px;
+        font-size: 1.25rem;
+      }
+      
+      .stat-item {
+        padding: 0.25rem;
+      }
+      
+      .stat-value {
+        font-size: 1rem;
+      }
+      
+      .stat-label {
+        font-size: 0.8rem;
+      }
+      
       .attendance-actions {
-        margin-top: 2rem;
+        margin-top: 1.5rem;
+        min-height: auto;
       }
       
       .btn-lg {
         width: 100%;
-        margin-bottom: 0.5rem;
+        margin-bottom: 0.75rem;
+        padding: 0.875rem 1.5rem;
+        font-size: 1rem;
+      }
+      
+      .dropdown {
+        width: 100%;
+      }
+      
+      .dropdown .btn {
+        width: 100%;
+      }
+      
+      .dropdown-menu {
+        width: 100%;
+      }
+    }
+
+    /* Extra small screens */
+    @media (max-width: 576px) {
+      .card-body {
+        padding: 1rem;
+      }
+      
+      .status-indicator {
+        width: 45px;
+        height: 45px;
+        font-size: 1.1rem;
+      }
+      
+      .row.text-center .col-4 {
+        margin-bottom: 1rem;
+      }
+      
+      .btn-lg {
+        padding: 0.75rem 1.25rem;
+        font-size: 0.95rem;
+      }
+      
+      .dropdown-item {
+        padding: 0.875rem 1rem;
+        font-size: 0.95rem;
+      }
+    }
+
+    /* Touch-friendly improvements */
+    .btn {
+      -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
+      touch-action: manipulation;
+    }
+
+    .btn:active {
+      transform: scale(0.98);
+    }
+
+    .dropdown-item {
+      -webkit-tap-highlight-color: rgba(0, 0, 0, 0.05);
+      touch-action: manipulation;
+    }
+
+    /* Improved alert styling for mobile */
+    @media (max-width: 768px) {
+      .alert {
+        margin-bottom: 1rem;
+        padding: 0.875rem 1rem;
+        font-size: 0.9rem;
+      }
+      
+      .alert .btn-close {
+        padding: 0.5rem;
       }
     }
   `]

@@ -69,6 +69,7 @@ h1, h2, h3, h4, h5, h6 {
   border-radius: 8px;
   font-weight: 500;
   transition: all 0.15s ease-in-out;
+  min-height: 44px; /* Touch-friendly minimum height */
 }
 
 .card {
@@ -79,9 +80,107 @@ h1, h2, h3, h4, h5, h6 {
 .form-control {
   border-radius: 8px;
   border: 2px solid var(--gray-200);
+  min-height: 44px; /* Touch-friendly minimum height */
+  font-size: 16px; /* Prevent zoom on iOS */
 }
 
 .form-control:focus {
   border-color: var(--primary);
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.form-select {
+  min-height: 44px; /* Touch-friendly minimum height */
+  font-size: 16px; /* Prevent zoom on iOS */
+}
+
+/* Mobile-specific styles */
+@media (max-width: 768px) {
+  .btn {
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+  }
+  
+  .btn-sm {
+    min-height: 36px;
+    padding: 0.5rem 0.75rem;
+  }
+  
+  .form-control, .form-select {
+    padding: 0.75rem 1rem;
+  }
+  
+  .card {
+    margin-bottom: 1rem;
+  }
+  
+  .table-responsive {
+    border-radius: 8px;
+  }
+}
+
+/* Touch-friendly improvements */
+.clickable, .btn, .nav-link, .dropdown-item, .page-link {
+  cursor: pointer;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
+}
+
+/* Improved touch targets */
+.nav-link, .dropdown-item {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+}
+
+/* Mobile navigation improvements */
+@media (max-width: 991px) {
+  .navbar-nav .nav-link {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  .navbar-nav .nav-link:last-child {
+    border-bottom: none;
+  }
+}
+
+/* Mobile table improvements */
+@media (max-width: 768px) {
+  .table-responsive {
+    font-size: 0.875rem;
+  }
+  
+  .table th, .table td {
+    padding: 0.5rem 0.25rem;
+    white-space: nowrap;
+  }
+}
+
+/* Mobile modal improvements */
+@media (max-width: 576px) {
+  .modal-dialog {
+    margin: 0.5rem;
+  }
+  
+  .modal-content {
+    border-radius: 12px;
+  }
+}
+
+/* Improved spacing for mobile */
+@media (max-width: 768px) {
+  .container-fluid {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  
+  .row {
+    margin-left: -0.5rem;
+    margin-right: -0.5rem;
+  }
+  
+  .row > * {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
 }

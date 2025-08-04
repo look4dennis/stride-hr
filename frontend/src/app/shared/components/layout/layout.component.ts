@@ -48,13 +48,22 @@ import { LoadingComponent } from '../loading/loading.component';
       padding: 2rem;
     }
 
+    /* Mobile-first responsive design */
     @media (max-width: 768px) {
       .main-content {
         margin-left: 0;
+        padding-top: 0;
       }
       
       .content-wrapper {
         padding: 1rem;
+      }
+    }
+
+    /* Tablet adjustments */
+    @media (min-width: 769px) and (max-width: 991px) {
+      .content-wrapper {
+        padding: 1.5rem;
       }
     }
 
@@ -67,6 +76,19 @@ import { LoadingComponent } from '../loading/loading.component';
       :host-context(.sidebar-collapsed) .main-content {
         margin-left: 0;
       }
+    }
+
+    /* Improved mobile layout */
+    @media (max-width: 576px) {
+      .content-wrapper {
+        padding: 0.75rem;
+      }
+    }
+
+    /* Touch-friendly scrolling */
+    .main-content {
+      -webkit-overflow-scrolling: touch;
+      overflow-x: hidden;
     }
   `]
 })

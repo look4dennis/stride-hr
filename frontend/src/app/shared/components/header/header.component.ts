@@ -115,6 +115,9 @@ import { AuthService, User } from '../../../core/auth/auth.service';
     .nav-link {
       font-weight: 500;
       transition: color 0.15s ease-in-out;
+      min-height: 44px;
+      display: flex;
+      align-items: center;
     }
 
     .nav-link:hover {
@@ -133,12 +136,79 @@ import { AuthService, User } from '../../../core/auth/auth.service';
     }
 
     .dropdown-item {
-      padding: 0.5rem 1rem;
+      padding: 0.75rem 1rem;
       transition: background-color 0.15s ease-in-out;
+      min-height: 44px;
+      display: flex;
+      align-items: center;
     }
 
     .dropdown-item:hover {
       background-color: var(--bg-tertiary);
+    }
+
+    /* Mobile-specific navbar styles */
+    @media (max-width: 991px) {
+      .navbar-brand {
+        font-size: 1.25rem;
+      }
+      
+      .navbar-nav {
+        padding-top: 1rem;
+        padding-bottom: 1rem;
+      }
+      
+      .navbar-nav .nav-link {
+        padding: 0.75rem 1rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        margin-bottom: 0;
+      }
+      
+      .navbar-nav .nav-link:last-child {
+        border-bottom: none;
+      }
+      
+      .navbar-nav .dropdown-menu {
+        background-color: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        margin-top: 0.5rem;
+      }
+      
+      .navbar-nav .dropdown-item {
+        color: var(--text-primary);
+      }
+      
+      .navbar-nav .dropdown-item:hover {
+        background-color: var(--bg-secondary);
+      }
+    }
+
+    /* Touch-friendly navbar toggler */
+    .navbar-toggler {
+      border: none;
+      padding: 0.5rem;
+      min-height: 44px;
+      min-width: 44px;
+    }
+
+    .navbar-toggler:focus {
+      box-shadow: none;
+    }
+
+    /* Profile image responsive sizing */
+    .navbar-nav img {
+      transition: all 0.2s ease;
+    }
+
+    @media (max-width: 576px) {
+      .navbar-nav img {
+        width: 28px;
+        height: 28px;
+      }
+      
+      .navbar-brand {
+        font-size: 1.1rem;
+      }
     }
   `]
 })

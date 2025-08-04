@@ -415,6 +415,137 @@ import { LoadingService } from '../../../core/services/loading.service';
     .page-link {
       cursor: pointer;
     }
+
+    /* Mobile-responsive employee list */
+    @media (max-width: 768px) {
+      .page-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+      }
+      
+      .page-header .btn {
+        width: 100%;
+      }
+      
+      .card-body .row.g-3 > * {
+        margin-bottom: 1rem;
+      }
+      
+      .card-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+      }
+      
+      .card-header .d-flex {
+        width: 100%;
+        justify-content: space-between;
+      }
+      
+      .employee-card {
+        padding: 1rem;
+      }
+      
+      .employee-actions {
+        flex-wrap: wrap;
+        gap: 0.25rem;
+      }
+      
+      .employee-actions .btn {
+        flex: 1;
+        min-width: 80px;
+      }
+      
+      .table-responsive {
+        font-size: 0.875rem;
+      }
+      
+      .table th,
+      .table td {
+        padding: 0.5rem 0.25rem;
+        white-space: nowrap;
+      }
+      
+      .btn-group {
+        flex-wrap: wrap;
+      }
+    }
+
+    /* Extra small screens */
+    @media (max-width: 576px) {
+      .employee-card {
+        padding: 0.75rem;
+      }
+      
+      .avatar-img {
+        width: 60px;
+        height: 60px;
+      }
+      
+      .employee-name {
+        font-size: 1rem;
+      }
+      
+      .employee-actions {
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+      
+      .employee-actions .btn {
+        width: 100%;
+      }
+      
+      .employee-actions .dropdown {
+        width: 100%;
+      }
+      
+      .employee-actions .dropdown .btn {
+        width: 100%;
+      }
+      
+      .table th,
+      .table td {
+        padding: 0.375rem 0.125rem;
+        font-size: 0.8rem;
+      }
+      
+      .avatar-sm {
+        width: 30px;
+        height: 30px;
+      }
+      
+      .btn-group .btn {
+        padding: 0.375rem 0.5rem;
+      }
+    }
+
+    /* Touch-friendly improvements */
+    .employee-card {
+      -webkit-tap-highlight-color: rgba(0, 0, 0, 0.05);
+      touch-action: manipulation;
+    }
+
+    .employee-card:active {
+      transform: translateY(-1px) scale(0.98);
+    }
+
+    .sortable {
+      -webkit-tap-highlight-color: rgba(0, 0, 0, 0.05);
+      touch-action: manipulation;
+    }
+
+    /* Improved dropdown for mobile */
+    @media (max-width: 768px) {
+      .dropdown-menu {
+        min-width: 200px;
+        font-size: 0.9rem;
+      }
+      
+      .dropdown-item {
+        padding: 0.75rem 1rem;
+      }
+    }
   `]
 })
 export class EmployeeListComponent implements OnInit {
