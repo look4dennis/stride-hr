@@ -17,6 +17,7 @@ import { Employee } from '../../../models/employee.models';
 
 @Component({
     selector: 'app-task-modal',
+    standalone: true,
     imports: [
         CommonModule,
         FormsModule,

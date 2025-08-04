@@ -5,6 +5,7 @@ import { Task, Project, TaskPriority, TaskStatus } from '../../../models/project
 
 @Component({
     selector: 'app-task-card',
+    standalone: true,
     imports: [CommonModule, NgbTooltipModule, NgbDropdownModule],
     template: `
     <div class="task-card" 
