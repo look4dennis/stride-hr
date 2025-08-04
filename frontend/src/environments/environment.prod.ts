@@ -15,5 +15,6 @@ export const environment = {
   cache: {
     defaultTtl: 300000, // 5 minutes
     maxSize: 100
-  }
+  },
+  vapidPublicKey: 'BEl62iUYgUivxIkv69yViEuiBIa40HI80NqIUHI80NqIUHI80NqIUHI80NqIUHI80NqIUHI80NqIUHI80NqIUHI80NqI'
 };

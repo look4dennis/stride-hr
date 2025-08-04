@@ -1,0 +1,6 @@
+{
+  "isCheckedIn": false,
+  "checkInTime": null,
+  "status": "offline",
+  "message": "You are currently offline. Your attendance status will be updated when connection is restored."
+}
