@@ -67,9 +67,9 @@ describe('TaskCardComponent', () => {
   });
 
   it('should truncate long task titles', () => {
-    const longTitleTask = { 
-      ...mockTask, 
-      title: 'This is a very long task title that should be truncated when displayed in the card' 
+    const longTitleTask = {
+      ...mockTask,
+      title: 'This is a very long task title that should be truncated when displayed in the card'
     };
     component.task = longTitleTask;
     fixture.detectChanges();
@@ -135,11 +135,11 @@ describe('TaskCardComponent', () => {
   });
 
   it('should display unassigned state when no assignee', () => {
-    const unassignedTask = { 
-      ...mockTask, 
-      assignedTo: 0, 
-      assignedToName: undefined, 
-      assignedToPhoto: undefined 
+    const unassignedTask = {
+      ...mockTask,
+      assignedTo: 0,
+      assignedToName: undefined,
+      assignedToPhoto: undefined
     };
     component.task = unassignedTask;
     fixture.detectChanges();
@@ -172,18 +172,18 @@ describe('TaskCardComponent', () => {
 
   it('should emit taskClick event when card is clicked', () => {
     spyOn(component.taskClick, 'emit');
-    
+
     component.onTaskClick();
-    
+
     expect(component.taskClick.emit).toHaveBeenCalledWith(mockTask);
   });
 
   it('should emit taskDelete event when delete is confirmed', () => {
     spyOn(window, 'confirm').and.returnValue(true);
     spyOn(component.taskDelete, 'emit');
-    
+
     component.onDeleteClick();
-    
+
     expect(window.confirm).toHaveBeenCalledWith('Are you sure you want to delete "Test Task"?');
     expect(component.taskDelete.emit).toHaveBeenCalledWith(mockTask);
   });
@@ -191,19 +191,19 @@ describe('TaskCardComponent', () => {
   it('should not emit taskDelete event when delete is cancelled', () => {
     spyOn(window, 'confirm').and.returnValue(false);
     spyOn(component.taskDelete, 'emit');
-    
+
     component.onDeleteClick();
-    
+
     expect(component.taskDelete.emit).not.toHaveBeenCalled();
   });
 
   it('should return correct priority class', () => {
     expect(component.getPriorityClass()).toBe('high');
-    
+
     const criticalTask = { ...mockTask, priority: TaskPriority.Critical };
     component.task = criticalTask;
     expect(component.getPriorityClass()).toBe('critical');
-    
+
     const mediumTask = { ...mockTask, priority: TaskPriority.Medium };
     component.task = mediumTask;
     expect(component.getPriorityClass()).toBe('');
@@ -211,29 +211,29 @@ describe('TaskCardComponent', () => {
 
   it('should return correct priority badge class', () => {
     expect(component.getPriorityBadgeClass()).toBe('bg-warning');
-    
+
     const criticalTask = { ...mockTask, priority: TaskPriority.Critical };
     component.task = criticalTask;
     expect(component.getPriorityBadgeClass()).toBe('bg-danger');
-    
+
     const lowTask = { ...mockTask, priority: TaskPriority.Low };
     component.task = lowTask;
     expect(component.getPriorityBadgeClass()).toBe('bg-light text-dark');
   });
 
   it('should detect overdue tasks correctly', () => {
-    const overdueTask = { 
-      ...mockTask, 
-      dueDate: new Date('2020-01-01'), 
-      status: TaskStatus.InProgress 
+    const overdueTask = {
+      ...mockTask,
+      dueDate: new Date('2020-01-01'),
+      status: TaskStatus.InProgress
     };
     component.task = overdueTask;
     expect(component.isOverdue()).toBe(true);
-    
-    const completedOverdueTask = { 
-      ...mockTask, 
-      dueDate: new Date('2020-01-01'), 
-      status: TaskStatus.Done 
+
+    const completedOverdueTask = {
+      ...mockTask,
+      dueDate: new Date('2020-01-01'),
+      status: TaskStatus.Done
     };
     component.task = completedOverdueTask;
     expect(component.isOverdue()).toBe(false);
@@ -241,27 +241,27 @@ describe('TaskCardComponent', () => {
 
   it('should return correct due date class', () => {
     const today = new Date();
-    
+
     // Overdue task
-    const overdueTask = { 
-      ...mockTask, 
-      dueDate: new Date(today.getTime() - 24 * 60 * 60 * 1000) 
+    const overdueTask = {
+      ...mockTask,
+      dueDate: new Date(today.getTime() - 24 * 60 * 60 * 1000)
     };
     component.task = overdueTask;
     expect(component.getDueDateClass()).toBe('text-danger');
-    
+
     // Due tomorrow
-    const dueSoonTask = { 
-      ...mockTask, 
-      dueDate: new Date(today.getTime() + 24 * 60 * 60 * 1000) 
+    const dueSoonTask = {
+      ...mockTask,
+      dueDate: new Date(today.getTime() + 24 * 60 * 60 * 1000)
     };
     component.task = dueSoonTask;
     expect(component.getDueDateClass()).toBe('text-warning');
-    
+
     // Due next week
-    const normalTask = { 
-      ...mockTask, 
-      dueDate: new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000) 
+    const normalTask = {
+      ...mockTask,
+      dueDate: new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000)
     };
     component.task = normalTask;
     expect(component.getDueDateClass()).toBe('text-muted');
@@ -269,24 +269,24 @@ describe('TaskCardComponent', () => {
 
   it('should format due date correctly', () => {
     const today = new Date();
-    
+
     // Today
     const todayTask = { ...mockTask, dueDate: today };
     component.task = todayTask;
     expect(component.formatDueDate()).toBe('Today');
-    
+
     // Tomorrow
-    const tomorrowTask = { 
-      ...mockTask, 
-      dueDate: new Date(today.getTime() + 24 * 60 * 60 * 1000) 
+    const tomorrowTask = {
+      ...mockTask,
+      dueDate: new Date(today.getTime() + 24 * 60 * 60 * 1000)
     };
     component.task = tomorrowTask;
     expect(component.formatDueDate()).toBe('Tomorrow');
-    
+
     // Yesterday
-    const yesterdayTask = { 
-      ...mockTask, 
-      dueDate: new Date(today.getTime() - 24 * 60 * 60 * 1000) 
+    const yesterdayTask = {
+      ...mockTask,
+      dueDate: new Date(today.getTime() - 24 * 60 * 60 * 1000)
     };
     component.task = yesterdayTask;
     expect(component.formatDueDate()).toBe('Yesterday');
@@ -301,7 +301,7 @@ describe('TaskCardComponent', () => {
 
   it('should show progress when task has estimated hours', () => {
     expect(component.showProgress()).toBe(true);
-    
+
     const noHoursTask = { ...mockTask, estimatedHours: 0, status: TaskStatus.Todo };
     component.task = noHoursTask;
     expect(component.showProgress()).toBe(false);
@@ -310,12 +310,12 @@ describe('TaskCardComponent', () => {
   it('should calculate progress correctly', () => {
     // Based on actual vs estimated hours
     expect(component.getProgress()).toBe(50); // 4h actual / 8h estimated
-    
+
     // Based on status when no hours
     const todoTask = { ...mockTask, estimatedHours: 0, actualHours: 0, status: TaskStatus.Todo };
     component.task = todoTask;
     expect(component.getProgress()).toBe(0);
-    
+
     const doneTask = { ...mockTask, estimatedHours: 0, actualHours: 0, status: TaskStatus.Done };
     component.task = doneTask;
     expect(component.getProgress()).toBe(100);
@@ -323,11 +323,11 @@ describe('TaskCardComponent', () => {
 
   it('should return correct progress bar class', () => {
     expect(component.getProgressBarClass()).toBe('bg-warning'); // 50% progress
-    
+
     const doneTask = { ...mockTask, status: TaskStatus.Done };
     component.task = doneTask;
     expect(component.getProgressBarClass()).toBe('bg-success');
-    
+
     const blockedTask = { ...mockTask, status: TaskStatus.Blocked };
     component.task = blockedTask;
     expect(component.getProgressBarClass()).toBe('bg-danger');
@@ -346,14 +346,14 @@ describe('TaskCardComponent', () => {
   });
 
   it('should apply overdue styling for overdue tasks', () => {
-    const overdueTask = { 
-      ...mockTask, 
-      dueDate: new Date('2020-01-01'), 
-      status: TaskStatus.InProgress 
+    const overdueTask = {
+      ...mockTask,
+      dueDate: new Date('2020-01-01'),
+      status: TaskStatus.InProgress
     };
     component.task = overdueTask;
     fixture.detectChanges();
-    
+
     const taskCard = fixture.nativeElement.querySelector('.task-card');
     expect(taskCard.classList).toContain('overdue');
   });
