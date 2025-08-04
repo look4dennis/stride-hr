@@ -6,14 +6,14 @@ import { NgbModal, NgbDropdownModule, NgbTooltipModule } from '@ng-bootstrap/ng-
 import { Subject, takeUntil } from 'rxjs';
 
 import { ProjectService } from '../../../services/project.service';
-import { 
-  Project, 
-  Task, 
-  KanbanColumn, 
-  TaskStatus, 
-  TaskPriority,
-  CreateTaskDto,
-  UpdateTaskDto
+import {
+    Project,
+    Task,
+    KanbanColumn,
+    TaskStatus,
+    TaskPriority,
+    CreateTaskDto,
+    UpdateTaskDto
 } from '../../../models/project.models';
 import { TaskCardComponent } from '../task-card/task-card.component';
 import { TaskModalComponent } from '../task-modal/task-modal.component';
@@ -416,346 +416,346 @@ import { TaskModalComponent } from '../task-modal/task-modal.component';
   `]
 })
 export class KanbanBoardComponent implements OnInit, OnDestroy {
-  @Input() project: Project | undefined = undefined;
-  @Input() projectId: number | null = null;
-  @Output() taskCreated = new EventEmitter<Task>();
-  @Output() taskUpdated = new EventEmitter<Task>();
-  @Output() taskDeleted = new EventEmitter<number>();
+    @Input() project: Project | undefined = undefined;
+    @Input() projectId: number | null = null;
+    @Output() taskCreated = new EventEmitter<Task>();
+    @Output() taskUpdated = new EventEmitter<Task>();
+    @Output() taskDeleted = new EventEmitter<number>();
 
-  viewMode: 'kanban' | 'list' = 'kanban';
-  columns: KanbanColumn[] = [];
-  filteredColumns: KanbanColumn[] = [];
-  allTasks: Task[] = [];
-  filteredTasks: Task[] = [];
-  loading = false;
+    viewMode: 'kanban' | 'list' = 'kanban';
+    columns: KanbanColumn[] = [];
+    filteredColumns: KanbanColumn[] = [];
+    allTasks: Task[] = [];
+    filteredTasks: Task[] = [];
+    loading = false;
 
-  // Filters
-  searchTerm = '';
-  selectedStatus = '';
-  selectedPriority = '';
-  selectedAssignee = '';
-  priorityFilter = 'All';
-  assigneeFilter = 'All';
+    // Filters
+    searchTerm = '';
+    selectedStatus = '';
+    selectedPriority = '';
+    selectedAssignee = '';
+    priorityFilter = 'All';
+    assigneeFilter = 'All';
 
-  private destroy$ = new Subject<void>();
+    private destroy$ = new Subject<void>();
 
-  constructor(
-    private projectService: ProjectService,
-    private modalService: NgbModal
-  ) {}
+    constructor(
+        private projectService: ProjectService,
+        private modalService: NgbModal
+    ) { }
 
-  ngOnInit(): void {
-    this.initializeKanbanBoard();
-    this.subscribeToUpdates();
-  }
-
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
-  }
-
-  private initializeKanbanBoard(): void {
-    this.columns = this.projectService.getDefaultKanbanColumns();
-    this.loadTasks();
-  }
-
-  private loadTasks(): void {
-    if (!this.projectId && !this.project?.id) return;
-
-    this.loading = true;
-    const id = this.projectId || this.project!.id;
-
-    this.projectService.getTasks({
-      projectId: id,
-      page: 1,
-      pageSize: 1000 // Load all tasks for Kanban
-    }).pipe(takeUntil(this.destroy$))
-    .subscribe({
-      next: (response) => {
-        this.allTasks = response.tasks;
-        this.distributeTasks();
-        this.applyFilters();
-        this.loading = false;
-      },
-      error: (error) => {
-        console.error('Error loading tasks:', error);
-        this.loading = false;
-      }
-    });
-  }
-
-  private distributeTasks(): void {
-    // Reset all columns
-    this.columns.forEach(column => column.tasks = []);
-
-    // Distribute tasks to appropriate columns
-    this.allTasks.forEach(task => {
-      const column = this.columns.find(col => col.status === task.status);
-      if (column) {
-        column.tasks.push(task);
-      }
-    });
-
-    this.filteredColumns = [...this.columns];
-  }
-
-  private subscribeToUpdates(): void {
-    this.projectService.kanbanUpdate$
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(update => {
-        if (update) {
-          this.loadTasks(); // Reload tasks on updates
-        }
-      });
-  }
-
-  setViewMode(mode: 'kanban' | 'list'): void {
-    this.viewMode = mode;
-    if (mode === 'list') {
-      this.filteredTasks = [...this.allTasks];
-      this.applyFilters();
+    ngOnInit(): void {
+        this.initializeKanbanBoard();
+        this.subscribeToUpdates();
     }
-  }
 
-  onTaskDrop(event: CdkDragDrop<Task[]>, targetColumn: KanbanColumn): void {
-    const task = event.item.data as Task;
-    
-    if (event.previousContainer === event.container) {
-      // Reordering within the same column
-      moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
-    } else {
-      // Moving between columns
-      const previousColumn = this.columns.find(col => 
-        col.tasks === event.previousContainer.data
-      );
-      
-      // Check column limits
-      if (targetColumn.limit && targetColumn.tasks.length >= targetColumn.limit) {
-        // Show warning and prevent drop
-        alert(`Cannot move task. ${targetColumn.title} has reached its limit of ${targetColumn.limit} tasks.`);
-        return;
-      }
-
-      transferArrayItem(
-        event.previousContainer.data,
-        event.container.data,
-        event.previousIndex,
-        event.currentIndex
-      );
-
-      // Update task status
-      const updatedTask: UpdateTaskDto = {
-        status: targetColumn.status
-      };
-
-      this.projectService.updateTask(task.id, updatedTask)
-        .pipe(takeUntil(this.destroy$))
-        .subscribe({
-          next: (updated) => {
-            task.status = updated.status;
-            this.taskUpdated.emit(updated);
-            this.projectService.notifyKanbanUpdate({ type: 'task_moved', task: updated });
-          },
-          error: (error) => {
-            console.error('Error updating task status:', error);
-            // Revert the move on error
-            this.distributeTasks();
-          }
-        });
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
     }
-  }
 
-  openTaskModal(defaultStatus?: TaskStatus, task?: Task): void {
-    const modalRef = this.modalService.open(TaskModalComponent, {
-      size: 'lg',
-      backdrop: 'static'
-    });
-
-    modalRef.componentInstance.project = this.project;
-    modalRef.componentInstance.task = task;
-    modalRef.componentInstance.defaultStatus = defaultStatus;
-
-    modalRef.result.then((result) => {
-      if (result) {
-        if (task) {
-          this.taskUpdated.emit(result);
-        } else {
-          this.taskCreated.emit(result);
-        }
+    private initializeKanbanBoard(): void {
+        this.columns = this.projectService.getDefaultKanbanColumns();
         this.loadTasks();
-      }
-    }).catch(() => {
-      // Modal dismissed
-    });
-  }
+    }
 
-  onTaskUpdate(task: Task): void {
-    this.taskUpdated.emit(task);
-    this.loadTasks();
-  }
+    private loadTasks(): void {
+        if (!this.projectId && !this.project?.id) return;
 
-  deleteTask(task: Task): void {
-    if (confirm(`Are you sure you want to delete "${task.title}"?`)) {
-      this.projectService.deleteTask(task.id)
-        .pipe(takeUntil(this.destroy$))
-        .subscribe({
-          next: () => {
-            this.taskDeleted.emit(task.id);
-            this.loadTasks();
-          },
-          error: (error) => {
-            console.error('Error deleting task:', error);
-          }
+        this.loading = true;
+        const id = this.projectId || this.project!.id;
+
+        this.projectService.getTasks({
+            projectId: id,
+            page: 1,
+            pageSize: 1000 // Load all tasks for Kanban
+        }).pipe(takeUntil(this.destroy$))
+            .subscribe({
+                next: (response) => {
+                    this.allTasks = response.tasks;
+                    this.distributeTasks();
+                    this.applyFilters();
+                    this.loading = false;
+                },
+                error: (error) => {
+                    console.error('Error loading tasks:', error);
+                    this.loading = false;
+                }
+            });
+    }
+
+    private distributeTasks(): void {
+        // Reset all columns
+        this.columns.forEach(column => column.tasks = []);
+
+        // Distribute tasks to appropriate columns
+        this.allTasks.forEach(task => {
+            const column = this.columns.find(col => col.status === task.status);
+            if (column) {
+                column.tasks.push(task);
+            }
+        });
+
+        this.filteredColumns = [...this.columns];
+    }
+
+    private subscribeToUpdates(): void {
+        this.projectService.kanbanUpdate$
+            .pipe(takeUntil(this.destroy$))
+            .subscribe(update => {
+                if (update) {
+                    this.loadTasks(); // Reload tasks on updates
+                }
+            });
+    }
+
+    setViewMode(mode: 'kanban' | 'list'): void {
+        this.viewMode = mode;
+        if (mode === 'list') {
+            this.filteredTasks = [...this.allTasks];
+            this.applyFilters();
+        }
+    }
+
+    onTaskDrop(event: CdkDragDrop<Task[]>, targetColumn: KanbanColumn): void {
+        const task = event.item.data as Task;
+
+        if (event.previousContainer === event.container) {
+            // Reordering within the same column
+            moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
+        } else {
+            // Moving between columns
+            const previousColumn = this.columns.find(col =>
+                col.tasks === event.previousContainer.data
+            );
+
+            // Check column limits
+            if (targetColumn.limit && targetColumn.tasks.length >= targetColumn.limit) {
+                // Show warning and prevent drop
+                alert(`Cannot move task. ${targetColumn.title} has reached its limit of ${targetColumn.limit} tasks.`);
+                return;
+            }
+
+            transferArrayItem(
+                event.previousContainer.data,
+                event.container.data,
+                event.previousIndex,
+                event.currentIndex
+            );
+
+            // Update task status
+            const updatedTask: UpdateTaskDto = {
+                status: targetColumn.status
+            };
+
+            this.projectService.updateTask(task.id, updatedTask)
+                .pipe(takeUntil(this.destroy$))
+                .subscribe({
+                    next: (updated) => {
+                        task.status = updated.status;
+                        this.taskUpdated.emit(updated);
+                        this.projectService.notifyKanbanUpdate({ type: 'task_moved', task: updated });
+                    },
+                    error: (error) => {
+                        console.error('Error updating task status:', error);
+                        // Revert the move on error
+                        this.distributeTasks();
+                    }
+                });
+        }
+    }
+
+    openTaskModal(defaultStatus?: TaskStatus, task?: Task): void {
+        const modalRef = this.modalService.open(TaskModalComponent, {
+            size: 'lg',
+            backdrop: 'static'
+        });
+
+        modalRef.componentInstance.project = this.project;
+        modalRef.componentInstance.task = task;
+        modalRef.componentInstance.defaultStatus = defaultStatus;
+
+        modalRef.result.then((result) => {
+            if (result) {
+                if (task) {
+                    this.taskUpdated.emit(result);
+                } else {
+                    this.taskCreated.emit(result);
+                }
+                this.loadTasks();
+            }
+        }).catch(() => {
+            // Modal dismissed
         });
     }
-  }
 
-  // Filter methods
-  filterByPriority(priority: string): void {
-    this.priorityFilter = priority;
-    this.applyFilters();
-  }
-
-  filterByAssignee(assignee: string): void {
-    this.assigneeFilter = assignee;
-    this.applyFilters();
-  }
-
-  applyFilters(): void {
-    if (this.viewMode === 'kanban') {
-      this.filteredColumns = this.columns.map(column => ({
-        ...column,
-        tasks: this.filterTasks(column.tasks)
-      }));
-    } else {
-      this.filteredTasks = this.filterTasks(this.allTasks);
+    onTaskUpdate(task: Task): void {
+        this.taskUpdated.emit(task);
+        this.loadTasks();
     }
-  }
 
-  private filterTasks(tasks: Task[]): Task[] {
-    return tasks.filter(task => {
-      // Search term filter
-      if (this.searchTerm && !task.title.toLowerCase().includes(this.searchTerm.toLowerCase()) &&
-          !task.description.toLowerCase().includes(this.searchTerm.toLowerCase())) {
-        return false;
-      }
+    deleteTask(task: Task): void {
+        if (confirm(`Are you sure you want to delete "${task.title}"?`)) {
+            this.projectService.deleteTask(task.id)
+                .pipe(takeUntil(this.destroy$))
+                .subscribe({
+                    next: () => {
+                        this.taskDeleted.emit(task.id);
+                        this.loadTasks();
+                    },
+                    error: (error) => {
+                        console.error('Error deleting task:', error);
+                    }
+                });
+        }
+    }
 
-      // Status filter
-      if (this.selectedStatus && task.status !== this.selectedStatus) {
-        return false;
-      }
+    // Filter methods
+    filterByPriority(priority: string): void {
+        this.priorityFilter = priority;
+        this.applyFilters();
+    }
 
-      // Priority filter
-      if (this.priorityFilter !== 'All' && task.priority !== this.priorityFilter) {
-        return false;
-      }
-      if (this.selectedPriority && task.priority !== this.selectedPriority) {
-        return false;
-      }
+    filterByAssignee(assignee: string): void {
+        this.assigneeFilter = assignee;
+        this.applyFilters();
+    }
 
-      // Assignee filter
-      if (this.assigneeFilter === 'Me' && task.assignedTo !== this.getCurrentUserId()) {
-        return false;
-      }
-      if (this.selectedAssignee === 'me' && task.assignedTo !== this.getCurrentUserId()) {
-        return false;
-      }
+    applyFilters(): void {
+        if (this.viewMode === 'kanban') {
+            this.filteredColumns = this.columns.map(column => ({
+                ...column,
+                tasks: this.filterTasks(column.tasks)
+            }));
+        } else {
+            this.filteredTasks = this.filterTasks(this.allTasks);
+        }
+    }
 
-      return true;
-    });
-  }
+    private filterTasks(tasks: Task[]): Task[] {
+        return tasks.filter(task => {
+            // Search term filter
+            if (this.searchTerm && !task.title.toLowerCase().includes(this.searchTerm.toLowerCase()) &&
+                !task.description.toLowerCase().includes(this.searchTerm.toLowerCase())) {
+                return false;
+            }
 
-  clearFilters(): void {
-    this.searchTerm = '';
-    this.selectedStatus = '';
-    this.selectedPriority = '';
-    this.selectedAssignee = '';
-    this.priorityFilter = 'All';
-    this.assigneeFilter = 'All';
-    this.applyFilters();
-  }
+            // Status filter
+            if (this.selectedStatus && task.status !== this.selectedStatus) {
+                return false;
+            }
 
-  // Utility methods
-  getConnectedLists(): string[] {
-    return this.columns.map(column => column.id);
-  }
+            // Priority filter
+            if (this.priorityFilter !== 'All' && task.priority !== this.priorityFilter) {
+                return false;
+            }
+            if (this.selectedPriority && task.priority !== this.selectedPriority) {
+                return false;
+            }
 
-  trackByColumnId(index: number, column: KanbanColumn): string {
-    return column.id;
-  }
+            // Assignee filter
+            if (this.assigneeFilter === 'Me' && task.assignedTo !== this.getCurrentUserId()) {
+                return false;
+            }
+            if (this.selectedAssignee === 'me' && task.assignedTo !== this.getCurrentUserId()) {
+                return false;
+            }
 
-  trackByTaskId(index: number, task: Task): number {
-    return task.id;
-  }
+            return true;
+        });
+    }
 
-  getStatusBadgeClass(status: TaskStatus): string {
-    const classes = {
-      [TaskStatus.Todo]: 'bg-secondary',
-      [TaskStatus.InProgress]: 'bg-primary',
-      [TaskStatus.InReview]: 'bg-warning',
-      [TaskStatus.Done]: 'bg-success',
-      [TaskStatus.Blocked]: 'bg-danger'
-    };
-    return classes[status] || 'bg-secondary';
-  }
+    clearFilters(): void {
+        this.searchTerm = '';
+        this.selectedStatus = '';
+        this.selectedPriority = '';
+        this.selectedAssignee = '';
+        this.priorityFilter = 'All';
+        this.assigneeFilter = 'All';
+        this.applyFilters();
+    }
 
-  getPriorityBadgeClass(priority: TaskPriority): string {
-    const classes = {
-      [TaskPriority.Low]: 'bg-light text-dark',
-      [TaskPriority.Medium]: 'bg-info',
-      [TaskPriority.High]: 'bg-warning',
-      [TaskPriority.Critical]: 'bg-danger'
-    };
-    return classes[priority] || 'bg-light text-dark';
-  }
+    // Utility methods
+    getConnectedLists(): string[] {
+        return this.columns.map(column => column.id);
+    }
 
-  getStatusLabel(status: TaskStatus): string {
-    const labels = {
-      [TaskStatus.Todo]: 'To Do',
-      [TaskStatus.InProgress]: 'In Progress',
-      [TaskStatus.InReview]: 'In Review',
-      [TaskStatus.Done]: 'Done',
-      [TaskStatus.Blocked]: 'Blocked'
-    };
-    return labels[status] || status;
-  }
+    trackByColumnId(index: number, column: KanbanColumn): string {
+        return column.id;
+    }
 
-  getDueDateClass(dueDate: Date): string {
-    const today = new Date();
-    const due = new Date(dueDate);
-    const diffTime = due.getTime() - today.getTime();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    trackByTaskId(index: number, task: Task): number {
+        return task.id;
+    }
 
-    if (diffDays < 0) return 'text-danger'; // Overdue
-    if (diffDays <= 1) return 'text-warning'; // Due soon
-    return 'text-muted'; // Normal
-  }
+    getStatusBadgeClass(status: TaskStatus): string {
+        const classes = {
+            [TaskStatus.Todo]: 'bg-secondary',
+            [TaskStatus.InProgress]: 'bg-primary',
+            [TaskStatus.InReview]: 'bg-warning',
+            [TaskStatus.Done]: 'bg-success',
+            [TaskStatus.Blocked]: 'bg-danger'
+        };
+        return classes[status] || 'bg-secondary';
+    }
 
-  getTaskProgress(task: Task): number {
-    const statusProgress = {
-      [TaskStatus.Todo]: 0,
-      [TaskStatus.InProgress]: 50,
-      [TaskStatus.InReview]: 80,
-      [TaskStatus.Done]: 100,
-      [TaskStatus.Blocked]: 25
-    };
-    return statusProgress[task.status] || 0;
-  }
+    getPriorityBadgeClass(priority: TaskPriority): string {
+        const classes = {
+            [TaskPriority.Low]: 'bg-light text-dark',
+            [TaskPriority.Medium]: 'bg-info',
+            [TaskPriority.High]: 'bg-warning',
+            [TaskPriority.Critical]: 'bg-danger'
+        };
+        return classes[priority] || 'bg-light text-dark';
+    }
 
-  getProgressBarClass(status: TaskStatus): string {
-    const classes = {
-      [TaskStatus.Todo]: 'bg-secondary',
-      [TaskStatus.InProgress]: 'bg-primary',
-      [TaskStatus.InReview]: 'bg-warning',
-      [TaskStatus.Done]: 'bg-success',
-      [TaskStatus.Blocked]: 'bg-danger'
-    };
-    return classes[status] || 'bg-secondary';
-  }
+    getStatusLabel(status: TaskStatus): string {
+        const labels = {
+            [TaskStatus.Todo]: 'To Do',
+            [TaskStatus.InProgress]: 'In Progress',
+            [TaskStatus.InReview]: 'In Review',
+            [TaskStatus.Done]: 'Done',
+            [TaskStatus.Blocked]: 'Blocked'
+        };
+        return labels[status] || status;
+    }
 
-  private getCurrentUserId(): number {
-    // This should be implemented to get the current user's ID
-    // For now, returning a placeholder
-    return 1;
-  }
+    getDueDateClass(dueDate: Date): string {
+        const today = new Date();
+        const due = new Date(dueDate);
+        const diffTime = due.getTime() - today.getTime();
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+        if (diffDays < 0) return 'text-danger'; // Overdue
+        if (diffDays <= 1) return 'text-warning'; // Due soon
+        return 'text-muted'; // Normal
+    }
+
+    getTaskProgress(task: Task): number {
+        const statusProgress = {
+            [TaskStatus.Todo]: 0,
+            [TaskStatus.InProgress]: 50,
+            [TaskStatus.InReview]: 80,
+            [TaskStatus.Done]: 100,
+            [TaskStatus.Blocked]: 25
+        };
+        return statusProgress[task.status] || 0;
+    }
+
+    getProgressBarClass(status: TaskStatus): string {
+        const classes = {
+            [TaskStatus.Todo]: 'bg-secondary',
+            [TaskStatus.InProgress]: 'bg-primary',
+            [TaskStatus.InReview]: 'bg-warning',
+            [TaskStatus.Done]: 'bg-success',
+            [TaskStatus.Blocked]: 'bg-danger'
+        };
+        return classes[status] || 'bg-secondary';
+    }
+
+    private getCurrentUserId(): number {
+        // This should be implemented to get the current user's ID
+        // For now, returning a placeholder
+        return 1;
+    }
 }
