@@ -544,8 +544,7 @@ For API support, contact: support@stridehr.com
                 TermsOfService = new Uri("https://stridehr.com/terms")
             });
 
-            // Add multiple API versions if needed
-            c.SwaggerDoc("v1", new OpenApiInfo { Title = "StrideHR API", Version = "v1.0" });
+            // Note: SwaggerDoc for v1 is already defined above with full documentation
 
             // Add JWT Authentication to Swagger
             c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme

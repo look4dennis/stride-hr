@@ -32,11 +32,11 @@ public class WebhookController : BaseController
         try
         {
             var subscription = await _webhookService.CreateSubscriptionAsync(dto);
-            return Ok(new { success = true, data = subscription });
+            return Success(subscription, "Webhook subscription created successfully");
         }
         catch (Exception ex)
         {
-            return BadRequest(new { success = false, message = ex.Message });
+            return Error(ex.Message);
         }
     }
 
@@ -52,15 +52,15 @@ public class WebhookController : BaseController
         try
         {
             var subscription = await _webhookService.GetSubscriptionAsync(id);
-            return Ok(new { success = true, data = subscription });
+            return Success(subscription);
         }
         catch (ArgumentException ex)
         {
-            return NotFound(new { success = false, message = ex.Message });
+            return NotFoundError(ex.Message);
         }
         catch (Exception ex)
         {
-            return BadRequest(new { success = false, message = ex.Message });
+            return Error(ex.Message);
         }
     }
 
@@ -76,11 +76,11 @@ public class WebhookController : BaseController
         try
         {
             var subscriptions = await _webhookService.GetSubscriptionsAsync(organizationId);
-            return Ok(new { success = true, data = subscriptions });
+            return Success(subscriptions);
         }
         catch (Exception ex)
         {
-            return BadRequest(new { success = false, message = ex.Message });
+            return Error(ex.Message);
         }
     }
 
@@ -97,15 +97,15 @@ public class WebhookController : BaseController
         try
         {
             var subscription = await _webhookService.UpdateSubscriptionAsync(id, dto);
-            return Ok(new { success = true, data = subscription });
+            return Success(subscription, "Webhook subscription updated successfully");
         }
         catch (ArgumentException ex)
         {
-            return NotFound(new { success = false, message = ex.Message });
+            return NotFoundError(ex.Message);
         }
         catch (Exception ex)
         {
-            return BadRequest(new { success = false, message = ex.Message });
+            return Error(ex.Message);
         }
     }
 
@@ -122,13 +122,13 @@ public class WebhookController : BaseController
         {
             var result = await _webhookService.DeleteSubscriptionAsync(id);
             if (result)
-                return Ok(new { success = true, message = "Webhook subscription deleted successfully" });
+                return Success("Webhook subscription deleted successfully");
             else
-                return NotFound(new { success = false, message = "Webhook subscription not found" });
+                return NotFoundError("Webhook subscription not found");
         }
         catch (Exception ex)
         {
-            return BadRequest(new { success = false, message = ex.Message });
+            return Error(ex.Message);
         }
     }
 
@@ -146,13 +146,13 @@ public class WebhookController : BaseController
         {
             var result = await _webhookService.ToggleSubscriptionAsync(id, isActive);
             if (result)
-                return Ok(new { success = true, message = $"Webhook subscription {(isActive ? "activated" : "deactivated")} successfully" });
+                return Success($"Webhook subscription {(isActive ? "activated" : "deactivated")} successfully");
             else
-                return NotFound(new { success = false, message = "Webhook subscription not found" });
+                return NotFoundError("Webhook subscription not found");
         }
         catch (Exception ex)
         {
-            return BadRequest(new { success = false, message = ex.Message });
+            return Error(ex.Message);
         }
     }
 
@@ -170,11 +170,11 @@ public class WebhookController : BaseController
         try
         {
             var delivery = await _webhookService.SendWebhookAsync(eventType, payload, subscriptionId);
-            return Ok(new { success = true, data = delivery });
+            return Success(delivery, "Webhook sent successfully");
         }
         catch (Exception ex)
         {
-            return BadRequest(new { success = false, message = ex.Message });
+            return Error(ex.Message);
         }
     }
 
@@ -192,11 +192,11 @@ public class WebhookController : BaseController
         try
         {
             var deliveries = await _webhookService.GetDeliveriesAsync(subscriptionId, page, pageSize);
-            return Ok(new { success = true, data = deliveries });
+            return Success(deliveries);
         }
         catch (Exception ex)
         {
-            return BadRequest(new { success = false, message = ex.Message });
+            return Error(ex.Message);
         }
     }
 
@@ -212,15 +212,15 @@ public class WebhookController : BaseController
         try
         {
             var delivery = await _webhookService.GetDeliveryAsync(deliveryId);
-            return Ok(new { success = true, data = delivery });
+            return Success(delivery);
         }
         catch (ArgumentException ex)
         {
-            return NotFound(new { success = false, message = ex.Message });
+            return NotFoundError(ex.Message);
         }
         catch (Exception ex)
         {
-            return BadRequest(new { success = false, message = ex.Message });
+            return Error(ex.Message);
         }
     }
 
@@ -237,13 +237,13 @@ public class WebhookController : BaseController
         {
             var result = await _webhookService.ResendWebhookAsync(deliveryId);
             if (result)
-                return Ok(new { success = true, message = "Webhook resent successfully" });
+                return Success("Webhook resent successfully");
             else
-                return NotFound(new { success = false, message = "Webhook delivery not found" });
+                return NotFoundError("Webhook delivery not found");
         }
         catch (Exception ex)
         {
-            return BadRequest(new { success = false, message = ex.Message });
+            return Error(ex.Message);
         }
     }
 
@@ -260,15 +260,15 @@ public class WebhookController : BaseController
         try
         {
             var result = await _webhookService.TestWebhookAsync(subscriptionId, eventType);
-            return Ok(new { success = true, data = result });
+            return Success(result, "Webhook test completed");
         }
         catch (ArgumentException ex)
         {
-            return NotFound(new { success = false, message = ex.Message });
+            return NotFoundError(ex.Message);
         }
         catch (Exception ex)
         {
-            return BadRequest(new { success = false, message = ex.Message });
+            return Error(ex.Message);
         }
     }
 
@@ -281,7 +281,7 @@ public class WebhookController : BaseController
     public IActionResult GetAvailableEvents()
     {
         var events = WebhookEvents.GetAllEvents();
-        return Ok(new { success = true, data = events });
+        return Success(events);
     }
 
     /// <summary>
@@ -298,11 +298,11 @@ public class WebhookController : BaseController
         try
         {
             var isValid = await _webhookService.ValidateWebhookSignatureAsync(payload, signature, secret);
-            return Ok(new { success = true, valid = isValid });
+            return Success(new { valid = isValid }, "Signature validation completed");
         }
         catch (Exception ex)
         {
-            return BadRequest(new { success = false, message = ex.Message });
+            return Error(ex.Message);
         }
     }
 }

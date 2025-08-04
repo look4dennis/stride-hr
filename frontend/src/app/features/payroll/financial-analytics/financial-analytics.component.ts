@@ -3,8 +3,6 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { Subject, takeUntil, forkJoin } from 'rxjs';
-import { Chart, ChartConfiguration, ChartType, registerables } from 'chart.js';
-
 import { FinancialService } from '../../../services/financial.service';
 import {
   FinancialSummaryReport,
@@ -19,8 +17,6 @@ import {
   MonthlyTrendRequest,
   FinancialDashboardData
 } from '../../../models/financial.models';
-
-Chart.register(...registerables);
 
 @Component({
   selector: 'app-financial-analytics',

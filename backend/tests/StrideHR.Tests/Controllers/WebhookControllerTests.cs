@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using StrideHR.API.Controllers;
+using StrideHR.API.Models;
 using StrideHR.Core.Interfaces.Services;
 using StrideHR.Core.Models.Webhooks;
 using Xunit;
@@ -51,10 +52,15 @@ public class WebhookControllerTests
         var result = await _controller.CreateSubscription(dto);
 
         // Assert
+        Assert.NotNull(result);
         var okResult = Assert.IsType<OkObjectResult>(result);
-        var response = okResult.Value as dynamic;
-        Assert.True(response?.success);
-        Assert.NotNull(response?.data);
+        Assert.NotNull(okResult.Value);
+        
+        // The response should be ApiResponse<WebhookSubscription>
+        var response = okResult.Value as ApiResponse<WebhookSubscription>;
+        Assert.NotNull(response);
+        Assert.True(response.Success);
+        Assert.NotNull(response.Data);
     }
 
     [Fact]
@@ -78,9 +84,10 @@ public class WebhookControllerTests
 
         // Assert
         var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
-        var response = badRequestResult.Value as dynamic;
-        Assert.False(response?.success);
-        Assert.Equal("Invalid URL", response?.message?.ToString());
+        var response = badRequestResult.Value as ApiResponse<object>;
+        Assert.NotNull(response);
+        Assert.False(response.Success);
+        Assert.Equal("Invalid URL", response.Message);
     }
 
     [Fact]
@@ -107,9 +114,10 @@ public class WebhookControllerTests
 
         // Assert
         var okResult = Assert.IsType<OkObjectResult>(result);
-        var response = okResult.Value as dynamic;
-        Assert.True(response?.success);
-        Assert.NotNull(response?.data);
+        var response = okResult.Value as ApiResponse<WebhookSubscription>;
+        Assert.NotNull(response);
+        Assert.True(response.Success);
+        Assert.NotNull(response.Data);
     }
 
     [Fact]
@@ -125,8 +133,9 @@ public class WebhookControllerTests
 
         // Assert
         var notFoundResult = Assert.IsType<NotFoundObjectResult>(result);
-        var response = notFoundResult.Value as dynamic;
-        Assert.False(response?.success);
+        var response = notFoundResult.Value as ApiResponse<object>;
+        Assert.NotNull(response);
+        Assert.False(response.Success);
     }
 
     [Fact]
@@ -168,9 +177,10 @@ public class WebhookControllerTests
 
         // Assert
         var okResult = Assert.IsType<OkObjectResult>(result);
-        var response = okResult.Value as dynamic;
-        Assert.True(response?.success);
-        Assert.NotNull(response?.data);
+        var response = okResult.Value as ApiResponse<List<WebhookSubscription>>;
+        Assert.NotNull(response);
+        Assert.True(response.Success);
+        Assert.NotNull(response.Data);
     }
 
     [Fact]
@@ -204,9 +214,10 @@ public class WebhookControllerTests
 
         // Assert
         var okResult = Assert.IsType<OkObjectResult>(result);
-        var response = okResult.Value as dynamic;
-        Assert.True(response?.success);
-        Assert.NotNull(response?.data);
+        var response = okResult.Value as ApiResponse<WebhookSubscription>;
+        Assert.NotNull(response);
+        Assert.True(response.Success);
+        Assert.NotNull(response.Data);
     }
 
     [Fact]
@@ -222,9 +233,10 @@ public class WebhookControllerTests
 
         // Assert
         var okResult = Assert.IsType<OkObjectResult>(result);
-        var response = okResult.Value as dynamic;
-        Assert.True(response?.success);
-        Assert.Equal("Webhook subscription deleted successfully", response?.message?.ToString());
+        var response = okResult.Value as ApiResponse<object>;
+        Assert.NotNull(response);
+        Assert.True(response.Success);
+        Assert.Equal("Webhook subscription deleted successfully", response.Message);
     }
 
     [Fact]
@@ -240,9 +252,10 @@ public class WebhookControllerTests
 
         // Assert
         var notFoundResult = Assert.IsType<NotFoundObjectResult>(result);
-        var response = notFoundResult.Value as dynamic;
-        Assert.False(response?.success);
-        Assert.Equal("Webhook subscription not found", response?.message?.ToString());
+        var response = notFoundResult.Value as ApiResponse<object>;
+        Assert.NotNull(response);
+        Assert.False(response.Success);
+        Assert.Equal("Webhook subscription not found", response.Message);
     }
 
     [Fact]
@@ -259,9 +272,10 @@ public class WebhookControllerTests
 
         // Assert
         var okResult = Assert.IsType<OkObjectResult>(result);
-        var response = okResult.Value as dynamic;
-        Assert.True(response?.success);
-        Assert.Equal("Webhook subscription deactivated successfully", response?.message?.ToString());
+        var response = okResult.Value as ApiResponse<object>;
+        Assert.NotNull(response);
+        Assert.True(response.Success);
+        Assert.Equal("Webhook subscription deactivated successfully", response.Message);
     }
 
     [Fact]
@@ -288,9 +302,10 @@ public class WebhookControllerTests
 
         // Assert
         var okResult = Assert.IsType<OkObjectResult>(result);
-        var response = okResult.Value as dynamic;
-        Assert.True(response?.success);
-        Assert.NotNull(response?.data);
+        var response = okResult.Value as ApiResponse<WebhookDelivery>;
+        Assert.NotNull(response);
+        Assert.True(response.Success);
+        Assert.NotNull(response.Data);
     }
 
     [Fact]
@@ -315,9 +330,10 @@ public class WebhookControllerTests
 
         // Assert
         var okResult = Assert.IsType<OkObjectResult>(result);
-        var response = okResult.Value as dynamic;
-        Assert.True(response?.success);
-        Assert.NotNull(response?.data);
+        var response = okResult.Value as ApiResponse<WebhookTestResult>;
+        Assert.NotNull(response);
+        Assert.True(response.Success);
+        Assert.NotNull(response.Data);
     }
 
     [Fact]
@@ -328,9 +344,9 @@ public class WebhookControllerTests
 
         // Assert
         var okResult = Assert.IsType<OkObjectResult>(result);
-        var response = okResult.Value as dynamic;
-        Assert.True(response?.success);
-        Assert.NotNull(response?.data);
+        var response = okResult.Value as ApiResponse<object>;
+        Assert.True(response?.Success);
+        Assert.NotNull(response?.Data);
     }
 
     [Fact]
@@ -349,8 +365,10 @@ public class WebhookControllerTests
 
         // Assert
         var okResult = Assert.IsType<OkObjectResult>(result);
-        var response = okResult.Value as dynamic;
-        Assert.True(response?.success);
-        Assert.True(response?.valid);
+        var response = okResult.Value as ApiResponse<object>;
+        Assert.True(response?.Success);
+        // For ValidateSignature, we need to check the nested valid property
+        var data = response?.Data as dynamic;
+        Assert.True(data?.valid);
     }
 }

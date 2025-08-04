@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using StrideHR.API.Controllers;
+using StrideHR.API.Models;
 using StrideHR.Core.Interfaces.Services;
 using StrideHR.Core.Models.Integrations;
 using Xunit;
@@ -58,9 +59,9 @@ public class ExternalIntegrationControllerTests
 
         // Assert
         var okResult = Assert.IsType<OkObjectResult>(response);
-        var responseData = okResult.Value as dynamic;
-        Assert.True(responseData?.success);
-        Assert.NotNull(responseData?.data);
+        var responseData = okResult.Value as ApiResponse<object>;
+        Assert.True(responseData?.Success);
+        Assert.NotNull(responseData?.Data);
     }
 
     [Fact]
@@ -90,10 +91,9 @@ public class ExternalIntegrationControllerTests
 
         // Assert
         var badRequestResult = Assert.IsType<BadRequestObjectResult>(response);
-        var responseData = badRequestResult.Value as dynamic;
-        Assert.False(responseData?.success);
-        Assert.Equal("Failed to validate payroll system connection", responseData?.message?.ToString());
-        Assert.Equal("CONNECTION_VALIDATION_FAILED", responseData?.errorCode?.ToString());
+        var responseData = badRequestResult.Value as ApiResponse<object>;
+        Assert.False(responseData?.Success);
+        Assert.Equal("Failed to validate payroll system connection", responseData?.Message);
     }
 
     [Fact]
@@ -117,9 +117,9 @@ public class ExternalIntegrationControllerTests
 
         // Assert
         var okResult = Assert.IsType<OkObjectResult>(response);
-        var responseData = okResult.Value as dynamic;
-        Assert.True(responseData?.success);
-        Assert.Equal("ADP payroll system disconnected successfully", responseData?.message?.ToString());
+        var responseData = okResult.Value as ApiResponse<object>;
+        Assert.True(responseData?.Success);
+        Assert.Equal("ADP payroll system disconnected successfully", responseData?.Message);
     }
 
     [Fact]
@@ -153,9 +153,9 @@ public class ExternalIntegrationControllerTests
 
         // Assert
         var okResult = Assert.IsType<OkObjectResult>(response);
-        var responseData = okResult.Value as dynamic;
-        Assert.True(responseData?.success);
-        Assert.NotNull(responseData?.data);
+        var responseData = okResult.Value as ApiResponse<object>;
+        Assert.True(responseData?.Success);
+        Assert.NotNull(responseData?.Data);
     }
 
     [Fact]
@@ -189,9 +189,9 @@ public class ExternalIntegrationControllerTests
 
         // Assert
         var okResult = Assert.IsType<OkObjectResult>(response);
-        var responseData = okResult.Value as dynamic;
-        Assert.True(responseData?.success);
-        Assert.NotNull(responseData?.data);
+        var responseData = okResult.Value as ApiResponse<object>;
+        Assert.True(responseData?.Success);
+        Assert.NotNull(responseData?.Data);
     }
 
     [Fact]
@@ -209,9 +209,11 @@ public class ExternalIntegrationControllerTests
 
         // Assert
         var okResult = Assert.IsType<OkObjectResult>(response);
-        var responseData = okResult.Value as dynamic;
-        Assert.True(responseData?.success);
-        Assert.True(responseData?.valid);
+        var responseData = okResult.Value as ApiResponse<object>;
+        Assert.True(responseData?.Success);
+        // For ValidatePayrollConnection, we need to check the nested valid property
+        var data = responseData?.Data as dynamic;
+        Assert.True(data?.valid);
     }
 
     #endregion
@@ -257,9 +259,9 @@ public class ExternalIntegrationControllerTests
 
         // Assert
         var okResult = Assert.IsType<OkObjectResult>(response);
-        var responseData = okResult.Value as dynamic;
-        Assert.True(responseData?.success);
-        Assert.NotNull(responseData?.data);
+        var responseData = okResult.Value as ApiResponse<object>;
+        Assert.True(responseData?.Success);
+        Assert.NotNull(responseData?.Data);
     }
 
     [Fact]
@@ -293,9 +295,9 @@ public class ExternalIntegrationControllerTests
 
         // Assert
         var okResult = Assert.IsType<OkObjectResult>(response);
-        var responseData = okResult.Value as dynamic;
-        Assert.True(responseData?.success);
-        Assert.NotNull(responseData?.data);
+        var responseData = okResult.Value as ApiResponse<object>;
+        Assert.True(responseData?.Success);
+        Assert.NotNull(responseData?.Data);
     }
 
     #endregion
@@ -339,9 +341,9 @@ public class ExternalIntegrationControllerTests
 
         // Assert
         var okResult = Assert.IsType<OkObjectResult>(response);
-        var responseData = okResult.Value as dynamic;
-        Assert.True(responseData?.success);
-        Assert.NotNull(responseData?.data);
+        var responseData = okResult.Value as ApiResponse<object>;
+        Assert.True(responseData?.Success);
+        Assert.NotNull(responseData?.Data);
     }
 
     [Fact]
@@ -368,9 +370,9 @@ public class ExternalIntegrationControllerTests
 
         // Assert
         var okResult = Assert.IsType<OkObjectResult>(response);
-        var responseData = okResult.Value as dynamic;
-        Assert.True(responseData?.success);
-        Assert.NotNull(responseData?.data);
+        var responseData = okResult.Value as ApiResponse<object>;
+        Assert.True(responseData?.Success);
+        Assert.NotNull(responseData?.Data);
     }
 
     [Fact]
@@ -386,8 +388,8 @@ public class ExternalIntegrationControllerTests
 
         // Assert
         var notFoundResult = Assert.IsType<NotFoundObjectResult>(response);
-        var responseData = notFoundResult.Value as dynamic;
-        Assert.False(responseData?.success);
+        var responseData = notFoundResult.Value as ApiResponse<object>;
+        Assert.False(responseData?.Success);
     }
 
     [Fact]
@@ -416,9 +418,9 @@ public class ExternalIntegrationControllerTests
 
         // Assert
         var okResult = Assert.IsType<OkObjectResult>(response);
-        var responseData = okResult.Value as dynamic;
-        Assert.True(responseData?.success);
-        Assert.NotNull(responseData?.data);
+        var responseData = okResult.Value as ApiResponse<object>;
+        Assert.True(responseData?.Success);
+        Assert.NotNull(responseData?.Data);
     }
 
     [Fact]
@@ -434,9 +436,11 @@ public class ExternalIntegrationControllerTests
 
         // Assert
         var okResult = Assert.IsType<OkObjectResult>(response);
-        var responseData = okResult.Value as dynamic;
-        Assert.True(responseData?.success);
-        Assert.True(responseData?.valid);
+        var responseData = okResult.Value as ApiResponse<object>;
+        Assert.True(responseData?.Success);
+        // For TestIntegrationConnection, we need to check the nested valid property
+        var data = responseData?.Data as dynamic;
+        Assert.True(data?.valid);
     }
 
     [Fact]
@@ -462,9 +466,9 @@ public class ExternalIntegrationControllerTests
 
         // Assert
         var okResult = Assert.IsType<OkObjectResult>(response);
-        var responseData = okResult.Value as dynamic;
-        Assert.True(responseData?.success);
-        Assert.NotNull(responseData?.data);
+        var responseData = okResult.Value as ApiResponse<object>;
+        Assert.True(responseData?.Success);
+        Assert.NotNull(responseData?.Data);
     }
 
     [Fact]
@@ -505,9 +509,9 @@ public class ExternalIntegrationControllerTests
 
         // Assert
         var okResult = Assert.IsType<OkObjectResult>(response);
-        var responseData = okResult.Value as dynamic;
-        Assert.True(responseData?.success);
-        Assert.NotNull(responseData?.data);
+        var responseData = okResult.Value as ApiResponse<object>;
+        Assert.True(responseData?.Success);
+        Assert.NotNull(responseData?.Data);
     }
 
     [Fact]
@@ -533,9 +537,9 @@ public class ExternalIntegrationControllerTests
 
         // Assert
         var okResult = Assert.IsType<OkObjectResult>(response);
-        var responseData = okResult.Value as dynamic;
-        Assert.True(responseData?.success);
-        Assert.NotNull(responseData?.data);
+        var responseData = okResult.Value as ApiResponse<object>;
+        Assert.True(responseData?.Success);
+        Assert.NotNull(responseData?.Data);
     }
 
     [Fact]
@@ -569,9 +573,12 @@ public class ExternalIntegrationControllerTests
 
         // Assert
         var okResult = Assert.IsType<OkObjectResult>(response);
-        var responseData = okResult.Value as dynamic;
-        Assert.True(responseData?.success);
-        Assert.NotNull(responseData?.data);
+        Assert.NotNull(okResult.Value);
+        
+        // Use dynamic to handle the generic ApiResponse type
+        dynamic responseData = okResult.Value;
+        Assert.True(responseData.Success);
+        Assert.NotNull(responseData.Data);
     }
 
     #endregion

@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ProjectService } from '../../../services/project.service';
 import { ProjectCollaboration, ProjectComment, ProjectActivity, CreateProjectComment, CreateCommentReply } from '../../../models/project.models';
-import { Subject, takeUntil } from 'rxjs';
+import { Subject, takeUntil, firstValueFrom } from 'rxjs';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import * as signalR from '@microsoft/signalr';
 
@@ -442,7 +442,7 @@ export class ProjectCollaborationComponent implements OnInit, OnDestroy {
     this.error = null;
 
     try {
-      this.collaboration = await this.projectService.getProjectCollaboration(this.projectId).toPromise();
+      this.collaboration = await firstValueFrom(this.projectService.getProjectCollaboration(this.projectId));
     } catch (error: any) {
       console.error('Error loading collaboration data:', error);
       this.error = error.message || 'Failed to load collaboration data';

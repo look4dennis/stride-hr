@@ -42,6 +42,18 @@ public abstract class BaseController : ControllerBase
         return BadRequest(response);
     }
 
+    protected IActionResult NotFoundError(string message, List<string>? errors = null)
+    {
+        var response = new ApiResponse<object>
+        {
+            Success = false,
+            Message = message,
+            Data = null,
+            Errors = errors ?? new List<string>()
+        };
+        return NotFound(response);
+    }
+
     /// <summary>
     /// Gets the current employee ID from JWT claims
     /// </summary>

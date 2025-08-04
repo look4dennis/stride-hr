@@ -37,13 +37,13 @@ public class ExternalIntegrationController : BaseController
         {
             var result = await _integrationService.ConnectPayrollSystemAsync(organizationId, systemType, config);
             if (result.Success)
-                return Ok(new { success = true, data = result });
+                return Success(result, "Payroll system connected successfully");
             else
-                return BadRequest(new { success = false, message = result.Message, errorCode = result.ErrorCode });
+                return Error(result.Message, new List<string> { result.ErrorCode });
         }
         catch (Exception ex)
         {
-            return BadRequest(new { success = false, message = ex.Message });
+            return Error(ex.Message);
         }
     }
 
@@ -61,13 +61,13 @@ public class ExternalIntegrationController : BaseController
         {
             var result = await _integrationService.DisconnectPayrollSystemAsync(organizationId, systemType);
             if (result.Success)
-                return Ok(new { success = true, message = result.Message });
+                return Success(result.Message);
             else
-                return BadRequest(new { success = false, message = result.Message, errorCode = result.ErrorCode });
+                return Error(result.Message, new List<string> { result.ErrorCode });
         }
         catch (Exception ex)
         {
-            return BadRequest(new { success = false, message = ex.Message });
+            return Error(ex.Message);
         }
     }
 
@@ -86,13 +86,13 @@ public class ExternalIntegrationController : BaseController
         {
             var result = await _integrationService.ExportPayrollDataAsync(organizationId, systemType, request);
             if (result.Success)
-                return Ok(new { success = true, data = result });
+                return Success(result, "Payroll data exported successfully");
             else
-                return BadRequest(new { success = false, message = result.Message, errors = result.Errors });
+                return Error(result.Message, result.Errors);
         }
         catch (Exception ex)
         {
-            return BadRequest(new { success = false, message = ex.Message });
+            return Error(ex.Message);
         }
     }
 
@@ -111,13 +111,13 @@ public class ExternalIntegrationController : BaseController
         {
             var result = await _integrationService.ImportPayrollDataAsync(organizationId, systemType, request);
             if (result.Success)
-                return Ok(new { success = true, data = result });
+                return Success(result, "Payroll data imported successfully");
             else
-                return BadRequest(new { success = false, message = result.Message, errors = result.Errors });
+                return Error(result.Message, result.Errors);
         }
         catch (Exception ex)
         {
-            return BadRequest(new { success = false, message = ex.Message });
+            return Error(ex.Message);
         }
     }
 
@@ -134,11 +134,11 @@ public class ExternalIntegrationController : BaseController
         try
         {
             var isValid = await _integrationService.ValidatePayrollConnectionAsync(organizationId, systemType);
-            return Ok(new { success = true, valid = isValid });
+            return Success(new { valid = isValid }, "Payroll connection validation completed");
         }
         catch (Exception ex)
         {
-            return BadRequest(new { success = false, message = ex.Message });
+            return Error(ex.Message);
         }
     }
 
@@ -161,13 +161,13 @@ public class ExternalIntegrationController : BaseController
         {
             var result = await _integrationService.ConnectAccountingSystemAsync(organizationId, systemType, config);
             if (result.Success)
-                return Ok(new { success = true, data = result });
+                return Success(result, "Accounting system connected successfully");
             else
-                return BadRequest(new { success = false, message = result.Message, errorCode = result.ErrorCode });
+                return Error(result.Message, new List<string> { result.ErrorCode });
         }
         catch (Exception ex)
         {
-            return BadRequest(new { success = false, message = ex.Message });
+            return Error(ex.Message);
         }
     }
 
@@ -185,13 +185,13 @@ public class ExternalIntegrationController : BaseController
         {
             var result = await _integrationService.DisconnectAccountingSystemAsync(organizationId, systemType);
             if (result.Success)
-                return Ok(new { success = true, message = result.Message });
+                return Success(result.Message);
             else
-                return BadRequest(new { success = false, message = result.Message, errorCode = result.ErrorCode });
+                return Error(result.Message, new List<string> { result.ErrorCode });
         }
         catch (Exception ex)
         {
-            return BadRequest(new { success = false, message = ex.Message });
+            return Error(ex.Message);
         }
     }
 
@@ -210,13 +210,13 @@ public class ExternalIntegrationController : BaseController
         {
             var result = await _integrationService.ExportAccountingDataAsync(organizationId, systemType, request);
             if (result.Success)
-                return Ok(new { success = true, data = result });
+                return Success(result, "Accounting data exported successfully");
             else
-                return BadRequest(new { success = false, message = result.Message, errors = result.Errors });
+                return Error(result.Message, result.Errors);
         }
         catch (Exception ex)
         {
-            return BadRequest(new { success = false, message = ex.Message });
+            return Error(ex.Message);
         }
     }
 
@@ -235,13 +235,13 @@ public class ExternalIntegrationController : BaseController
         {
             var result = await _integrationService.ImportAccountingDataAsync(organizationId, systemType, request);
             if (result.Success)
-                return Ok(new { success = true, data = result });
+                return Success(result, "Accounting data imported successfully");
             else
-                return BadRequest(new { success = false, message = result.Message, errors = result.Errors });
+                return Error(result.Message, result.Errors);
         }
         catch (Exception ex)
         {
-            return BadRequest(new { success = false, message = ex.Message });
+            return Error(ex.Message);
         }
     }
 
@@ -258,11 +258,11 @@ public class ExternalIntegrationController : BaseController
         try
         {
             var isValid = await _integrationService.ValidateAccountingConnectionAsync(organizationId, systemType);
-            return Ok(new { success = true, valid = isValid });
+            return Success(new { valid = isValid }, "Accounting connection validation completed");
         }
         catch (Exception ex)
         {
-            return BadRequest(new { success = false, message = ex.Message });
+            return Error(ex.Message);
         }
     }
 
@@ -282,11 +282,11 @@ public class ExternalIntegrationController : BaseController
         try
         {
             var integrations = await _integrationService.GetOrganizationIntegrationsAsync(organizationId);
-            return Ok(new { success = true, data = integrations });
+            return Success(integrations);
         }
         catch (Exception ex)
         {
-            return BadRequest(new { success = false, message = ex.Message });
+            return Error(ex.Message);
         }
     }
 
@@ -302,15 +302,15 @@ public class ExternalIntegrationController : BaseController
         try
         {
             var integration = await _integrationService.GetIntegrationAsync(integrationId);
-            return Ok(new { success = true, data = integration });
+            return Success(integration);
         }
         catch (ArgumentException ex)
         {
-            return NotFound(new { success = false, message = ex.Message });
+            return NotFoundError(ex.Message);
         }
         catch (Exception ex)
         {
-            return BadRequest(new { success = false, message = ex.Message });
+            return Error(ex.Message);
         }
     }
 
@@ -327,15 +327,15 @@ public class ExternalIntegrationController : BaseController
         try
         {
             var integration = await _integrationService.UpdateIntegrationConfigAsync(integrationId, config);
-            return Ok(new { success = true, data = integration });
+            return Success(integration, "Integration configuration updated successfully");
         }
         catch (ArgumentException ex)
         {
-            return NotFound(new { success = false, message = ex.Message });
+            return NotFoundError(ex.Message);
         }
         catch (Exception ex)
         {
-            return BadRequest(new { success = false, message = ex.Message });
+            return Error(ex.Message);
         }
     }
 
@@ -351,11 +351,11 @@ public class ExternalIntegrationController : BaseController
         try
         {
             var isValid = await _integrationService.TestIntegrationConnectionAsync(integrationId);
-            return Ok(new { success = true, valid = isValid });
+            return Success(new { valid = isValid }, "Integration connection test completed");
         }
         catch (Exception ex)
         {
-            return BadRequest(new { success = false, message = ex.Message });
+            return Error(ex.Message);
         }
     }
 
@@ -373,13 +373,13 @@ public class ExternalIntegrationController : BaseController
         {
             var result = await _integrationService.SyncIntegrationDataAsync(integrationId, direction);
             if (result.Success)
-                return Ok(new { success = true, data = result });
+                return Success(result, "Integration data synchronized successfully");
             else
-                return BadRequest(new { success = false, message = result.Message, errors = result.Errors });
+                return Error(result.Message, result.Errors);
         }
         catch (Exception ex)
         {
-            return BadRequest(new { success = false, message = ex.Message });
+            return Error(ex.Message);
         }
     }
 
@@ -401,11 +401,11 @@ public class ExternalIntegrationController : BaseController
         try
         {
             var logs = await _integrationService.GetIntegrationLogsAsync(integrationId, startDate, endDate);
-            return Ok(new { success = true, data = logs });
+            return Success(logs);
         }
         catch (Exception ex)
         {
-            return BadRequest(new { success = false, message = ex.Message });
+            return Error(ex.Message);
         }
     }
 
@@ -421,11 +421,11 @@ public class ExternalIntegrationController : BaseController
         try
         {
             var health = await _integrationService.GetIntegrationHealthAsync(integrationId);
-            return Ok(new { success = true, data = health });
+            return Success(health);
         }
         catch (Exception ex)
         {
-            return BadRequest(new { success = false, message = ex.Message });
+            return Error(ex.Message);
         }
     }
 
@@ -443,11 +443,11 @@ public class ExternalIntegrationController : BaseController
         try
         {
             var metrics = await _integrationService.GetIntegrationMetricsAsync(integrationId, startDate, endDate);
-            return Ok(new { success = true, data = metrics });
+            return Success(metrics);
         }
         catch (Exception ex)
         {
-            return BadRequest(new { success = false, message = ex.Message });
+            return Error(ex.Message);
         }
     }
 

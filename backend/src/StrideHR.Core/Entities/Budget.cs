@@ -19,7 +19,7 @@ public class Budget : BaseEntity
     public BudgetStatus Status { get; set; } = BudgetStatus.Draft;
     
     public string? Notes { get; set; }
-    public int CreatedBy { get; set; }
+    public new int CreatedBy { get; set; }
     public int? ApprovedBy { get; set; }
     public DateTime? ApprovedAt { get; set; }
     

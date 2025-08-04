@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ProjectService } from '../../../services/project.service';
 import { ProjectAnalytics, ProjectDashboard, ProjectHoursReport, ProjectAlert, ProjectRisk } from '../../../models/project.models';
-import { Subject, takeUntil, interval } from 'rxjs';
+import { Subject, takeUntil, interval, firstValueFrom } from 'rxjs';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
@@ -371,10 +371,10 @@ export class ProjectMonitoringComponent implements OnInit, OnDestroy {
 
     try {
       // Load team leader dashboard
-      this.dashboard = await this.projectService.getTeamLeaderDashboard().toPromise() || null;
+      this.dashboard = await firstValueFrom(this.projectService.getTeamLeaderDashboard()) || null;
       
       // Load hours tracking reports
-      this.hoursReports = await this.projectService.getTeamHoursTracking().toPromise() || [];
+      this.hoursReports = await firstValueFrom(this.projectService.getTeamHoursTracking()) || [];
       
     } catch (error: any) {
       console.error('Error loading dashboard data:', error);

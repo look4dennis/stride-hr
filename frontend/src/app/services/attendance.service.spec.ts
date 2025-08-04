@@ -59,12 +59,7 @@ describe('AttendanceService', () => {
   });
 
   afterEach(() => {
-    // Flush any pending requests before verification
-    try {
-      httpMock.match(() => true).forEach(req => req.flush({}));
-    } catch (e) {
-      // Ignore errors during cleanup
-    }
+    // Verify no outstanding requests
     httpMock.verify();
   });
 

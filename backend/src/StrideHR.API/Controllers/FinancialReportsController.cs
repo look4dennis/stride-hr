@@ -79,7 +79,7 @@ public class FinancialReportsController : ControllerBase
     /// Generate currency conversion report
     /// </summary>
     [HttpPost("currency-conversion")]
-    public async Task<ActionResult<CurrencyConversionReport>> GenerateCurrencyConversion([FromBody] CurrencyConversionRequest request)
+    public async Task<ActionResult<CurrencyConversionReport>> GenerateCurrencyConversion([FromBody] Core.Models.Financial.CurrencyConversionRequest request)
     {
         try
         {

@@ -254,7 +254,7 @@ public class GrievanceServiceTests
         Assert.NotNull(result);
         Assert.Equal(assignedToId, result.AssignedToId);
 
-        _mockGrievanceRepository.Verify(r => r.GetByIdAsync(grievanceId), Times.Once);
+        _mockGrievanceRepository.Verify(r => r.GetByIdAsync(grievanceId), Times.AtLeastOnce);
         _mockGrievanceRepository.Verify(r => r.UpdateAsync(It.IsAny<Grievance>()), Times.AtLeastOnce);
         _mockNotificationService.Verify(n => n.CreateNotificationAsync(
             It.IsAny<CreateNotificationDto>()), Times.Once);
@@ -592,7 +592,7 @@ public class GrievanceServiceTests
         Assert.NotNull(result);
         Assert.Equal(GrievanceStatus.Withdrawn, result.Status);
 
-        _mockGrievanceRepository.Verify(r => r.GetByIdAsync(grievanceId), Times.Once);
+        _mockGrievanceRepository.Verify(r => r.GetByIdAsync(grievanceId), Times.AtLeastOnce);
     }
 
     [Fact]

@@ -286,9 +286,9 @@ public class ProjectCollaborationService : IProjectCollaborationService
     {
         try
         {
-            var comments = await _commentRepository.GetProjectCommentsAsync(projectId);
-            var activities = await _activityRepository.GetProjectActivitiesAsync(projectId, 1000);
-            var teamMembers = await _assignmentRepository.GetProjectTeamMembersAsync(projectId);
+            var comments = await _commentRepository.GetProjectCommentsAsync(projectId) ?? new List<ProjectComment>();
+            var activities = await _activityRepository.GetProjectActivitiesAsync(projectId, 1000) ?? new List<ProjectActivity>();
+            var teamMembers = await _assignmentRepository.GetProjectTeamMembersAsync(projectId) ?? new List<Employee>();
 
             var memberActivities = teamMembers.Select(tm => new TeamMemberActivityDto
             {
@@ -335,16 +335,19 @@ public class ProjectCollaborationService : IProjectCollaborationService
     {
         try
         {
-            var teamMembers = await _assignmentRepository.GetProjectTeamMembersAsync(projectId);
+            var teamMembers = await _assignmentRepository.GetProjectTeamMembersAsync(projectId) ?? new List<Employee>();
             var groupName = $"Project_{projectId}";
 
-            await _hubContext.Clients.Group(groupName).SendAsync("ReceiveNotification", new
+            if (_hubContext?.Clients != null)
             {
-                ProjectId = projectId,
-                Message = message,
-                Type = notificationType,
-                Timestamp = DateTime.UtcNow
-            });
+                await _hubContext.Clients.Group(groupName).SendAsync("ReceiveNotification", new
+                {
+                    ProjectId = projectId,
+                    Message = message,
+                    Type = notificationType,
+                    Timestamp = DateTime.UtcNow
+                });
+            }
 
             _logger.LogInformation("Notification sent to {MemberCount} team members for project {ProjectId}", 
                 teamMembers.Count(), projectId);
@@ -385,18 +388,21 @@ public class ProjectCollaborationService : IProjectCollaborationService
     {
         try
         {
-            var groupName = $"Project_{projectId}";
-
-            await _hubContext.Clients.Group(groupName).SendAsync("ReceiveProjectUpdate", new
+            if (_hubContext?.Clients != null)
             {
-                ProjectId = projectId,
-                UpdateType = updateType,
-                Data = updateData,
-                Timestamp = DateTime.UtcNow
-            });
+                var groupName = $"Project_{projectId}";
 
-            _logger.LogInformation("Project update broadcasted for project {ProjectId}: {UpdateType}", 
-                projectId, updateType);
+                await _hubContext.Clients.Group(groupName).SendAsync("ReceiveProjectUpdate", new
+                {
+                    ProjectId = projectId,
+                    UpdateType = updateType,
+                    Data = updateData,
+                    Timestamp = DateTime.UtcNow
+                });
+
+                _logger.LogInformation("Project update broadcasted for project {ProjectId}: {UpdateType}", 
+                    projectId, updateType);
+            }
         }
         catch (Exception ex)
         {

@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Logging;
 using StrideHR.Core.Entities;
+using StrideHR.Core.Interfaces;
 using StrideHR.Core.Interfaces.Repositories;
 using StrideHR.Core.Interfaces.Services;
 using StrideHR.Core.Models.Financial;
