@@ -6,23 +6,96 @@ using Microsoft.Extensions.Logging;
 using StrideHR.Infrastructure.Data;
 using Microsoft.Extensions.Configuration;
 using StrideHR.Core.Entities;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.Extensions.Options;
+using System.Security.Claims;
+using System.Text.Encodings.Web;
+using Microsoft.AspNetCore.Authorization.Policy;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using StrideHR.Tests.TestConfiguration;
 
 namespace StrideHR.Tests.Integration
 {
+    // Test authentication handler for bypassing JWT authentication in tests
+    public class TestAuthenticationHandler : AuthenticationHandler<AuthenticationSchemeOptions>
+    {
+        public TestAuthenticationHandler(IOptionsMonitor<AuthenticationSchemeOptions> options,
+            ILoggerFactory logger, UrlEncoder encoder)
+            : base(options, logger, encoder)
+        {
+        }
+
+        protected override Task<AuthenticateResult> HandleAuthenticateAsync()
+        {
+            var claims = new[]
+            {
+                new Claim(ClaimTypes.Name, "Test User"),
+                new Claim(ClaimTypes.NameIdentifier, "1"),
+                new Claim("employeeId", "1"),
+                new Claim("organizationId", "1"),
+                new Claim("branchId", "1"),
+                new Claim(ClaimTypes.Role, "Admin")
+            };
+
+            var identity = new ClaimsIdentity(claims, "Test");
+            var principal = new ClaimsPrincipal(identity);
+            var ticket = new AuthenticationTicket(principal, "Test");
+
+            return Task.FromResult(AuthenticateResult.Success(ticket));
+        }
+    }
+
+    // Test policy evaluator that always allows access
+    public class TestPolicyEvaluator : IPolicyEvaluator
+    {
+        public virtual async Task<AuthenticateResult> AuthenticateAsync(AuthorizationPolicy policy, HttpContext context)
+        {
+            var testScheme = "Test";
+            var principal = new ClaimsPrincipal();
+            
+            principal.AddIdentity(new ClaimsIdentity(new[]
+            {
+                new Claim(ClaimTypes.Name, "Test User"),
+                new Claim(ClaimTypes.NameIdentifier, "1"),
+                new Claim("employeeId", "1"),
+                new Claim("organizationId", "1"),
+                new Claim("branchId", "1"),
+                new Claim(ClaimTypes.Role, "Admin")
+            }, testScheme));
+
+            return await Task.FromResult(AuthenticateResult.Success(new AuthenticationTicket(principal, testScheme)));
+        }
+
+        public virtual async Task<PolicyAuthorizationResult> AuthorizeAsync(AuthorizationPolicy policy,
+            AuthenticateResult authenticationResult, HttpContext context, object resource)
+        {
+            return await Task.FromResult(PolicyAuthorizationResult.Success());
+        }
+    }
+
     public class SystemIntegrationTestFactory : WebApplicationFactory<Program>
     {
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
             builder.ConfigureAppConfiguration((context, config) =>
             {
+                // Clear existing configuration
+                config.Sources.Clear();
+                
                 // Use test configuration
-                config.AddInMemoryCollection(new Dictionary<string, string>
+                config.AddInMemoryCollection(new Dictionary<string, string?>
                 {
                     ["ConnectionStrings:DefaultConnection"] = "DataSource=:memory:",
                     ["JwtSettings:SecretKey"] = "test-super-secret-jwt-key-for-integration-testing-that-is-long-enough",
                     ["JwtSettings:Issuer"] = "StrideHR-Test",
                     ["JwtSettings:Audience"] = "StrideHR-Test-Users",
                     ["JwtSettings:ExpirationHours"] = "24",
+                    ["JwtSettings:ValidateIssuer"] = "false",
+                    ["JwtSettings:ValidateAudience"] = "false",
+                    ["JwtSettings:ValidateLifetime"] = "false",
+                    ["JwtSettings:ValidateIssuerSigningKey"] = "false",
+                    ["JwtSettings:ClockSkewMinutes"] = "5",
                     ["EncryptionSettings:MasterKey"] = "test-encryption-key-for-integration-testing-that-is-long-enough",
                     ["EncryptionSettings:Salt"] = "test-salt-value",
                     ["EncryptionSettings:EnableEncryption"] = "false"
@@ -39,31 +112,52 @@ namespace StrideHR.Tests.Integration
                     services.Remove(descriptor);
                 }
 
-                // Add in-memory database for testing
-                services.AddDbContext<StrideHRDbContext>(options =>
+                // Remove existing authentication services
+                var authDescriptor = services.SingleOrDefault(d => d.ServiceType == typeof(IPolicyEvaluator));
+                if (authDescriptor != null)
                 {
-                    options.UseInMemoryDatabase("StrideHR_Test");
-                    options.EnableSensitiveDataLogging();
-                    options.EnableDetailedErrors();
-                });
+                    services.Remove(authDescriptor);
+                }
 
-                // Ensure database is created
+                // Add test authentication
+                services.AddAuthentication("Test")
+                    .AddScheme<AuthenticationSchemeOptions, TestAuthenticationHandler>("Test", options => { });
+                
+                // Add test policy evaluator
+                services.AddSingleton<IPolicyEvaluator, TestPolicyEvaluator>();
+
+                // Configure test database provider
+                var databaseName = $"StrideHR_Test_{Guid.NewGuid()}";
+                var tempServiceProvider = services.BuildServiceProvider();
+                var logger = tempServiceProvider.GetService<ILogger<TestDatabaseProvider>>();
+                var databaseProvider = new TestDatabaseProvider(DatabaseProviderType.InMemory, logger: logger);
+                
+                databaseProvider.ConfigureDbContext(services, databaseName);
+
+                // Build service provider to initialize database
                 var serviceProvider = services.BuildServiceProvider();
                 using var scope = serviceProvider.CreateScope();
                 var context = scope.ServiceProvider.GetRequiredService<StrideHRDbContext>();
+                var factoryLogger = scope.ServiceProvider.GetRequiredService<ILogger<SystemIntegrationTestFactory>>();
                 
                 try
                 {
+                    // Initialize database using provider (synchronous version for ConfigureServices)
                     context.Database.EnsureCreated();
                     
                     // Seed test data
                     SeedTestData(context);
+                    
+                    factoryLogger.LogInformation("Test database initialized successfully with {OrganizationCount} organizations", 
+                        context.Organizations.Count());
                 }
                 catch (Exception ex)
                 {
-                    var logger = scope.ServiceProvider.GetRequiredService<ILogger<SystemIntegrationTestFactory>>();
-                    logger.LogError(ex, "An error occurred while setting up the test database");
+                    factoryLogger.LogError(ex, "An error occurred while setting up the test database");
+                    throw; // Re-throw to fail the test setup if database initialization fails
                 }
+                
+                tempServiceProvider.Dispose();
             });
 
             builder.UseEnvironment("Testing");
@@ -71,79 +165,15 @@ namespace StrideHR.Tests.Integration
 
         private static void SeedTestData(StrideHRDbContext context)
         {
-            // Create test organization
-            var organization = new Organization
+            try
             {
-                Name = "Test Organization",
-                Address = "123 Test St",
-                Email = "test@test.com",
-                Phone = "1234567890",
-                NormalWorkingHours = TimeSpan.FromHours(8),
-                OvertimeRate = 1.5m,
-                ProductiveHoursThreshold = 6,
-                BranchIsolationEnabled = true,
-                CreatedAt = DateTime.UtcNow
-            };
-
-            context.Organizations.Add(organization);
-            context.SaveChanges();
-
-            // Create test branch
-            var branch = new Branch
+                var seeder = new TestDataSeeder(context);
+                seeder.SeedAllAsync().GetAwaiter().GetResult();
+            }
+            catch (Exception ex)
             {
-                OrganizationId = organization.Id,
-                Name = "Test Branch",
-                Country = "Test Country",
-                Currency = "USD",
-                TimeZone = "UTC",
-                Address = "456 Test Ave"
-            };
-
-            context.Branches.Add(branch);
-            context.SaveChanges();
-
-            // Create test roles
-            var adminRole = new Role
-            {
-                Name = "Admin",
-                Description = "Administrator role",
-                HierarchyLevel = 1,
-                IsActive = true,
-                CreatedAt = DateTime.UtcNow
-            };
-
-            var employeeRole = new Role
-            {
-                Name = "Employee",
-                Description = "Employee role",
-                HierarchyLevel = 5,
-                IsActive = true,
-                CreatedAt = DateTime.UtcNow
-            };
-
-            context.Roles.AddRange(adminRole, employeeRole);
-            context.SaveChanges();
-
-            // Create test employee
-            var employee = new Employee
-            {
-                EmployeeId = "TEST-001",
-                BranchId = branch.Id,
-                FirstName = "Test",
-                LastName = "Employee",
-                Email = "test.employee@test.com",
-                Phone = "1234567890",
-                DateOfBirth = DateTime.UtcNow.AddYears(-25),
-                JoiningDate = DateTime.UtcNow.AddMonths(-6),
-                Designation = "Test Engineer",
-                Department = "Testing",
-                BasicSalary = 50000,
-                Status = StrideHR.Core.Enums.EmployeeStatus.Active,
-                CreatedAt = DateTime.UtcNow
-            };
-
-            context.Employees.Add(employee);
-            context.SaveChanges();
+                throw new InvalidOperationException("Failed to seed test data", ex);
+            }
         }
     }
 }

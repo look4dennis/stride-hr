@@ -19,6 +19,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using FluentAssertions;
 using System.Diagnostics;
 using StrideHR.Tests.TestConfiguration;
+using StrideHR.Core.Models.Employee;
 
 namespace StrideHR.Tests.Integration;
 
@@ -27,98 +28,18 @@ namespace StrideHR.Tests.Integration;
 /// API availability, and critical functionality for CI/CD pipelines
 /// </summary>
 [Collection("CI Tests")]
-public class ContinuousIntegrationTests : IClassFixture<WebApplicationFactory<Program>>
+public class ContinuousIntegrationTests : IClassFixture<SystemIntegrationTestFactory>
 {
-    private readonly WebApplicationFactory<Program> _factory;
+    private readonly SystemIntegrationTestFactory _factory;
     private readonly HttpClient _client;
 
-    public ContinuousIntegrationTests(WebApplicationFactory<Program> factory)
+    public ContinuousIntegrationTests(SystemIntegrationTestFactory factory)
     {
-        _factory = factory.WithWebHostBuilder(builder =>
-        {
-            builder.ConfigureServices(services =>
-            {
-                var descriptor = services.SingleOrDefault(d => d.ServiceType == typeof(DbContextOptions<StrideHRDbContext>));
-                if (descriptor != null)
-                {
-                    services.Remove(descriptor);
-                }
-
-                services.AddDbContext<StrideHRDbContext>(options =>
-                {
-                    options.UseInMemoryDatabase($"CITestDatabase_{Guid.NewGuid()}");
-                });
-
-                ConfigureTestAuthorization(services);
-
-                services.AddAuthentication("Test")
-                    .AddScheme<AuthenticationSchemeOptions, TestAuthenticationHandler>("Test", options => { });
-            });
-        });
+        _factory = factory;
         _client = _factory.CreateClient();
-        
-        SeedTestData();
     }
 
-    private void ConfigureTestAuthorization(IServiceCollection services)
-    {
-        services.RemoveAll<IAuthorizationService>();
-        services.RemoveAll<IAuthorizationPolicyProvider>();
-        services.RemoveAll<IAuthorizationHandlerProvider>();
 
-        services.AddAuthorization(options =>
-        {
-            options.DefaultPolicy = new AuthorizationPolicyBuilder()
-                .RequireAssertion(_ => true)
-                .Build();
-        });
-    }
-
-    private void SeedTestData()
-    {
-        using var scope = _factory.Services.CreateScope();
-        var context = scope.ServiceProvider.GetRequiredService<StrideHRDbContext>();
-        
-        context.Database.EnsureCreated();
-        
-        if (!context.Organizations.Any())
-        {
-            var organization = new Organization
-            {
-                Id = 1,
-                Name = "CI Test Organization",
-                Email = "ci@test.com",
-                Phone = "123-456-7890",
-                Address = "CI Test Address",
-                CreatedAt = DateTime.UtcNow
-            };
-            context.Organizations.Add(organization);
-        }
-
-        if (!context.Branches.Any())
-        {
-            var branch = new Branch
-            {
-                Id = 1,
-                OrganizationId = 1,
-                Name = "CI Test Branch",
-                Email = "ci.branch@test.com",
-                Phone = "123-456-7890",
-                Address = "CI Branch Address",
-                City = "CI City",
-                State = "CI State",
-                Country = "CI Country",
-                PostalCode = "12345",
-                TimeZone = "UTC",
-                Currency = "USD",
-                IsActive = true,
-                CreatedAt = DateTime.UtcNow
-            };
-            context.Branches.Add(branch);
-        }
-
-        context.SaveChanges();
-    }
 
     [Fact]
     [Trait("Category", "HealthCheck")]
@@ -228,24 +149,31 @@ public class ContinuousIntegrationTests : IClassFixture<WebApplicationFactory<Pr
     public async Task CRUD_Operations_ShouldWorkEndToEnd()
     {
         // Create
-        var createDto = new
+        var createDto = new CreateEmployeeDto
         {
             FirstName = "CI",
             LastName = "Test",
             Email = "ci.test@test.com",
-            Phone = "123-456-7890",
-            DateOfBirth = "1990-01-01",
+            Phone = "+1-555-0123",
+            DateOfBirth = new DateTime(1990, 1, 1),
             Address = "CI Test Address",
-            JoiningDate = DateTime.UtcNow.ToString("yyyy-MM-dd"),
+            JoiningDate = DateTime.UtcNow,
             Designation = "CI Tester",
             Department = "QA",
-            BranchId = 1
+            BranchId = 1,
+            BasicSalary = 50000.00m,
+            Status = EmployeeStatus.Active
         };
 
         var createResponse = await _client.PostAsJsonAsync("/api/employee", createDto);
+        
+        // Log the response for debugging
+        var createContent = await createResponse.Content.ReadAsStringAsync();
+        Console.WriteLine($"Create Response Status: {createResponse.StatusCode}");
+        Console.WriteLine($"Create Response Content: {createContent}");
+        
         createResponse.IsSuccessStatusCode.Should().BeTrue("Employee creation should succeed");
 
-        var createContent = await createResponse.Content.ReadAsStringAsync();
         var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
         var createApiResponse = JsonSerializer.Deserialize<ApiResponse<dynamic>>(createContent, options);
         createApiResponse.Should().NotBeNull();
