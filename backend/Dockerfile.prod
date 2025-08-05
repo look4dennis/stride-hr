@@ -1,0 +1,48 @@
+# Build stage
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+WORKDIR /src
+
+# Copy csproj files and restore dependencies
+COPY ["src/StrideHR.API/StrideHR.API.csproj", "src/StrideHR.API/"]
+COPY ["src/StrideHR.Core/StrideHR.Core.csproj", "src/StrideHR.Core/"]
+COPY ["src/StrideHR.Infrastructure/StrideHR.Infrastructure.csproj", "src/StrideHR.Infrastructure/"]
+RUN dotnet restore "src/StrideHR.API/StrideHR.API.csproj"
+
+# Copy everything else and build
+COPY . .
+WORKDIR "/src/src/StrideHR.API"
+RUN dotnet build "StrideHR.API.csproj" -c Release -o /app/build
+
+# Publish stage
+FROM build AS publish
+RUN dotnet publish "StrideHR.API.csproj" -c Release -o /app/publish /p:UseAppHost=false
+
+# Runtime stage
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
+
+# Install curl for health checks
+RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
+
+# Create non-root user
+RUN groupadd -r stridehr && useradd -r -g stridehr stridehr
+
+WORKDIR /app
+
+# Create necessary directories
+RUN mkdir -p /app/logs /app/uploads && \
+    chown -R stridehr:stridehr /app
+
+# Copy published application
+COPY --from=publish /app/publish .
+RUN chown -R stridehr:stridehr /app
+
+# Switch to non-root user
+USER stridehr
+
+EXPOSE 8080
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+    CMD curl -f http://localhost:8080/health || exit 1
+
+ENTRYPOINT ["dotnet", "StrideHR.API.dll"]
