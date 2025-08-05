@@ -63,7 +63,7 @@ export interface FormFieldOption {
           (input)="onInput($event)"
           (blur)="onBlur()"
           (focus)="onFocus()"
-          (change)="onChange($event)"
+          (change)="onInputChange($event)"
         />
 
         <!-- Textarea -->
@@ -89,7 +89,7 @@ export interface FormFieldOption {
           [class]="inputClasses"
           [disabled]="disabled"
           [value]="value"
-          (change)="onChange($event)"
+          (change)="onSelectChange($event)"
           (blur)="onBlur()"
           (focus)="onFocus()"
         >
@@ -377,6 +377,11 @@ export class FormFieldComponent implements ControlValueAccessor, OnInit, OnDestr
     this.updateValue(target.value);
   }
 
+  onInputChange(event: Event): void {
+    const target = event.target as HTMLInputElement;
+    this.updateValue(target.value);
+  }
+
   onCheckboxChange(event: Event): void {
     const target = event.target as HTMLInputElement;
     this.updateValue(target.checked);
@@ -387,7 +392,7 @@ export class FormFieldComponent implements ControlValueAccessor, OnInit, OnDestr
     this.updateValue(target.value);
   }
 
-  onChange(event: Event): void {
+  onSelectChange(event: Event): void {
     const target = event.target as HTMLSelectElement;
     this.updateValue(target.value);
   }
