@@ -6,8 +6,13 @@ using System.Security.Claims;
 
 namespace StrideHR.API.Controllers;
 
+/// <summary>
+/// Authentication and authorization endpoints for user login, token management, and security operations
+/// </summary>
 [ApiController]
 [Route("api/[controller]")]
+[Produces("application/json")]
+[Tags("Authentication")]
 public class AuthController : ControllerBase
 {
     private readonly IAuthenticationService _authenticationService;
@@ -22,7 +27,17 @@ public class AuthController : ControllerBase
     /// <summary>
     /// Authenticate user with email and password
     /// </summary>
+    /// <param name="request">Login credentials including email and password</param>
+    /// <returns>JWT token and user information if authentication is successful</returns>
+    /// <response code="200">Authentication successful, returns JWT token and user details</response>
+    /// <response code="400">Invalid request format or missing required fields</response>
+    /// <response code="401">Invalid credentials or account locked</response>
+    /// <response code="429">Too many login attempts, account temporarily locked</response>
     [HttpPost("login")]
+    [ProducesResponseType(typeof(AuthenticationResult), 200)]
+    [ProducesResponseType(typeof(object), 400)]
+    [ProducesResponseType(typeof(object), 401)]
+    [ProducesResponseType(typeof(object), 429)]
     public async Task<IActionResult> Login([FromBody] LoginRequest request)
     {
         if (!ModelState.IsValid)
@@ -63,7 +78,17 @@ public class AuthController : ControllerBase
     /// <summary>
     /// Refresh JWT token using refresh token
     /// </summary>
+    /// <param name="request">Refresh token request containing the refresh token</param>
+    /// <returns>New JWT token and refresh token if refresh is successful</returns>
+    /// <response code="200">Token refreshed successfully, returns new JWT token</response>
+    /// <response code="400">Invalid request format or missing refresh token</response>
+    /// <response code="401">Invalid or expired refresh token</response>
+    /// <response code="403">Refresh token has been revoked or user account is disabled</response>
     [HttpPost("refresh")]
+    [ProducesResponseType(typeof(AuthenticationResult), 200)]
+    [ProducesResponseType(typeof(object), 400)]
+    [ProducesResponseType(typeof(object), 401)]
+    [ProducesResponseType(typeof(object), 403)]
     public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequest request)
     {
         if (!ModelState.IsValid)

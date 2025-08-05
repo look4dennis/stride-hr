@@ -206,7 +206,7 @@ describe('PIPManagementComponent', () => {
 
     expect(component.isEditMode).toBeFalse();
     expect(component.currentPIP).toBeNull();
-    expect(mockModalService.open).toHaveBeenCalled();
+    expect(mockModalService.open).toHaveBeenCalledWith(mockTemplateRef, { size: 'xl', backdrop: 'static' });
   });
 
   it('should populate form for editing', () => {

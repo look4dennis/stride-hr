@@ -34,7 +34,343 @@ Include the token in the Authorization header:
 Authorization: Bearer your-jwt-token-here
 ```
 
+## Quick Start Guide
+
+### 1. Authentication
+
+First, obtain an access token:
+
+```bash
+curl -X POST "https://api.stridehr.com/api/auth/login" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "user@example.com",
+    "password": "your-password"
+  }'
+```
+
+Response:
+```json
+{
+  "success": true,
+  "data": {
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    "refreshToken": "refresh-token-here",
+    "expiresAt": "2024-12-01T10:00:00Z",
+    "user": {
+      "id": 123,
+      "name": "John Doe",
+      "email": "user@example.com",
+      "role": "Employee"
+    }
+  }
+}
+```
+
+### 2. Making API Calls
+
+Use the token in subsequent requests:
+
+```bash
+curl -X GET "https://api.stridehr.com/api/employees" \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+```
+
+### 3. Common Operations
+
+#### Get Employee Information
+```bash
+curl -X GET "https://api.stridehr.com/api/employees/123" \
+  -H "Authorization: Bearer {token}"
+```
+
+#### Submit Attendance
+```bash
+curl -X POST "https://api.stridehr.com/api/attendance/checkin" \
+  -H "Authorization: Bearer {token}" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "location": "Office",
+    "timestamp": "2024-12-01T09:00:00Z"
+  }'
+```
+
+#### Request Leave
+```bash
+curl -X POST "https://api.stridehr.com/api/leave/request" \
+  -H "Authorization: Bearer {token}" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "leaveType": "Annual",
+    "startDate": "2024-12-15",
+    "endDate": "2024-12-16",
+    "reason": "Personal work"
+  }'
+```
+
 ## API Endpoints
+
+### 🔐 Authentication APIs
+
+#### Login
+```http
+POST /api/auth/login
+Content-Type: application/json
+
+{
+  "email": "user@example.com",
+  "password": "your-password",
+  "rememberMe": true
+}
+```
+
+#### Refresh Token
+```http
+POST /api/auth/refresh
+Content-Type: application/json
+
+{
+  "refreshToken": "your-refresh-token"
+}
+```
+
+#### Logout
+```http
+POST /api/auth/logout
+Authorization: Bearer {token}
+```
+
+### 👥 Employee Management APIs
+
+#### Get All Employees
+```http
+GET /api/employees?page=1&pageSize=20&search=john&department=IT
+Authorization: Bearer {token}
+```
+
+#### Get Employee by ID
+```http
+GET /api/employees/123
+Authorization: Bearer {token}
+```
+
+#### Create Employee
+```http
+POST /api/employees
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+  "firstName": "John",
+  "lastName": "Doe",
+  "email": "john.doe@company.com",
+  "phone": "+1234567890",
+  "department": "IT",
+  "designation": "Software Engineer",
+  "branchId": 1,
+  "reportingManagerId": 456,
+  "joiningDate": "2024-01-15",
+  "basicSalary": 75000
+}
+```
+
+#### Update Employee
+```http
+PUT /api/employees/123
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+  "firstName": "John",
+  "lastName": "Smith",
+  "phone": "+1234567891",
+  "designation": "Senior Software Engineer"
+}
+```
+
+### ⏰ Attendance Management APIs
+
+#### Check In
+```http
+POST /api/attendance/checkin
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+  "location": "Office - Main Building",
+  "coordinates": {
+    "latitude": 40.7128,
+    "longitude": -74.0060
+  },
+  "timestamp": "2024-12-01T09:00:00Z"
+}
+```
+
+#### Check Out
+```http
+POST /api/attendance/checkout
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+  "timestamp": "2024-12-01T18:00:00Z"
+}
+```
+
+#### Start Break
+```http
+POST /api/attendance/break/start
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+  "breakType": "Lunch",
+  "timestamp": "2024-12-01T12:00:00Z"
+}
+```
+
+#### End Break
+```http
+POST /api/attendance/break/end
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+  "timestamp": "2024-12-01T13:00:00Z"
+}
+```
+
+#### Get Attendance Records
+```http
+GET /api/attendance?employeeId=123&startDate=2024-12-01&endDate=2024-12-31
+Authorization: Bearer {token}
+```
+
+### 🏖️ Leave Management APIs
+
+#### Submit Leave Request
+```http
+POST /api/leave/request
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+  "leaveType": "Annual",
+  "startDate": "2024-12-15",
+  "endDate": "2024-12-16",
+  "reason": "Personal work",
+  "isHalfDay": false,
+  "emergencyContact": "+1234567890"
+}
+```
+
+#### Get Leave Requests
+```http
+GET /api/leave/requests?status=Pending&page=1&pageSize=10
+Authorization: Bearer {token}
+```
+
+#### Approve/Reject Leave
+```http
+PUT /api/leave/requests/456/approve
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+  "action": "Approve",
+  "comments": "Approved for the requested dates"
+}
+```
+
+#### Get Leave Balance
+```http
+GET /api/leave/balance/123
+Authorization: Bearer {token}
+```
+
+### 💰 Payroll APIs
+
+#### Get Payslips
+```http
+GET /api/payroll/payslips?employeeId=123&year=2024
+Authorization: Bearer {token}
+```
+
+#### Download Payslip
+```http
+GET /api/payroll/payslips/789/download
+Authorization: Bearer {token}
+```
+
+#### Process Payroll
+```http
+POST /api/payroll/process
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+  "payrollPeriod": "2024-12",
+  "branchId": 1,
+  "employeeIds": [123, 456, 789]
+}
+```
+
+### 📊 Project Management APIs
+
+#### Get Projects
+```http
+GET /api/projects?status=Active&assignedTo=123
+Authorization: Bearer {token}
+```
+
+#### Create Project
+```http
+POST /api/projects
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+  "name": "Website Redesign",
+  "description": "Complete redesign of company website",
+  "startDate": "2024-12-01",
+  "endDate": "2024-12-31",
+  "estimatedHours": 200,
+  "budget": 50000,
+  "priority": "High",
+  "teamMembers": [123, 456, 789]
+}
+```
+
+#### Create Task
+```http
+POST /api/projects/123/tasks
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+  "title": "Design Homepage",
+  "description": "Create mockups for the new homepage",
+  "estimatedHours": 16,
+  "priority": "High",
+  "dueDate": "2024-12-15",
+  "assignedTo": 456
+}
+```
+
+#### Submit DSR
+```http
+POST /api/dsr
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+  "date": "2024-12-01",
+  "projectId": 123,
+  "taskId": 456,
+  "hoursWorked": 8,
+  "description": "Completed homepage design mockups and reviewed with team"
+}
+```
 
 ### 🔗 Integration APIs
 

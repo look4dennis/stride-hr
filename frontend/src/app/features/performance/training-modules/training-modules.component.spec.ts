@@ -204,7 +204,7 @@ describe('TrainingModulesComponent', () => {
 
     expect(component.isEditMode).toBeFalse();
     expect(component.currentModule).toBeNull();
-    expect(mockModalService.open).toHaveBeenCalledWith(mockTemplateRef, { size: 'lg' });
+    expect(mockModalService.open).toHaveBeenCalledWith(mockTemplateRef, { size: 'lg', backdrop: 'static' });
   });
 
   it('should edit module', () => {
@@ -232,7 +232,7 @@ describe('TrainingModulesComponent', () => {
     expect(component.isEditMode).toBeTrue();
     expect(component.currentModule).toEqual(module);
     expect(component.moduleForm.get('title')?.value).toBe(module.title);
-    expect(mockModalService.open).toHaveBeenCalledWith(mockTemplateRef, { size: 'lg' });
+    expect(mockModalService.open).toHaveBeenCalledWith(mockTemplateRef, { size: 'lg', backdrop: 'static' });
   });
 
   it('should save new module', () => {

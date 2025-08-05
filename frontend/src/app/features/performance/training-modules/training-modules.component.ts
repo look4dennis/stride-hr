@@ -336,6 +336,9 @@ import { Employee } from '../../../models/employee.models';
   `]
 })
 export class TrainingModulesComponent implements OnInit {
+  @ViewChild('moduleModal') moduleModal!: TemplateRef<any>;
+  @ViewChild('enrollModal') enrollModal!: TemplateRef<any>;
+  
   modules: TrainingModule[] = [];
   availableModules: TrainingModule[] = [];
   employees: Employee[] = [];
@@ -492,7 +495,7 @@ export class TrainingModulesComponent implements OnInit {
 
   openEnrollModal() {
     this.enrollForm = this.createEnrollForm();
-    this.modalService.open(this.enrollModalRef, { backdrop: 'static' });
+    this.modalService.open(this.enrollModal, { backdrop: 'static' });
   }
 
   enrollEmployee(modal: any) {
@@ -551,7 +554,4 @@ export class TrainingModulesComponent implements OnInit {
     if (stats.total === 0) return 0;
     return Math.round((stats.completed / stats.total) * 100);
   }
-
-  @ViewChild('moduleModal') moduleModal!: TemplateRef<any>;
-  @ViewChild('enrollModal') enrollModalRef!: TemplateRef<any>;
 }

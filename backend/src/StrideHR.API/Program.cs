@@ -41,15 +41,38 @@ try
     // Configure the HTTP request pipeline
     app.UseMiddleware<GlobalExceptionMiddleware>();
 
-    if (app.Environment.IsDevelopment())
+    // Enable Swagger in all environments with proper security
+    app.UseSwagger(c =>
     {
-        app.UseSwagger();
-        app.UseSwaggerUI(c =>
+        c.RouteTemplate = "api-docs/{documentName}/swagger.json";
+    });
+    
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/api-docs/v1/swagger.json", "StrideHR API V1");
+        c.RoutePrefix = "api-docs"; // Set Swagger UI at /api-docs
+        c.DocumentTitle = "StrideHR API Documentation";
+        c.DefaultModelsExpandDepth(-1); // Hide models section by default
+        c.DisplayRequestDuration();
+        c.EnableDeepLinking();
+        c.EnableFilter();
+        c.ShowExtensions();
+        c.EnableValidator();
+        
+        // Custom CSS for better appearance
+        c.InjectStylesheet("/swagger-ui/custom.css");
+        
+        // Add custom JavaScript for enhanced functionality
+        c.InjectJavascript("/swagger-ui/custom.js");
+        
+        // OAuth configuration for production
+        if (!app.Environment.IsDevelopment())
         {
-            c.SwaggerEndpoint("/swagger/v1/swagger.json", "StrideHR API V1");
-            c.RoutePrefix = string.Empty; // Set Swagger UI at the app's root
-        });
-    }
+            c.OAuthClientId("stridehr-swagger-ui");
+            c.OAuthAppName("StrideHR API Documentation");
+            c.OAuthUseBasicAuthenticationWithAccessCodeGrant();
+        }
+    });
 
     app.UseHttpsRedirection();
     app.UseCors("AllowAll");

@@ -350,6 +350,8 @@ import { Employee } from '../../../models/employee.models';
   `]
 })
 export class PIPManagementComponent implements OnInit {
+  @ViewChild('pipModal') pipModal!: TemplateRef<any>;
+  
   pips: PIP[] = [];
   employees: Employee[] = [];
   selectedEmployeeId: string = '';
@@ -592,6 +594,4 @@ export class PIPManagementComponent implements OnInit {
     if (!milestones) return 0;
     return milestones.filter(m => m.status === MilestoneStatus.Overdue).length;
   }
-
-  @ViewChild('pipModal') pipModal!: TemplateRef<any>;
 }

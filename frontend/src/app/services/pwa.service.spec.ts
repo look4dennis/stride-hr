@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
-import { ApplicationRef, ChangeDetectionStrategy, NgZone } from '@angular/core';
+import { ApplicationRef, NgZone } from '@angular/core';
 import { SwUpdate } from '@angular/service-worker';
-import { of, BehaviorSubject, EMPTY } from 'rxjs';
+import { of, BehaviorSubject } from 'rxjs';
 import { PwaService } from './pwa.service';
 import { provideZoneChangeDetection } from '@angular/core';
 
@@ -62,7 +62,8 @@ describe('PwaService', () => {
         PwaService,
         { provide: SwUpdate, useValue: swUpdateSpy },
         { provide: ApplicationRef, useValue: appRefSpy },
-        { provide: NgZone, useValue: mockNgZone }
+        { provide: NgZone, useValue: mockNgZone },
+        provideZoneChangeDetection({ eventCoalescing: true })
       ]
     });
 

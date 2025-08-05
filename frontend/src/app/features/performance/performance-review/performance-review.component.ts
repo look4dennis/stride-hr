@@ -281,6 +281,8 @@ import { Employee } from '../../../models/employee.models';
   `]
 })
 export class PerformanceReviewComponent implements OnInit {
+  @ViewChild('reviewModal') reviewModal!: TemplateRef<any>;
+  
   reviews: PerformanceReview[] = [];
   employees: Employee[] = [];
   selectedEmployeeId: string = '';
@@ -493,6 +495,4 @@ export class PerformanceReviewComponent implements OnInit {
     if (progress >= 60) return 'bg-warning';
     return 'bg-danger';
   }
-
-  @ViewChild('reviewModal') reviewModal!: TemplateRef<any>;
 }

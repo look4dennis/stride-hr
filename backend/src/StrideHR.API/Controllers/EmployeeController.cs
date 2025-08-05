@@ -5,8 +5,13 @@ using StrideHR.Core.Models.Employee;
 
 namespace StrideHR.API.Controllers;
 
+/// <summary>
+/// Employee management endpoints for CRUD operations, profile management, and organizational hierarchy
+/// </summary>
 [ApiController]
 [Route("api/[controller]")]
+[Produces("application/json")]
+[Tags("Employee")]
 public class EmployeeController : ControllerBase
 {
     private readonly IEmployeeService _employeeService;
@@ -18,8 +23,36 @@ public class EmployeeController : ControllerBase
         _logger = logger;
     }
 
+    /// <summary>
+    /// Retrieve all employees with optional filtering and pagination
+    /// </summary>
+    /// <param name="page">Page number for pagination (default: 1)</param>
+    /// <param name="pageSize">Number of items per page (default: 20, max: 100)</param>
+    /// <param name="search">Search term to filter employees by name, email, or employee ID</param>
+    /// <param name="department">Filter by department name</param>
+    /// <param name="branchId">Filter by branch ID</param>
+    /// <param name="status">Filter by employee status (Active, Inactive, Terminated)</param>
+    /// <param name="sortBy">Field to sort by (Name, Email, JoiningDate, Department)</param>
+    /// <param name="sortOrder">Sort order: 'asc' or 'desc' (default: 'asc')</param>
+    /// <returns>Paginated list of employees matching the criteria</returns>
+    /// <response code="200">Employees retrieved successfully</response>
+    /// <response code="400">Invalid pagination or filter parameters</response>
+    /// <response code="401">Unauthorized - Invalid or missing JWT token</response>
+    /// <response code="403">Forbidden - Insufficient permissions to view employees</response>
     [HttpGet]
-    public async Task<ActionResult<ApiResponse<IEnumerable<EmployeeDto>>>> GetAllEmployees()
+    [ProducesResponseType(typeof(ApiResponse<IEnumerable<EmployeeDto>>), 200)]
+    [ProducesResponseType(typeof(object), 400)]
+    [ProducesResponseType(typeof(object), 401)]
+    [ProducesResponseType(typeof(object), 403)]
+    public async Task<ActionResult<ApiResponse<IEnumerable<EmployeeDto>>>> GetAllEmployees(
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 20,
+        [FromQuery] string? search = null,
+        [FromQuery] string? department = null,
+        [FromQuery] int? branchId = null,
+        [FromQuery] string? status = null,
+        [FromQuery] string sortBy = "Name",
+        [FromQuery] string sortOrder = "asc")
     {
         try
         {
@@ -42,7 +75,20 @@ public class EmployeeController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Retrieve a specific employee by ID
+    /// </summary>
+    /// <param name="id">The unique identifier of the employee</param>
+    /// <returns>Employee details including personal information, job details, and organizational hierarchy</returns>
+    /// <response code="200">Employee retrieved successfully</response>
+    /// <response code="404">Employee not found with the specified ID</response>
+    /// <response code="401">Unauthorized - Invalid or missing JWT token</response>
+    /// <response code="403">Forbidden - Insufficient permissions to view this employee</response>
     [HttpGet("{id}")]
+    [ProducesResponseType(typeof(ApiResponse<EmployeeDto>), 200)]
+    [ProducesResponseType(typeof(object), 404)]
+    [ProducesResponseType(typeof(object), 401)]
+    [ProducesResponseType(typeof(object), 403)]
     public async Task<ActionResult<ApiResponse<EmployeeDto>>> GetEmployee(int id)
     {
         try

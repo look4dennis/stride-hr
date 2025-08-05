@@ -199,7 +199,7 @@ describe('PerformanceReviewComponent', () => {
 
         expect(component.isEditMode).toBeFalse();
         expect(component.currentReview).toBeNull();
-        expect(mockModalService.open).toHaveBeenCalledWith(mockTemplateRef, { size: 'lg' });
+        expect(mockModalService.open).toHaveBeenCalledWith(mockTemplateRef, { size: 'lg', backdrop: 'static' });
     });
 
     it('should populate form for editing', () => {
