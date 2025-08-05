@@ -518,17 +518,91 @@ A comprehensive Human Resource Management System API designed for global organiz
 - **Audit Trails**: Comprehensive logging and monitoring
 - **International Compliance**: Multi-currency, timezone, and regulatory support
 
-## Authentication
+## Getting Started
 
-All API endpoints require JWT Bearer token authentication unless otherwise specified.
+### 1. Authentication
+All API endpoints require JWT Bearer token authentication. Obtain a token by calling the `/api/auth/login` endpoint with valid credentials.
+
+### 2. Authorization Header
+Include the JWT token in the Authorization header for all requests:
+```
+Authorization: Bearer your-jwt-token-here
+```
+
+### 3. Response Format
+All API responses follow a consistent format:
+```json
+{
+  ""success"": true,
+  ""data"": { /* response data */ },
+  ""message"": ""Operation completed successfully""
+}
+```
+
+### 4. Error Handling
+Error responses include detailed information:
+```json
+{
+  ""success"": false,
+  ""message"": ""Error description"",
+  ""errors"": [""Detailed error message""]
+}
+```
 
 ## Rate Limiting
 
-API requests are rate-limited to ensure system stability. Please refer to response headers for current limits.
+API requests are rate-limited to ensure system stability:
+- Standard endpoints: 1000 requests per hour per user
+- Bulk operations: 100 requests per hour per user
+- Authentication endpoints: 10 requests per minute per IP
 
-## Support
+Rate limit headers are included in responses:
+```
+X-RateLimit-Limit: 1000
+X-RateLimit-Remaining: 999
+X-RateLimit-Reset: 1638360000
+```
 
-For API support, contact: support@stridehr.com
+## Pagination
+
+List endpoints support pagination with the following parameters:
+- `page`: Page number (default: 1)
+- `pageSize`: Items per page (default: 20, max: 100)
+- `sortBy`: Field to sort by
+- `sortOrder`: 'asc' or 'desc' (default: 'asc')
+
+## Filtering and Search
+
+Many endpoints support filtering and search:
+- Use query parameters for basic filtering
+- Use the `search` parameter for text-based searches
+- Date ranges can be specified with `startDate` and `endDate`
+
+## Webhooks
+
+StrideHR supports webhooks for real-time event notifications. Available events include:
+- Employee lifecycle events (created, updated, deleted)
+- Attendance events (check-in, check-out)
+- Leave request events (submitted, approved, rejected)
+- Payroll events (processed, approved)
+- Project events (created, completed)
+
+## SDKs and Libraries
+
+Official SDKs are available for:
+- JavaScript/Node.js: `npm install @stridehr/api-client`
+- Python: `pip install stridehr-api`
+- C#: `dotnet add package StrideHR.ApiClient`
+
+
+## Changelog
+
+### v1.0.0 (Current)
+- Initial API release with full HR management capabilities
+- Comprehensive authentication and authorization system
+- Real-time notifications via SignalR
+- Webhook support for external integrations
+- Multi-branch and multi-currency support
 ",
                 Contact = new OpenApiContact
                 {
@@ -538,13 +612,11 @@ For API support, contact: support@stridehr.com
                 },
                 License = new OpenApiLicense
                 {
-                    Name = "StrideHR License",
-                    Url = new Uri("https://stridehr.com/license")
+                    Name = "MIT License",
+                    Url = new Uri("https://opensource.org/licenses/MIT")
                 },
                 TermsOfService = new Uri("https://stridehr.com/terms")
             });
-
-            // Note: SwaggerDoc for v1 is already defined above with full documentation
 
             // Add JWT Authentication to Swagger
             c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
@@ -555,11 +627,10 @@ For API support, contact: support@stridehr.com
                 Name = "Authorization",
                 In = ParameterLocation.Header,
                 Type = SecuritySchemeType.ApiKey,
-                Scheme = "Bearer",
-                BearerFormat = "JWT"
+                Scheme = "Bearer"
             });
 
-            c.AddSecurityRequirement(new OpenApiSecurityRequirement
+            c.AddSecurityRequirement(new OpenApiSecurityRequirement()
             {
                 {
                     new OpenApiSecurityScheme
@@ -571,37 +642,45 @@ For API support, contact: support@stridehr.com
                         },
                         Scheme = "oauth2",
                         Name = "Bearer",
-                        In = ParameterLocation.Header
+                        In = ParameterLocation.Header,
                     },
                     new List<string>()
                 }
             });
 
+            // Include XML comments for better documentation
+            var xmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
+            var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+            if (File.Exists(xmlPath))
+            {
+                c.IncludeXmlComments(xmlPath);
+            }
+
+            // Add custom schema filters
+            c.SchemaFilter<SwaggerSchemaExampleFilter>();
+            c.DocumentFilter<SwaggerDocumentFilter>();
+            c.OperationFilter<SwaggerDefaultValues>();
+
             // Group endpoints by tags
             c.TagActionsBy(api => new[] { api.GroupName ?? api.ActionDescriptor.RouteValues["controller"] });
             c.DocInclusionPredicate((name, api) => true);
 
-            // Add custom operation filters
-            c.OperationFilter<SwaggerDefaultValues>();
-            c.DocumentFilter<SwaggerDocumentFilter>();
-
-            // Include XML comments for better documentation
-            var xmlFiles = Directory.GetFiles(AppContext.BaseDirectory, "*.xml");
-            foreach (var xmlFile in xmlFiles)
+            // Add examples for common response types
+            c.MapType<DateTime>(() => new OpenApiSchema
             {
-                if (Path.GetFileNameWithoutExtension(xmlFile).StartsWith("StrideHR"))
-                {
-                    c.IncludeXmlComments(xmlFile);
-                }
-            }
+                Type = "string",
+                Format = "date-time",
+                Example = new Microsoft.OpenApi.Any.OpenApiString("2024-12-01T10:00:00Z")
+            });
 
-            // Add examples for common request/response models
-            c.SchemaFilter<SwaggerSchemaExampleFilter>();
+            c.MapType<TimeSpan>(() => new OpenApiSchema
+            {
+                Type = "string",
+                Format = "time",
+                Example = new Microsoft.OpenApi.Any.OpenApiString("08:30:00")
+            });
 
-            // Note: EnableAnnotations() is not available in this version of Swashbuckle
-            // Annotations can be enabled through other means if needed
-
-            // Add servers information
+            // Add servers for different environments
             c.AddServer(new OpenApiServer
             {
                 Url = "https://api.stridehr.com",
@@ -617,6 +696,10 @@ For API support, contact: support@stridehr.com
                 Url = "http://localhost:5000",
                 Description = "Development Server"
             });
+
+
+
+
         });
 
         return services;
