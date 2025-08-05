@@ -86,10 +86,16 @@ try
     // Map SignalR hubs
     app.MapHub<StrideHR.API.Hubs.NotificationHub>("/hubs/notification");
 
-    // Health check endpoint
-    app.MapGet("/health", () => new { Status = "Healthy", Timestamp = DateTime.UtcNow })
-        .WithName("HealthCheck")
-        .WithOpenApi();
+    // Legacy health check endpoint for backward compatibility
+    app.MapGet("/health", async (StrideHR.API.Services.HealthCheckService healthService) =>
+    {
+        var health = await healthService.GetSystemHealthAsync();
+        return health.Status == StrideHR.API.Services.HealthStatus.Healthy 
+            ? Results.Ok(new { Status = "Healthy", Timestamp = DateTime.UtcNow })
+            : Results.Problem("System is unhealthy", statusCode: 503);
+    })
+    .WithName("HealthCheck")
+    .WithOpenApi();
 
     Log.Information("StrideHR API started successfully");
     app.Run();

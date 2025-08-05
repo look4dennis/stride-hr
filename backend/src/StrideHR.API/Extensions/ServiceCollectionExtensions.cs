@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using StrideHR.API.Filters;
+using StrideHR.API.Services;
 using StrideHR.Core.Entities;
 using StrideHR.Core.Interfaces;
 using StrideHR.Core.Interfaces.Repositories;
@@ -424,6 +425,9 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IEmailCampaignRepository, EmailCampaignRepository>();
         services.AddScoped<IBranchRepository, BranchRepository>();
 
+        // Register health check service
+        services.AddScoped<HealthCheckService>();
+
         // Register services
         services.AddScoped<IAuthenticationService, AuthenticationService>();
         services.AddScoped<IJwtService, JwtService>();
@@ -786,6 +790,7 @@ Official SDKs are available for:
             c.SchemaFilter<SwaggerSchemaExampleFilter>();
             c.DocumentFilter<SwaggerDocumentFilter>();
             c.OperationFilter<SwaggerDefaultValues>();
+            c.OperationFilter<SwaggerFileUploadOperationFilter>();
 
             // Group endpoints by tags
             c.TagActionsBy(api => new[] { api.GroupName ?? api.ActionDescriptor.RouteValues["controller"] });
