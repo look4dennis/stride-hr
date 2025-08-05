@@ -3,7 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Subject, takeUntil, forkJoin } from 'rxjs';
-import { NgbModal, NgbTooltip, NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbTooltip, NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
+import { ModalService } from '../../../services/modal.service';
 
 import { PayrollService } from '../../../services/payroll.service';
 import { EmployeeService } from '../../../services/employee.service';
@@ -450,7 +451,7 @@ export class PayrollProcessingComponent implements OnInit, OnDestroy {
   constructor(
     private payrollService: PayrollService,
     private employeeService: EmployeeService,
-    private modalService: NgbModal,
+    private modalService: ModalService,
     private fb: FormBuilder,
     private router: Router
   ) {
@@ -560,7 +561,7 @@ export class PayrollProcessingComponent implements OnInit, OnDestroy {
   }
 
   openCreateBatchModal(): void {
-    this.modalService.open(this.createBatchModal, { 
+    this.modalService.openTemplate(this.createBatchModal, { 
       size: 'lg',
       backdrop: 'static'
     });

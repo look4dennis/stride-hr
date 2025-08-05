@@ -2,5 +2,15 @@
   "isCheckedIn": false,
   "checkInTime": null,
   "status": "offline",
-  "message": "You are currently offline. Your attendance status will be updated when connection is restored."
+  "message": "You are currently offline. Your data will sync when connection is restored.",
+  "lastSync": null,
+  "offlineFeatures": [
+    "View cached employee data",
+    "Submit attendance (syncs automatically)",
+    "Access recent reports and dashboard",
+    "View payroll information",
+    "Submit leave requests (syncs later)"
+  ],
+  "syncPending": 0,
+  "lastOnline": null
 }

@@ -53,23 +53,13 @@ export class PwaService {
     }
 
     try {
-      // Check for updates when app becomes stable
-      const appIsStable$ = this.appRef.isStable.pipe(
-        first(isStable => isStable === true)
-      );
-      const everySixHours$ = interval(6 * 60 * 60 * 1000);
-      const everySixHoursOnceAppIsStable$ = concat(appIsStable$, everySixHours$);
-
-      everySixHoursOnceAppIsStable$.subscribe({
-        next: () => {
-          this.swUpdate.checkForUpdate().catch(error => {
-            console.warn('Error checking for updates:', error);
-          });
-        },
-        error: (error) => {
-          console.error('Error in update checking subscription:', error);
-        }
-      });
+      // Use a simpler approach for update checking
+      // Check for updates immediately and then every 6 hours
+      this.checkForUpdatesWithDelay();
+      
+      const updateInterval = setInterval(() => {
+        this.checkForUpdatesWithDelay();
+      }, 6 * 60 * 60 * 1000); // 6 hours
 
       // Handle version updates
       this.swUpdate.versionUpdates
@@ -84,9 +74,27 @@ export class PwaService {
             console.error('Error handling version updates:', error);
           }
         });
+
+      // Clean up interval on service destruction
+      if (typeof window !== 'undefined') {
+        window.addEventListener('beforeunload', () => {
+          clearInterval(updateInterval);
+        });
+      }
     } catch (error) {
       console.error('Error initializing service worker updates:', error);
     }
+  }
+
+  /**
+   * Check for updates with a delay to ensure app is stable
+   */
+  private checkForUpdatesWithDelay(): void {
+    setTimeout(() => {
+      this.swUpdate.checkForUpdate().catch(error => {
+        console.warn('Error checking for updates:', error);
+      });
+    }, 5000); // 5 second delay
   }
 
   /**

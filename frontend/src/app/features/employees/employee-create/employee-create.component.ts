@@ -8,10 +8,12 @@ import { CreateEmployeeDto, Employee } from '../../../models/employee.models';
 import { Branch } from '../../../models/admin.models';
 import { NotificationService } from '../../../core/services/notification.service';
 import { LoadingService } from '../../../core/services/loading.service';
+import { FormValidationService } from '../../../shared/services/form-validation.service';
+import { FormValidationDirective } from '../../../shared/directives/form-validation.directive';
 
 @Component({
     selector: 'app-employee-create',
-    imports: [CommonModule, FormsModule, ReactiveFormsModule],
+    imports: [CommonModule, FormsModule, ReactiveFormsModule, FormValidationDirective],
     template: `
     <div class="page-header d-flex justify-content-between align-items-center">
       <div>
@@ -42,7 +44,7 @@ import { LoadingService } from '../../../core/services/loading.service';
             </h5>
           </div>
           <div class="card-body">
-            <form [formGroup]="employeeForm" (ngSubmit)="onSubmit()">
+            <form [formGroup]="employeeForm" (ngSubmit)="onSubmit()" [appFormValidation]="employeeForm">
               <!-- Profile Photo Section -->
               <div class="row mb-4">
                 <div class="col-12 text-center">
@@ -506,7 +508,8 @@ export class EmployeeCreateComponent implements OnInit {
         private branchService: BranchService,
         private router: Router,
         private notificationService: NotificationService,
-        private loadingService: LoadingService
+        private loadingService: LoadingService,
+        private formValidationService: FormValidationService
     ) {
         this.employeeForm = this.createForm();
     }
@@ -634,8 +637,12 @@ export class EmployeeCreateComponent implements OnInit {
     }
 
     isFieldInvalid(fieldName: string): boolean {
-        const field = this.employeeForm.get(fieldName);
-        return !!(field && field.invalid && (field.dirty || field.touched));
+        return this.formValidationService.isFieldInvalid(this.employeeForm, fieldName);
+    }
+
+    getValidationMessage(fieldName: string): string | null {
+        const control = this.employeeForm.get(fieldName);
+        return control ? this.formValidationService.getValidationMessage(control, fieldName) : null;
     }
 
     onSubmit(): void {
@@ -674,12 +681,9 @@ export class EmployeeCreateComponent implements OnInit {
                 }
             });
         } else {
-            // Mark all fields as touched to show validation errors
-            Object.keys(this.employeeForm.controls).forEach(key => {
-                this.employeeForm.get(key)?.markAsTouched();
-            });
-
-            this.notificationService.showError('Please fill in all required fields correctly');
+            // Use the validation service to mark fields and get error message
+            const firstError = this.formValidationService.validateFormAndGetFirstError(this.employeeForm);
+            this.notificationService.showError(firstError || 'Please fill in all required fields correctly');
         }
     }
 

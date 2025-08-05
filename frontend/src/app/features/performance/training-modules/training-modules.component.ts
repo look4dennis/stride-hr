@@ -2,7 +2,8 @@ import { Component, OnInit, ViewChild, TemplateRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { NgbModal, NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { ModalService } from '../../../services/modal.service';
 import { PerformanceService } from '../../../services/performance.service';
 import { EmployeeService } from '../../../services/employee.service';
 import { 
@@ -357,7 +358,7 @@ export class TrainingModulesComponent implements OnInit {
   constructor(
     private performanceService: PerformanceService,
     private employeeService: EmployeeService,
-    private modalService: NgbModal,
+    private modalService: ModalService,
     private fb: FormBuilder,
     private router: Router
   ) {
@@ -442,7 +443,7 @@ export class TrainingModulesComponent implements OnInit {
     this.isEditMode = false;
     this.currentModule = null;
     this.moduleForm = this.createModuleForm();
-    this.modalService.open(this.moduleModal, { size: 'lg', backdrop: 'static' });
+    this.modalService.openTemplate(this.moduleModal, { size: 'lg', backdrop: 'static' });
   }
 
   editModule(module: TrainingModule) {
@@ -457,7 +458,7 @@ export class TrainingModulesComponent implements OnInit {
       content: module.content,
       prerequisites: module.prerequisites || []
     });
-    this.modalService.open(this.moduleModal, { size: 'lg', backdrop: 'static' });
+    this.modalService.openTemplate(this.moduleModal, { size: 'lg', backdrop: 'static' });
   }
 
   saveModule(modal: any) {
@@ -495,7 +496,7 @@ export class TrainingModulesComponent implements OnInit {
 
   openEnrollModal() {
     this.enrollForm = this.createEnrollForm();
-    this.modalService.open(this.enrollModal, { backdrop: 'static' });
+    this.modalService.openTemplate(this.enrollModal, { backdrop: 'static' });
   }
 
   enrollEmployee(modal: any) {

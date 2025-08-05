@@ -2,7 +2,8 @@ import { Component, OnInit, ViewChild, TemplateRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
-import { NgbModal, NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { ModalService } from '../../../services/modal.service';
 import { PerformanceService } from '../../../services/performance.service';
 import { EmployeeService } from '../../../services/employee.service';
 import { PerformanceReview, PerformanceReviewStatus, GoalStatus, CreatePerformanceReviewDto } from '../../../models/performance.models';
@@ -297,7 +298,7 @@ export class PerformanceReviewComponent implements OnInit {
   constructor(
     private performanceService: PerformanceService,
     private employeeService: EmployeeService,
-    private modalService: NgbModal,
+    private modalService: ModalService,
     private fb: FormBuilder,
     private router: Router,
     private route: ActivatedRoute
@@ -373,14 +374,14 @@ export class PerformanceReviewComponent implements OnInit {
     this.isEditMode = false;
     this.currentReview = null;
     this.reviewForm = this.createReviewForm();
-    this.modalService.open(this.reviewModal, { size: 'lg', backdrop: 'static' });
+    this.modalService.openTemplate(this.reviewModal, { size: 'lg', backdrop: 'static' });
   }
 
   editReview(review: PerformanceReview) {
     this.isEditMode = true;
     this.currentReview = review;
     this.populateForm(review);
-    this.modalService.open(this.reviewModal, { size: 'lg', backdrop: 'static' });
+    this.modalService.openTemplate(this.reviewModal, { size: 'lg', backdrop: 'static' });
   }
 
   populateForm(review: PerformanceReview) {
