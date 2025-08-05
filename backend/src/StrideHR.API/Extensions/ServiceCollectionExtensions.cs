@@ -580,7 +580,7 @@ public static class ServiceCollectionExtensions
         services.AddSignalR(options =>
         {
             // Configure hub options for production readiness and resilience
-            options.EnableDetailedErrors = builder.Environment.IsDevelopment();
+            options.EnableDetailedErrors = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development";
             options.HandshakeTimeout = TimeSpan.FromSeconds(30);
             options.KeepAliveInterval = TimeSpan.FromSeconds(15);
             options.ClientTimeoutInterval = TimeSpan.FromSeconds(60);
@@ -595,7 +595,7 @@ public static class ServiceCollectionExtensions
         {
             // Configure JSON serialization for SignalR
             options.PayloadSerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase;
-            options.PayloadSerializerOptions.WriteIndented = builder.Environment.IsDevelopment();
+            options.PayloadSerializerOptions.WriteIndented = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development";
             options.PayloadSerializerOptions.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull;
         })
         .AddMessagePackProtocol(); // Add MessagePack for better performance and resilience

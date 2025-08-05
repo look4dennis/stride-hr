@@ -43,7 +43,7 @@ public class SignalRNotificationService : IRealTimeNotificationService
                 notification.Type,
                 notification.Priority,
                 notification.CreatedAt,
-                notification.Data,
+                notification.Metadata,
                 DeliveredAt = DateTime.UtcNow,
                 TargetType = "User",
                 TargetId = userId.ToString()
@@ -86,7 +86,7 @@ public class SignalRNotificationService : IRealTimeNotificationService
                 notification.Type,
                 notification.Priority,
                 notification.CreatedAt,
-                notification.Data,
+                notification.Metadata,
                 DeliveredAt = DateTime.UtcNow,
                 TargetType = "Group",
                 TargetId = groupName
@@ -123,7 +123,7 @@ public class SignalRNotificationService : IRealTimeNotificationService
                 notification.Type,
                 notification.Priority,
                 notification.CreatedAt,
-                notification.Data,
+                notification.Metadata,
                 DeliveredAt = DateTime.UtcNow,
                 TargetType = "Branch",
                 TargetId = branchId.ToString()
@@ -166,7 +166,7 @@ public class SignalRNotificationService : IRealTimeNotificationService
                 notification.Type,
                 notification.Priority,
                 notification.CreatedAt,
-                notification.Data,
+                notification.Metadata,
                 DeliveredAt = DateTime.UtcNow,
                 TargetType = "Role",
                 TargetId = role
@@ -203,7 +203,7 @@ public class SignalRNotificationService : IRealTimeNotificationService
                 notification.Type,
                 notification.Priority,
                 notification.CreatedAt,
-                notification.Data,
+                notification.Metadata,
                 DeliveredAt = DateTime.UtcNow,
                 TargetType = "All",
                 TargetId = "Global"
@@ -406,7 +406,7 @@ public class SignalRNotificationService : IRealTimeNotificationService
                     notification.Type,
                     notification.Priority,
                     notification.CreatedAt,
-                    notification.Data,
+                    notification.Metadata,
                     DeliveredAt = DateTime.UtcNow,
                     TargetType = "User",
                     TargetId = userId.ToString(),
@@ -467,7 +467,7 @@ public class SignalRNotificationService : IRealTimeNotificationService
         
         // Find users in the group
         var groupUsers = connections.Values
-            .Where(c => IsUserInGroup(c, groupName))
+            .Where(c => IsUserInGroup(MapToCore(c), groupName))
             .Select(c => int.Parse(c.UserId))
             .Distinct()
             .ToList();
@@ -710,33 +710,34 @@ public class SignalRNotificationService : IRealTimeNotificationService
     }
 
     // Connection management
-    public async Task<List<UserConnectionInfo>> GetActiveConnectionsAsync()
+    public async Task<List<StrideHR.Core.Models.Notification.UserConnectionInfo>> GetActiveConnectionsAsync()
     {
         try
         {
             var connections = NotificationHub.GetCurrentConnections();
-            return connections.Values.ToList();
+            return connections.Values.Select(MapToCore).ToList();
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Failed to get active connections");
-            return new List<UserConnectionInfo>();
+            return new List<StrideHR.Core.Models.Notification.UserConnectionInfo>();
         }
     }
 
-    public async Task<List<UserConnectionInfo>> GetUserConnectionsAsync(int userId)
+    public async Task<List<StrideHR.Core.Models.Notification.UserConnectionInfo>> GetUserConnectionsAsync(int userId)
     {
         try
         {
             var connections = NotificationHub.GetCurrentConnections();
             return connections.Values
                 .Where(c => c.UserId == userId.ToString())
+                .Select(MapToCore)
                 .ToList();
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Failed to get connections for user {UserId}", userId);
-            return new List<UserConnectionInfo>();
+            return new List<StrideHR.Core.Models.Notification.UserConnectionInfo>();
         }
     }
 
@@ -931,7 +932,7 @@ public class SignalRNotificationService : IRealTimeNotificationService
     }
 
     // Helper methods
-    private bool IsUserInGroup(UserConnectionInfo connection, string groupName)
+    private bool IsUserInGroup(StrideHR.Core.Models.Notification.UserConnectionInfo connection, string groupName)
     {
         if (groupName.StartsWith("User_"))
         {
@@ -958,5 +959,21 @@ public class SignalRNotificationService : IRealTimeNotificationService
         }
         
         return false;
+    }
+
+    private StrideHR.Core.Models.Notification.UserConnectionInfo MapToCore(StrideHR.API.Hubs.UserConnectionInfo hubConnection)
+    {
+        return new StrideHR.Core.Models.Notification.UserConnectionInfo
+        {
+            ConnectionId = hubConnection.ConnectionId,
+            UserId = hubConnection.UserId,
+            EmployeeId = hubConnection.EmployeeId,
+            BranchId = hubConnection.BranchId,
+            OrganizationId = hubConnection.OrganizationId,
+            Roles = hubConnection.Roles,
+            ConnectedAt = hubConnection.ConnectedAt,
+            UserAgent = hubConnection.UserAgent,
+            IpAddress = hubConnection.IpAddress
+        };
     }
 }
