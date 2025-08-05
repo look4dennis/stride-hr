@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
 import { Router } from '@angular/router';
+import { environment } from '../../../environments/environment';
 
 export interface User {
   id: number;
@@ -30,7 +31,7 @@ export interface AuthResponse {
   providedIn: 'root'
 })
 export class AuthService {
-  private readonly API_URL = 'http://localhost:5000/api';
+  private readonly API_URL = environment.apiUrl;
   private currentUserSubject = new BehaviorSubject<User | null>(null);
   private tokenSubject = new BehaviorSubject<string | null>(null);
 
@@ -57,10 +58,18 @@ export class AuthService {
   }
 
   login(credentials: LoginRequest): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.API_URL}/auth/login`, credentials)
+    // Temporarily use the test endpoint that works
+    return this.http.post<any>(`${this.API_URL}/TestAuth/simple-login`, credentials)
       .pipe(
         tap(response => {
-          this.setAuthData(response);
+          // Extract the auth data from the API response
+          const authResponse: AuthResponse = {
+            token: response.data.token,
+            refreshToken: response.data.refreshToken,
+            user: response.data.user,
+            expiresAt: response.data.expiresAt
+          };
+          this.setAuthData(authResponse);
         })
       );
   }

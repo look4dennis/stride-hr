@@ -12,8 +12,8 @@ using StrideHR.Infrastructure.Data;
 namespace StrideHR.Infrastructure.Migrations
 {
     [DbContext(typeof(StrideHRDbContext))]
-    [Migration("20250805105125_InitialSetup")]
-    partial class InitialSetup
+    [Migration("20250805152212_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -990,8 +990,17 @@ namespace StrideHR.Infrastructure.Migrations
 
                     b.HasIndex("ShiftId");
 
+                    b.HasIndex("Date", "Status")
+                        .HasDatabaseName("IX_Attendance_Date_Status");
+
+                    b.HasIndex("EmployeeId", "CreatedAt")
+                        .HasDatabaseName("IX_Attendance_Employee_Created");
+
                     b.HasIndex("EmployeeId", "Date")
                         .IsUnique();
+
+                    b.HasIndex("EmployeeId", "Date", "Status")
+                        .HasDatabaseName("IX_Attendance_Employee_Date_Status");
 
                     b.ToTable("AttendanceRecords");
                 });
@@ -1025,7 +1034,7 @@ namespace StrideHR.Infrastructure.Migrations
 
                     b.Property<string>("EventType")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("varchar(255)");
 
                     b.Property<string>("IpAddress")
                         .HasColumnType("longtext");
@@ -1056,7 +1065,14 @@ namespace StrideHR.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("Timestamp")
+                        .HasDatabaseName("IX_AuditLog_Timestamp");
+
+                    b.HasIndex("EventType", "Timestamp")
+                        .HasDatabaseName("IX_AuditLog_EventType_Timestamp");
+
+                    b.HasIndex("UserId", "Timestamp")
+                        .HasDatabaseName("IX_AuditLog_User_Timestamp");
 
                     b.ToTable("AuditLogs");
                 });
@@ -1232,7 +1248,8 @@ namespace StrideHR.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AttendanceRecordId");
+                    b.HasIndex("AttendanceRecordId", "StartTime")
+                        .HasDatabaseName("IX_BreakRecord_Attendance_Start");
 
                     b.ToTable("BreakRecords");
                 });
@@ -2057,7 +2074,11 @@ namespace StrideHR.Infrastructure.Migrations
 
                     b.HasIndex("TaskId");
 
-                    b.HasIndex("EmployeeId", "Date");
+                    b.HasIndex("EmployeeId", "Date")
+                        .HasDatabaseName("IX_DSR_Employee_Date");
+
+                    b.HasIndex("ProjectId", "Date")
+                        .HasDatabaseName("IX_DSR_Project_Date");
 
                     b.ToTable("DSRs", (string)null);
                 });
@@ -3160,15 +3181,26 @@ namespace StrideHR.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("BranchId");
-
                     b.HasIndex("Email")
                         .IsUnique();
 
                     b.HasIndex("EmployeeId")
                         .IsUnique();
 
-                    b.HasIndex("ReportingManagerId");
+                    b.HasIndex("JoiningDate")
+                        .HasDatabaseName("IX_Employee_JoiningDate");
+
+                    b.HasIndex("BranchId", "Status")
+                        .HasDatabaseName("IX_Employee_Branch_Status");
+
+                    b.HasIndex("Department", "Status")
+                        .HasDatabaseName("IX_Employee_Department_Status");
+
+                    b.HasIndex("FirstName", "LastName")
+                        .HasDatabaseName("IX_Employee_FullName");
+
+                    b.HasIndex("ReportingManagerId", "Status")
+                        .HasDatabaseName("IX_Employee_Manager_Status");
 
                     b.ToTable("Employees");
                 });
@@ -3351,9 +3383,10 @@ namespace StrideHR.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("EmployeeId");
-
                     b.HasIndex("RoleId");
+
+                    b.HasIndex("EmployeeId", "IsActive")
+                        .HasDatabaseName("IX_EmployeeRole_Employee_Active");
 
                     b.ToTable("EmployeeRoles");
                 });
@@ -3429,7 +3462,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasDatabaseName("IX_ExchangeRate_IsActive");
 
                     b.HasIndex("FromCurrency", "ToCurrency", "EffectiveDate")
-                        .HasDatabaseName("IX_ExchangeRate_Currencies_Date");
+                        .HasDatabaseName("IX_ExchangeRate_Currencies_EffectiveDate");
 
                     b.ToTable("ExchangeRates");
                 });
@@ -5592,6 +5625,9 @@ namespace StrideHR.Infrastructure.Migrations
 
                     b.HasIndex("LeaveRequestId");
 
+                    b.HasIndex("LeaveRequestId", "Level")
+                        .HasDatabaseName("IX_LeaveApproval_Request_Level");
+
                     b.ToTable("LeaveApprovalHistories");
                 });
 
@@ -5650,7 +5686,8 @@ namespace StrideHR.Infrastructure.Migrations
                     b.HasIndex("LeavePolicyId");
 
                     b.HasIndex("EmployeeId", "LeavePolicyId", "Year")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasDatabaseName("IX_LeaveBalance_Employee_Policy_Year");
 
                     b.ToTable("LeaveBalances");
                 });
@@ -5981,7 +6018,11 @@ namespace StrideHR.Infrastructure.Migrations
 
                     b.HasIndex("Status");
 
-                    b.HasIndex("StartDate", "EndDate");
+                    b.HasIndex("EmployeeId", "Status")
+                        .HasDatabaseName("IX_LeaveRequest_Employee_Status");
+
+                    b.HasIndex("StartDate", "EndDate")
+                        .HasDatabaseName("IX_LeaveRequest_DateRange");
 
                     b.ToTable("LeaveRequests");
                 });
@@ -6084,7 +6125,14 @@ namespace StrideHR.Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.HasIndex("UserId", "IsRead");
+                    b.HasIndex("IsRead", "CreatedAt")
+                        .HasDatabaseName("IX_Notification_Read_Created");
+
+                    b.HasIndex("Type", "CreatedAt")
+                        .HasDatabaseName("IX_Notification_Type_Created");
+
+                    b.HasIndex("UserId", "IsRead")
+                        .HasDatabaseName("IX_Notification_User_Read");
 
                     b.ToTable("Notifications", (string)null);
                 });
@@ -6501,6 +6549,9 @@ namespace StrideHR.Infrastructure.Migrations
                     b.HasIndex("Type")
                         .HasDatabaseName("IX_PayrollAdjustment_Type");
 
+                    b.HasIndex("PayrollRecordId", "Type")
+                        .HasDatabaseName("IX_PayrollAdjustment_Record_Type");
+
                     b.ToTable("PayrollAdjustments");
                 });
 
@@ -6807,14 +6858,23 @@ namespace StrideHR.Infrastructure.Migrations
 
                     b.HasIndex("EmployeeId1");
 
+                    b.HasIndex("ProcessedAt")
+                        .HasDatabaseName("IX_Payroll_ProcessedAt");
+
                     b.HasIndex("ProcessedBy");
 
                     b.HasIndex("Status")
                         .HasDatabaseName("IX_PayrollRecord_Status");
 
+                    b.HasIndex("EmployeeId", "Status")
+                        .HasDatabaseName("IX_Payroll_Employee_Status");
+
                     b.HasIndex("EmployeeId", "PayrollYear", "PayrollMonth")
                         .IsUnique()
                         .HasDatabaseName("IX_PayrollRecord_Employee_Period");
+
+                    b.HasIndex("PayrollYear", "PayrollMonth", "Status")
+                        .HasDatabaseName("IX_Payroll_Period_Status");
 
                     b.ToTable("PayrollRecords");
                 });
@@ -7322,9 +7382,10 @@ namespace StrideHR.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("EmployeeId");
-
                     b.HasIndex("ManagerId");
+
+                    b.HasIndex("EmployeeId", "Status")
+                        .HasDatabaseName("IX_PerformanceGoal_Employee_Status");
 
                     b.ToTable("PerformanceGoals");
                 });
@@ -7503,13 +7564,14 @@ namespace StrideHR.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("EmployeeId");
-
                     b.HasIndex("HRId");
 
                     b.HasIndex("ManagerId");
 
                     b.HasIndex("PerformanceReviewId");
+
+                    b.HasIndex("EmployeeId", "Status")
+                        .HasDatabaseName("IX_PIP_Employee_Status");
 
                     b.ToTable("PerformanceImprovementPlans");
                 });
@@ -7609,9 +7671,10 @@ namespace StrideHR.Infrastructure.Migrations
 
                     b.HasIndex("ApprovedBy");
 
-                    b.HasIndex("EmployeeId");
-
                     b.HasIndex("ManagerId");
+
+                    b.HasIndex("EmployeeId", "ReviewPeriod")
+                        .HasDatabaseName("IX_PerformanceReview_Employee_Period");
 
                     b.ToTable("PerformanceReviews");
                 });
@@ -7753,7 +7816,11 @@ namespace StrideHR.Infrastructure.Migrations
 
                     b.HasIndex("Status");
 
-                    b.HasIndex("StartDate", "EndDate");
+                    b.HasIndex("StartDate", "EndDate")
+                        .HasDatabaseName("IX_Project_DateRange");
+
+                    b.HasIndex("Status", "Priority")
+                        .HasDatabaseName("IX_Project_Status_Priority");
 
                     b.ToTable("Projects", (string)null);
                 });
@@ -7947,6 +8014,9 @@ namespace StrideHR.Infrastructure.Migrations
                     b.HasIndex("IsTeamLead");
 
                     b.HasIndex("ProjectId");
+
+                    b.HasIndex("EmployeeId", "UnassignedDate")
+                        .HasDatabaseName("IX_ProjectAssignment_Employee_Unassigned");
 
                     b.HasIndex("ProjectId", "EmployeeId");
 
@@ -8203,7 +8273,13 @@ namespace StrideHR.Infrastructure.Migrations
 
                     b.HasIndex("Status");
 
+                    b.HasIndex("AssignedToEmployeeId", "Status")
+                        .HasDatabaseName("IX_ProjectTask_Assignee_Status");
+
                     b.HasIndex("ProjectId", "DisplayOrder");
+
+                    b.HasIndex("ProjectId", "Status")
+                        .HasDatabaseName("IX_ProjectTask_Project_Status");
 
                     b.ToTable("ProjectTasks", (string)null);
                 });
@@ -8796,6 +8872,9 @@ namespace StrideHR.Infrastructure.Migrations
 
                     b.HasIndex("PermissionId");
 
+                    b.HasIndex("RoleId", "IsGranted")
+                        .HasDatabaseName("IX_RolePermission_Role_Granted");
+
                     b.HasIndex("RoleId", "PermissionId")
                         .IsUnique();
 
@@ -8951,6 +9030,9 @@ namespace StrideHR.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("ShiftId");
+
+                    b.HasIndex("EmployeeId", "StartDate")
+                        .HasDatabaseName("IX_ShiftAssignment_Employee_StartDate");
 
                     b.HasIndex("EmployeeId", "ShiftId", "StartDate")
                         .IsUnique();
@@ -9181,13 +9263,14 @@ namespace StrideHR.Infrastructure.Migrations
 
                     b.HasIndex("ApprovedByEmployeeId");
 
-                    b.HasIndex("RequesterId");
-
                     b.HasIndex("RequesterShiftAssignmentId");
 
                     b.HasIndex("TargetEmployeeId");
 
                     b.HasIndex("TargetShiftAssignmentId");
+
+                    b.HasIndex("RequesterId", "Status")
+                        .HasDatabaseName("IX_ShiftSwap_Employee_Status");
 
                     b.ToTable("ShiftSwapRequests");
                 });
@@ -10674,8 +10757,14 @@ namespace StrideHR.Infrastructure.Migrations
                     b.HasIndex("EmployeeId")
                         .IsUnique();
 
+                    b.HasIndex("LastLoginAt")
+                        .HasDatabaseName("IX_User_LastLogin");
+
                     b.HasIndex("Username")
                         .IsUnique();
+
+                    b.HasIndex("Email", "IsActive")
+                        .HasDatabaseName("IX_User_Email_Active");
 
                     b.ToTable("Users");
                 });
