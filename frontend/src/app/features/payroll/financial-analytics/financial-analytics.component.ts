@@ -203,7 +203,10 @@ import {
         <div class="col-12">
           <ngb-tabset>
             <!-- Financial Summary Tab -->
-            <ngb-tab id="summary" title="Financial Summary">
+            <ngb-tab id="summary">
+              <ng-template ngbTabTitle>
+                <i class="fas fa-chart-bar me-2"></i>Financial Summary
+              </ng-template>
               <ng-template ngbTabContent>
                 <div *ngIf="financialSummary" class="mt-3">
                   <!-- Summary Cards -->
@@ -323,7 +326,10 @@ import {
             </ngb-tab>
 
             <!-- Cost Analysis Tab -->
-            <ngb-tab id="cost-analysis" title="Cost Analysis">
+            <ngb-tab id="cost-analysis">
+              <ng-template ngbTabTitle>
+                <i class="fas fa-calculator me-2"></i>Cost Analysis
+              </ng-template>
               <ng-template ngbTabContent>
                 <div *ngIf="costAnalysis" class="mt-3">
                   <!-- Cost Breakdown Cards -->
@@ -391,7 +397,10 @@ import {
             </ngb-tab>
 
             <!-- Budget Variance Tab -->
-            <ngb-tab id="budget-variance" title="Budget Variance">
+            <ngb-tab id="budget-variance">
+              <ng-template ngbTabTitle>
+                <i class="fas fa-balance-scale me-2"></i>Budget Variance
+              </ng-template>
               <ng-template ngbTabContent>
                 <div *ngIf="budgetVariance" class="mt-3">
                   <!-- Variance Summary -->
@@ -481,7 +490,10 @@ import {
             </ngb-tab>
 
             <!-- Currency Management Tab -->
-            <ngb-tab id="currency" title="Currency Management">
+            <ngb-tab id="currency">
+              <ng-template ngbTabTitle>
+                <i class="fas fa-exchange-alt me-2"></i>Currency Management
+              </ng-template>
               <ng-template ngbTabContent>
                 <div *ngIf="currencyConversion" class="mt-3">
                   <!-- Currency Overview -->
@@ -576,7 +588,10 @@ import {
             </ngb-tab>
 
             <!-- Monthly Trends Tab -->
-            <ngb-tab id="trends" title="Monthly Trends">
+            <ngb-tab id="trends">
+              <ng-template ngbTabTitle>
+                <i class="fas fa-chart-line me-2"></i>Monthly Trends
+              </ng-template>
               <ng-template ngbTabContent>
                 <div *ngIf="monthlyTrends" class="mt-3">
                   <!-- Trend Analysis Summary -->

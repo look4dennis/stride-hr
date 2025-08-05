@@ -137,7 +137,7 @@ describe('LeaveRequestFormComponent', () => {
     expect(reasonControl?.hasError('minlength')).toBeFalsy();
   });
 
-  it('should calculate leave days when dates change', () => {
+  it('should calculate leave days when dates change', (done) => {
     fixture.detectChanges();
     
     const startDate = { year: 2024, month: 1, day: 15 };
@@ -156,10 +156,11 @@ describe('LeaveRequestFormComponent', () => {
     setTimeout(() => {
       expect(mockLeaveService.calculateLeaveDays).toHaveBeenCalled();
       expect(component.calculatedDays).toBe(3);
+      done();
     }, 400);
   });
 
-  it('should detect conflicts when dates change', () => {
+  it('should detect conflicts when dates change', (done) => {
     fixture.detectChanges();
     
     const conflicts: LeaveConflict[] = [
@@ -189,6 +190,7 @@ describe('LeaveRequestFormComponent', () => {
     setTimeout(() => {
       expect(mockLeaveService.detectLeaveConflicts).toHaveBeenCalled();
       expect(component.conflicts).toEqual(conflicts);
+      done();
     }, 400);
   });
 

@@ -57,7 +57,7 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
                   <div class="d-flex justify-content-between">
                     <div>
                       <h6 class="card-title">Total Projects</h6>
-                      <h3 class="mb-0">{{ dashboard.teamOverview.totalProjects }}</h3>
+                      <h3 class="mb-0">{{ dashboard?.teamOverview?.totalProjects || 0 }}</h3>
                     </div>
                     <i class="fas fa-project-diagram fa-2x opacity-75"></i>
                   </div>
@@ -70,7 +70,7 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
                   <div class="d-flex justify-content-between">
                     <div>
                       <h6 class="card-title">Active Projects</h6>
-                      <h3 class="mb-0">{{ dashboard.teamOverview.activeProjects }}</h3>
+                      <h3 class="mb-0">{{ dashboard?.teamOverview?.activeProjects || 0 }}</h3>
                     </div>
                     <i class="fas fa-play-circle fa-2x opacity-75"></i>
                   </div>
@@ -83,7 +83,7 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
                   <div class="d-flex justify-content-between">
                     <div>
                       <h6 class="card-title">Delayed Projects</h6>
-                      <h3 class="mb-0">{{ dashboard.teamOverview.delayedProjects }}</h3>
+                      <h3 class="mb-0">{{ dashboard?.teamOverview?.delayedProjects || 0 }}</h3>
                     </div>
                     <i class="fas fa-exclamation-triangle fa-2x opacity-75"></i>
                   </div>
@@ -96,7 +96,7 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
                   <div class="d-flex justify-content-between">
                     <div>
                       <h6 class="card-title">Team Members</h6>
-                      <h3 class="mb-0">{{ dashboard.teamOverview.totalTeamMembers }}</h3>
+                      <h3 class="mb-0">{{ dashboard?.teamOverview?.totalTeamMembers || 0 }}</h3>
                     </div>
                     <i class="fas fa-users fa-2x opacity-75"></i>
                   </div>
@@ -107,7 +107,7 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
         </div>
 
         <!-- Critical Alerts -->
-        <div class="col-md-6 mb-4" *ngIf="dashboard.criticalAlerts.length > 0">
+        <div class="col-md-6 mb-4" *ngIf="dashboard?.criticalAlerts && dashboard.criticalAlerts.length > 0">
           <div class="card h-100">
             <div class="card-header bg-danger text-white">
               <h5 class="mb-0">
@@ -133,7 +133,7 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
         </div>
 
         <!-- High Risks -->
-        <div class="col-md-6 mb-4" *ngIf="dashboard.highRisks.length > 0">
+        <div class="col-md-6 mb-4" *ngIf="dashboard?.highRisks && dashboard.highRisks.length > 0">
           <div class="card h-100">
             <div class="card-header bg-warning text-dark">
               <h5 class="mb-0">
@@ -168,7 +168,7 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
               </h5>
             </div>
             <div class="card-body">
-              <div class="row" *ngIf="dashboard.projectAnalytics.length > 0">
+              <div class="row" *ngIf="dashboard?.projectAnalytics && dashboard.projectAnalytics.length > 0">
                 <div class="col-md-6 col-lg-4 mb-3" *ngFor="let project of dashboard.projectAnalytics">
                   <div class="card border-start border-4" 
                        [class.border-success]="project.performance.overallEfficiency >= 80"
@@ -216,7 +216,7 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
                   </div>
                 </div>
               </div>
-              <div *ngIf="dashboard.projectAnalytics.length === 0" class="text-center py-4">
+              <div *ngIf="!dashboard?.projectAnalytics || dashboard.projectAnalytics.length === 0" class="text-center py-4">
                 <i class="fas fa-chart-bar fa-3x text-muted mb-3"></i>
                 <p class="text-muted">No project analytics available</p>
               </div>
@@ -418,9 +418,10 @@ export class ProjectMonitoringComponent implements OnInit, OnDestroy {
 
   private async loadHoursTrackingWithDateRange(startDate: Date, endDate: Date): Promise<void> {
     try {
-      this.hoursReports = await this.projectService.getTeamHoursTracking(startDate, endDate).toPromise() || [];
+      this.hoursReports = await firstValueFrom(this.projectService.getTeamHoursTracking(startDate, endDate)) || [];
     } catch (error: any) {
       console.error('Error loading hours tracking with date range:', error);
+      this.error = 'Failed to load hours tracking data';
     }
   }
 }

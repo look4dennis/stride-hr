@@ -1,7 +1,12 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { provideHttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+
 import { of, throwError } from 'rxjs';
 
 import { FinancialAnalyticsComponent } from './financial-analytics.component';
@@ -211,13 +216,16 @@ describe('FinancialAnalyticsComponent', () => {
     await TestBed.configureTestingModule({
       imports: [
         FinancialAnalyticsComponent,
-        HttpClientTestingModule,
+        NoopAnimationsModule,
         FormsModule,
         NgbModule
       ],
       providers: [
+        provideHttpClient(),
+        provideHttpClientTesting(),
         { provide: FinancialService, useValue: financialServiceSpy }
-      ]
+      ],
+      schemas: [CUSTOM_ELEMENTS_SCHEMA]
     }).compileComponents();
 
     fixture = TestBed.createComponent(FinancialAnalyticsComponent);
@@ -231,6 +239,7 @@ describe('FinancialAnalyticsComponent', () => {
     financialService.getCurrencySymbol.and.returnValue('$');
     financialService.getVarianceStatusClass.and.returnValue('text-success');
     financialService.getTrendIconClass.and.returnValue('fas fa-arrow-up text-success');
+    financialService.exportReport.and.returnValue(undefined);
   });
 
   it('should create', () => {
@@ -258,7 +267,7 @@ describe('FinancialAnalyticsComponent', () => {
   });
 
   it('should handle dashboard data loading error', () => {
-    financialService.getFinancialDashboardData.and.returnValue(throwError('Error'));
+    financialService.getFinancialDashboardData.and.returnValue(throwError(() => 'Error'));
     spyOn(console, 'error');
 
     component.ngOnInit();
@@ -267,7 +276,7 @@ describe('FinancialAnalyticsComponent', () => {
     expect(console.error).toHaveBeenCalledWith('Error loading dashboard data:', 'Error');
   });
 
-  it('should generate all reports when generateReports is called', () => {
+  it('should generate all reports when generateReports is called', async () => {
     // Setup spy returns for all report generation methods
     financialService.generateFinancialSummary.and.returnValue(of(mockFinancialSummary));
     financialService.generatePayrollCostAnalysis.and.returnValue(of(mockCostAnalysis));
@@ -275,17 +284,23 @@ describe('FinancialAnalyticsComponent', () => {
     financialService.generateCurrencyConversion.and.returnValue(of(mockCurrencyConversion));
     financialService.generateMonthlyTrend.and.returnValue(of(mockMonthlyTrends));
 
+    // Don't trigger ngOnInit to avoid template rendering issues
     component.generateReports();
 
     expect(component.loading).toBeTrue();
+    
+    // Wait for async operations to complete
+    await new Promise(resolve => setTimeout(resolve, 100));
+    
     expect(financialService.generateFinancialSummary).toHaveBeenCalled();
     expect(financialService.generatePayrollCostAnalysis).toHaveBeenCalled();
     expect(financialService.generateBudgetVariance).toHaveBeenCalled();
     expect(financialService.generateCurrencyConversion).toHaveBeenCalled();
     expect(financialService.generateMonthlyTrend).toHaveBeenCalled();
+    expect(component.loading).toBeFalse();
   });
 
-  it('should handle report generation success', () => {
+  it('should handle report generation success', async () => {
     financialService.generateFinancialSummary.and.returnValue(of(mockFinancialSummary));
     financialService.generatePayrollCostAnalysis.and.returnValue(of(mockCostAnalysis));
     financialService.generateBudgetVariance.and.returnValue(of(mockBudgetVariance));
@@ -293,6 +308,9 @@ describe('FinancialAnalyticsComponent', () => {
     financialService.generateMonthlyTrend.and.returnValue(of(mockMonthlyTrends));
 
     component.generateReports();
+
+    // Wait for async operations to complete
+    await new Promise(resolve => setTimeout(resolve, 100));
 
     expect(component.financialSummary).toEqual(mockFinancialSummary);
     expect(component.costAnalysis).toEqual(mockCostAnalysis);
@@ -302,8 +320,8 @@ describe('FinancialAnalyticsComponent', () => {
     expect(component.loading).toBeFalse();
   });
 
-  it('should handle report generation error', () => {
-    financialService.generateFinancialSummary.and.returnValue(throwError('Error'));
+  it('should handle report generation error', async () => {
+    financialService.generateFinancialSummary.and.returnValue(throwError(() => 'Error'));
     financialService.generatePayrollCostAnalysis.and.returnValue(of(mockCostAnalysis));
     financialService.generateBudgetVariance.and.returnValue(of(mockBudgetVariance));
     financialService.generateCurrencyConversion.and.returnValue(of(mockCurrencyConversion));
@@ -311,6 +329,9 @@ describe('FinancialAnalyticsComponent', () => {
     spyOn(console, 'error');
 
     component.generateReports();
+
+    // Wait for async operations to complete
+    await new Promise(resolve => setTimeout(resolve, 100));
 
     expect(component.loading).toBeFalse();
     expect(console.error).toHaveBeenCalledWith('Error generating reports:', 'Error');
@@ -416,13 +437,14 @@ describe('FinancialAnalyticsComponent', () => {
   });
 
   it('should cleanup subscriptions on destroy', () => {
-    spyOn(component['destroy$'], 'next');
-    spyOn(component['destroy$'], 'complete');
+    const destroySubject = component['destroy$'];
+    spyOn(destroySubject, 'next');
+    spyOn(destroySubject, 'complete');
 
     component.ngOnDestroy();
 
-    expect(component['destroy$'].next).toHaveBeenCalled();
-    expect(component['destroy$'].complete).toHaveBeenCalled();
+    expect(destroySubject.next).toHaveBeenCalled();
+    expect(destroySubject.complete).toHaveBeenCalled();
   });
 
   it('should display loading state correctly', () => {

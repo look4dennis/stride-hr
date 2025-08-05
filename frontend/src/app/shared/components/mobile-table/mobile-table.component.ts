@@ -374,7 +374,7 @@ export class MobileTableComponent {
     return item.id || item._id || Math.random().toString(36).substr(2, 9);
   }
 
-  trackByFn(index: number, item: any): any {
+  trackByFn = (index: number, item: any): any => {
     return this.getItemId(item);
   }
 }

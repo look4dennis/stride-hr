@@ -2,6 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { ApplicationRef } from '@angular/core';
 import { SwUpdate } from '@angular/service-worker';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { provideZoneChangeDetection } from '@angular/core';
 import { of, Subject } from 'rxjs';
 
 import { PwaService } from './services/pwa.service';
@@ -30,7 +31,8 @@ describe('PWA Functionality Tests', () => {
         PushNotificationService,
         OfflineStorageService,
         { provide: SwUpdate, useValue: swUpdateSpy },
-        { provide: ApplicationRef, useValue: appRefSpy }
+        { provide: ApplicationRef, useValue: appRefSpy },
+        provideZoneChangeDetection({ eventCoalescing: true })
       ]
     });
 

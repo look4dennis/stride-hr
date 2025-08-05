@@ -9,8 +9,8 @@ export class E2ETestHelper<T> extends E2ETestBase<T> {
   /**
    * Initialize the test helper with a component
    */
-  async initialize(componentType: any, additionalImports: any[] = [], additionalProviders: any[] = []): Promise<void> {
-    await this.setupComponent(componentType, additionalImports, additionalProviders);
+  async initialize(componentType: any, additionalImports: any[] = [], additionalProviders: any[] = [], isStandalone: boolean = true): Promise<void> {
+    await this.setupComponent(componentType, additionalImports, additionalProviders, isStandalone);
   }
 
   /**

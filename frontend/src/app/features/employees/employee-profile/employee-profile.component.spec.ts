@@ -1,6 +1,7 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { RouterTestingModule } from '@angular/router/testing';
 import { of, throwError } from 'rxjs';
 import { EmployeeProfileComponent } from './employee-profile.component';
 import { EmployeeService } from '../../../services/employee.service';
@@ -72,11 +73,10 @@ describe('EmployeeProfileComponent', () => {
     };
 
     await TestBed.configureTestingModule({
-      imports: [EmployeeProfileComponent, ReactiveFormsModule],
+      imports: [EmployeeProfileComponent, ReactiveFormsModule, RouterTestingModule],
       providers: [
         { provide: EmployeeService, useValue: employeeServiceSpy },
         { provide: NotificationService, useValue: notificationServiceSpy },
-        { provide: Router, useValue: routerSpy },
         { provide: ActivatedRoute, useValue: mockActivatedRoute }
       ]
     }).compileComponents();
@@ -86,6 +86,7 @@ describe('EmployeeProfileComponent', () => {
     mockEmployeeService = TestBed.inject(EmployeeService) as jasmine.SpyObj<EmployeeService>;
     mockNotificationService = TestBed.inject(NotificationService) as jasmine.SpyObj<NotificationService>;
     mockRouter = TestBed.inject(Router) as jasmine.SpyObj<Router>;
+    spyOn(mockRouter, 'navigate');
 
     // Setup default mock returns
     mockEmployeeService.getEmployeeById.and.returnValue(of(mockEmployee));
@@ -105,17 +106,19 @@ describe('EmployeeProfileComponent', () => {
     expect(component.selectedPhoto).toBeNull();
   });
 
-  it('should load employee and managers on init', () => {
-    component.ngOnInit();
+  it('should load employee and managers on init', fakeAsync(() => {
+    mockEmployeeService.getEmployeeById.and.returnValue(of(mockEmployee));
+    mockEmployeeService.getManagers.and.returnValue(of(mockManagers));
 
-    // Wait for setTimeout to complete
-    setTimeout(() => {
-      expect(component.employee).toEqual(mockEmployee);
-      expect(component.managers).toEqual(mockManagers);
-      expect(component.profileForm).toBeDefined();
-      expect(component.loading).toBe(false);
-    }, 600);
-  });
+    component.ngOnInit();
+    tick(600); // Wait for setTimeout to complete
+    fixture.detectChanges();
+
+    expect(component.employee).toEqual(mockEmployee);
+    expect(component.managers).toEqual(mockManagers);
+    expect(component.profileForm).toBeDefined();
+    expect(component.loading).toBe(false);
+  }));
 
   it('should initialize form with employee data', () => {
     component.employee = mockEmployee;
@@ -156,23 +159,23 @@ describe('EmployeeProfileComponent', () => {
     expect(component.initializeForm).toHaveBeenCalled();
   });
 
-  it('should save changes successfully', () => {
+  it('should save changes successfully', fakeAsync(() => {
     component.employee = mockEmployee;
     component.initializeForm();
     component.editMode = true;
 
     // Mock form valid
     Object.defineProperty(component.profileForm!, 'valid', { value: true });
+    mockEmployeeService.updateEmployee.and.returnValue(of(mockEmployee));
 
     component.saveChanges();
+    tick(600); // Wait for setTimeout to complete
+    fixture.detectChanges();
 
-    // Wait for setTimeout to complete
-    setTimeout(() => {
-      expect(component.editMode).toBe(false);
-      expect(component.selectedPhoto).toBeNull();
-      expect(mockNotificationService.showSuccess).toHaveBeenCalledWith('Employee profile updated successfully');
-    }, 600);
-  });
+    expect(component.editMode).toBe(false);
+    expect(component.selectedPhoto).toBeNull();
+    expect(mockNotificationService.showSuccess).toHaveBeenCalledWith('Employee profile updated successfully');
+  }));
 
   it('should not save changes if form is invalid', () => {
     component.employee = mockEmployee;
@@ -188,7 +191,7 @@ describe('EmployeeProfileComponent', () => {
   });
 
   it('should handle photo selection', () => {
-    component.employee = mockEmployee;
+    component.employee = { ...mockEmployee };
     const mockFile = new File([''], 'test.jpg', { type: 'image/jpeg' });
     const mockEvent = {
       target: {
@@ -212,7 +215,7 @@ describe('EmployeeProfileComponent', () => {
   });
 
   it('should get profile photo with fallback', () => {
-    component.employee = mockEmployee;
+    component.employee = { ...mockEmployee };
     expect(component.getProfilePhoto()).toBe('/assets/images/avatars/john-doe.jpg');
 
     component.employee = { ...mockEmployee, profilePhoto: undefined };
@@ -275,17 +278,16 @@ describe('EmployeeProfileComponent', () => {
     expect(mockInput.click).toHaveBeenCalled();
   });
 
-  it('should handle load employee error', () => {
+  it('should handle load employee error', fakeAsync(() => {
     mockEmployeeService.getEmployeeById.and.returnValue(throwError('Error'));
     
     component.loadEmployee(1);
+    tick(600); // Wait for setTimeout to complete
+    fixture.detectChanges();
 
-    // Wait for setTimeout to complete
-    setTimeout(() => {
-      expect(component.loading).toBe(false);
-      expect(mockNotificationService.showError).toHaveBeenCalledWith('Failed to load employee profile');
-    }, 600);
-  });
+    expect(component.loading).toBe(false);
+    expect(mockNotificationService.showError).toHaveBeenCalledWith('Failed to load employee profile');
+  }));
 
   it('should create update DTO correctly', () => {
     component.employee = mockEmployee;

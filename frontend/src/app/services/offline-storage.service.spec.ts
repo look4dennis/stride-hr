@@ -73,7 +73,7 @@ describe('OfflineStorageService', () => {
     expect(service.isCached('test-key')).toBe(true);
   });
 
-  it('should return null for expired cache', () => {
+  it('should return null for expired cache', (done) => {
     const testData = { name: 'John Doe', id: 1 };
     
     // Cache with 0 minutes expiry (immediately expired)
@@ -84,6 +84,7 @@ describe('OfflineStorageService', () => {
       const cachedData = service.getCachedData('test-key');
       expect(cachedData).toBeNull();
       expect(service.isCached('test-key')).toBe(false);
+      done();
     }, 10);
   });
 
@@ -150,7 +151,7 @@ describe('OfflineStorageService', () => {
     expect(cachedStatus).toEqual(status);
   });
 
-  it('should clear expired cache items', () => {
+  it('should clear expired cache items', (done) => {
     // Cache item with 0 minutes expiry (immediately expired)
     service.cacheData('expired-key', { data: 'test' }, 0);
     service.cacheData('valid-key', { data: 'test' }, 60);
@@ -160,6 +161,7 @@ describe('OfflineStorageService', () => {
       
       expect(service.isCached('expired-key')).toBe(false);
       expect(service.isCached('valid-key')).toBe(true);
+      done();
     }, 10);
   });
 

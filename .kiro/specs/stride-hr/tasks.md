@@ -529,6 +529,9 @@ Convert the feature design into a series of prompts for a code-generation LLM th
   - [x] 24.3 Test remediation and codebase alignment
 
 
+
+
+
     - Examine actual backend implementation to understand real API interfaces and service signatures
     - Fix 122 backend compilation errors by aligning tests with actual implementation
     - Correct entity model assumptions in tests (missing properties, wrong enum values, incorrect relationships)

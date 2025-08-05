@@ -360,72 +360,24 @@ export class EmployeeProfileComponent implements OnInit {
   loadEmployee(id: number): void {
     this.loading = true;
     
-    // Mock data for development
-    const mockEmployee: Employee = {
-      id: id,
-      employeeId: 'EMP001',
-      branchId: 1,
-      firstName: 'John',
-      lastName: 'Doe',
-      email: 'john.doe@company.com',
-      phone: '+1-555-0101',
-      profilePhoto: '/assets/images/avatars/john-doe.jpg',
-      dateOfBirth: '1990-05-15',
-      joiningDate: '2020-01-15',
-      designation: 'Senior Developer',
-      department: 'Development',
-      basicSalary: 75000,
-      status: 'Active' as any,
-      reportingManagerId: 2,
-      createdAt: '2020-01-15T00:00:00Z'
-    };
-
-    setTimeout(() => {
-      this.employee = mockEmployee;
-      this.initializeForm();
-      this.loading = false;
-    }, 500);
-
-    // Uncomment for production
-    // this.employeeService.getEmployeeById(id).subscribe({
-    //   next: (employee) => {
-    //     this.employee = employee;
-    //     this.initializeForm();
-    //     this.loading = false;
-    //   },
-    //   error: (error) => {
-    //     this.notificationService.showError('Failed to load employee profile');
-    //     this.loading = false;
-    //   }
-    // });
+    this.employeeService.getEmployeeById(id).subscribe({
+      next: (employee) => {
+        this.employee = employee;
+        this.initializeForm();
+        this.loading = false;
+      },
+      error: (error) => {
+        this.notificationService.showError('Failed to load employee profile');
+        this.loading = false;
+      }
+    });
   }
 
   loadManagers(): void {
-    // Mock managers for development
-    this.managers = [
-      {
-        id: 2,
-        employeeId: 'EMP002',
-        branchId: 1,
-        firstName: 'Jane',
-        lastName: 'Smith',
-        email: 'jane.smith@company.com',
-        phone: '+1-555-0102',
-        dateOfBirth: '1985-08-22',
-        joiningDate: '2018-03-10',
-        designation: 'Development Manager',
-        department: 'Development',
-        basicSalary: 95000,
-        status: 'Active' as any,
-        createdAt: '2018-03-10T00:00:00Z'
-      }
-    ];
-
-    // Uncomment for production
-    // this.employeeService.getManagers().subscribe({
-    //   next: (managers) => this.managers = managers,
-    //   error: (error) => console.error('Failed to load managers', error)
-    // });
+    this.employeeService.getManagers().subscribe({
+      next: (managers) => this.managers = managers,
+      error: (error) => console.error('Failed to load managers', error)
+    });
   }
 
   initializeForm(): void {
@@ -473,26 +425,17 @@ export class EmployeeProfileComponent implements OnInit {
       profilePhoto: this.selectedPhoto || undefined
     };
 
-    // Mock update for development
-    setTimeout(() => {
-      Object.assign(this.employee!, formValue);
-      this.editMode = false;
-      this.selectedPhoto = null;
-      this.notificationService.showSuccess('Employee profile updated successfully');
-    }, 500);
-
-    // Uncomment for production
-    // this.employeeService.updateEmployee(this.employee.id, updateDto).subscribe({
-    //   next: (updatedEmployee) => {
-    //     this.employee = updatedEmployee;
-    //     this.editMode = false;
-    //     this.selectedPhoto = null;
-    //     this.notificationService.showSuccess('Employee profile updated successfully');
-    //   },
-    //   error: (error) => {
-    //     this.notificationService.showError('Failed to update employee profile');
-    //   }
-    // });
+    this.employeeService.updateEmployee(this.employee.id, updateDto).subscribe({
+      next: (updatedEmployee) => {
+        this.employee = updatedEmployee;
+        this.editMode = false;
+        this.selectedPhoto = null;
+        this.notificationService.showSuccess('Employee profile updated successfully');
+      },
+      error: (error) => {
+        this.notificationService.showError('Failed to update employee profile');
+      }
+    });
   }
 
   triggerPhotoUpload(): void {

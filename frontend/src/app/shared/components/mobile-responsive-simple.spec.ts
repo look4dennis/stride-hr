@@ -4,6 +4,8 @@ import { TouchButtonComponent } from './touch-button/touch-button.component';
 import { ResponsiveService } from '../../core/services/responsive.service';
 
 @Component({
+    standalone: true,
+    imports: [TouchButtonComponent],
     template: `
     <app-touch-button 
       [variant]="'primary'"
@@ -27,8 +29,7 @@ describe('Mobile Responsive Implementation', () => {
 
         beforeEach(async () => {
             await TestBed.configureTestingModule({
-                imports: [TouchButtonComponent],
-                declarations: [TestTouchButtonComponent]
+                imports: [TouchButtonComponent, TestTouchButtonComponent]
             }).compileComponents();
 
             fixture = TestBed.createComponent(TestTouchButtonComponent);
@@ -72,6 +73,21 @@ describe('Mobile Responsive Implementation', () => {
         let service: ResponsiveService;
 
         beforeEach(() => {
+            // Mock window object for testing
+            Object.defineProperty(window, 'matchMedia', {
+                writable: true,
+                value: jasmine.createSpy('matchMedia').and.returnValue({
+                    matches: false,
+                    media: '',
+                    onchange: null,
+                    addListener: jasmine.createSpy('addListener'),
+                    removeListener: jasmine.createSpy('removeListener'),
+                    addEventListener: jasmine.createSpy('addEventListener'),
+                    removeEventListener: jasmine.createSpy('removeEventListener'),
+                    dispatchEvent: jasmine.createSpy('dispatchEvent')
+                })
+            });
+
             TestBed.configureTestingModule({});
             service = TestBed.inject(ResponsiveService);
         });
@@ -80,7 +96,7 @@ describe('Mobile Responsive Implementation', () => {
             expect(service).toBeTruthy();
         });
 
-        it('should detect mobile viewport', () => {
+        it('should detect mobile viewport', (done) => {
             // Mock mobile viewport
             Object.defineProperty(window, 'innerWidth', {
                 writable: true,
@@ -88,11 +104,18 @@ describe('Mobile Responsive Implementation', () => {
                 value: 375,
             });
 
-            const state = service.getCurrentState();
-            expect(state.isMobile).toBeTruthy();
+            // Trigger resize event to update service state
+            window.dispatchEvent(new Event('resize'));
+            
+            // Wait for debounced update
+            setTimeout(() => {
+                const state = service.getCurrentState();
+                expect(state.isMobile).toBeTruthy();
+                done();
+            }, 150);
         });
 
-        it('should detect desktop viewport', () => {
+        it('should detect desktop viewport', (done) => {
             // Mock desktop viewport
             Object.defineProperty(window, 'innerWidth', {
                 writable: true,
@@ -100,13 +123,34 @@ describe('Mobile Responsive Implementation', () => {
                 value: 1200,
             });
 
-            const state = service.getCurrentState();
-            expect(state.isDesktop).toBeTruthy();
+            // Trigger resize event to update service state
+            window.dispatchEvent(new Event('resize'));
+            
+            // Wait for debounced update
+            setTimeout(() => {
+                const state = service.getCurrentState();
+                expect(state.isDesktop).toBeTruthy();
+                done();
+            }, 150);
         });
 
-        it('should provide responsive classes', () => {
-            const classes = service.getResponsiveClasses();
-            expect(classes).toContain('is-desktop');
+        it('should provide responsive classes', (done) => {
+            // Mock desktop viewport
+            Object.defineProperty(window, 'innerWidth', {
+                writable: true,
+                configurable: true,
+                value: 1200,
+            });
+
+            // Trigger resize event to update service state
+            window.dispatchEvent(new Event('resize'));
+            
+            // Wait for debounced update
+            setTimeout(() => {
+                const classes = service.getResponsiveClasses();
+                expect(classes).toContain('is-desktop');
+                done();
+            }, 150);
         });
     });
 

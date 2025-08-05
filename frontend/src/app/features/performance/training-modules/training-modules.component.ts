@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, TemplateRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -552,6 +552,6 @@ export class TrainingModulesComponent implements OnInit {
     return Math.round((stats.completed / stats.total) * 100);
   }
 
-  moduleModal: any;
-  enrollModalRef: any;
+  @ViewChild('moduleModal') moduleModal!: TemplateRef<any>;
+  @ViewChild('enrollModal') enrollModalRef!: TemplateRef<any>;
 }

@@ -1,5 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
+import { filter } from 'rxjs/operators';
 
 import { ProjectService } from './project.service';
 import { 
@@ -374,7 +375,9 @@ describe('ProjectService', () => {
     it('should notify kanban updates', () => {
       const updateData = { type: 'task_moved', taskId: 1 };
       
-      service.kanbanUpdate$.subscribe(update => {
+      service.kanbanUpdate$.pipe(
+        filter(update => update !== null)
+      ).subscribe(update => {
         expect(update).toEqual(updateData);
       });
 

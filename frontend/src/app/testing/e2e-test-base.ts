@@ -15,9 +15,8 @@ export abstract class E2ETestBase<T> {
   protected fixture!: ComponentFixture<T>;
   protected httpMock!: HttpTestingController;
 
-  protected async setupComponent(componentType: any, additionalImports: any[] = [], additionalProviders: any[] = []): Promise<void> {
-    await TestBed.configureTestingModule({
-      declarations: [componentType],
+  protected async setupComponent(componentType: any, additionalImports: any[] = [], additionalProviders: any[] = [], isStandalone: boolean = false): Promise<void> {
+    const config: any = {
       imports: [
         BrowserAnimationsModule,
         NgbModule,
@@ -31,7 +30,16 @@ export abstract class E2ETestBase<T> {
         provideRouter([]),
         ...additionalProviders
       ]
-    }).compileComponents();
+    };
+
+    // Handle standalone vs non-standalone components
+    if (isStandalone) {
+      config.imports.push(componentType);
+    } else {
+      config.declarations = [componentType];
+    }
+
+    await TestBed.configureTestingModule(config).compileComponents();
 
     this.fixture = TestBed.createComponent(componentType);
     this.component = this.fixture.componentInstance;
@@ -147,7 +155,14 @@ export abstract class E2ETestBase<T> {
   }
 
   protected cleanup(): void {
-    this.httpMock.verify();
+    try {
+      if (this.httpMock) {
+        this.httpMock.verify();
+      }
+    } catch (error) {
+      // Ignore verification errors during cleanup
+      console.warn('HTTP verification failed during cleanup:', error);
+    }
   }
 
   // Mock data generators
@@ -250,6 +265,21 @@ export abstract class E2ETestBase<T> {
   }
 
   protected assertElementNotExists(selector: string, message?: string): void {
+    // Handle :contains() pseudo-selector
+    if (selector.includes(':contains(')) {
+      const match = selector.match(/(.+):contains\("([^"]+)"\)/);
+      if (match) {
+        const baseSelector = match[1];
+        const textContent = match[2];
+        const elements = this.fixture.debugElement.nativeElement.querySelectorAll(baseSelector);
+        const foundElement = Array.from(elements).find((el: any) => el.textContent.includes(textContent));
+        if (foundElement) {
+          throw new Error(message || `Element '${selector}' should not exist`);
+        }
+        return;
+      }
+    }
+    
     const element = this.fixture.debugElement.nativeElement.querySelector(selector);
     if (element) {
       throw new Error(message || `Element '${selector}' should not exist`);

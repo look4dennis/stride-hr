@@ -94,6 +94,11 @@ describe('TrainingModulesComponent', () => {
     const employeeServiceSpy = jasmine.createSpyObj('EmployeeService', ['getEmployees']);
     const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
     const modalServiceSpy = jasmine.createSpyObj('NgbModal', ['open']);
+    modalServiceSpy.open.and.returnValue({
+      result: Promise.resolve(),
+      close: jasmine.createSpy('close'),
+      dismiss: jasmine.createSpy('dismiss')
+    });
 
     await TestBed.configureTestingModule({
       imports: [TrainingModulesComponent, ReactiveFormsModule],
@@ -177,27 +182,57 @@ describe('TrainingModulesComponent', () => {
   });
 
   it('should open create module modal', () => {
-    const mockModalRef = { close: jasmine.createSpy(), dismiss: jasmine.createSpy() };
+    const mockModalRef = { 
+      close: jasmine.createSpy(), 
+      dismiss: jasmine.createSpy(),
+      result: Promise.resolve()
+    };
     mockModalService.open.and.returnValue(mockModalRef as any);
+    
+    // Initialize component and ViewChild
+    component.ngOnInit();
+    fixture.detectChanges();
+
+    // Create a proper mock template reference
+    const mockTemplateRef = {
+      createEmbeddedView: jasmine.createSpy('createEmbeddedView'),
+      elementRef: { nativeElement: document.createElement('div') }
+    };
+    component.moduleModal = mockTemplateRef as any;
 
     component.openCreateModuleModal();
 
     expect(component.isEditMode).toBeFalse();
     expect(component.currentModule).toBeNull();
-    expect(mockModalService.open).toHaveBeenCalled();
+    expect(mockModalService.open).toHaveBeenCalledWith(mockTemplateRef, { size: 'lg' });
   });
 
   it('should edit module', () => {
     const module = mockModules[0];
-    const mockModalRef = { close: jasmine.createSpy(), dismiss: jasmine.createSpy() };
+    const mockModalRef = { 
+      close: jasmine.createSpy(), 
+      dismiss: jasmine.createSpy(),
+      result: Promise.resolve()
+    };
     mockModalService.open.and.returnValue(mockModalRef as any);
+    
+    // Initialize component and ViewChild
+    component.ngOnInit();
+    fixture.detectChanges();
+
+    // Create a proper mock template reference
+    const mockTemplateRef = {
+      createEmbeddedView: jasmine.createSpy('createEmbeddedView'),
+      elementRef: { nativeElement: document.createElement('div') }
+    };
+    component.moduleModal = mockTemplateRef as any;
 
     component.editModule(module);
 
     expect(component.isEditMode).toBeTrue();
     expect(component.currentModule).toEqual(module);
     expect(component.moduleForm.get('title')?.value).toBe(module.title);
-    expect(mockModalService.open).toHaveBeenCalled();
+    expect(mockModalService.open).toHaveBeenCalledWith(mockTemplateRef, { size: 'lg' });
   });
 
   it('should save new module', () => {
@@ -286,6 +321,7 @@ describe('TrainingModulesComponent', () => {
   });
 
   it('should calculate enrollment stats correctly', () => {
+    component.enrollments = mockEnrollments; // Ensure enrollments are set
     const stats = component.getEnrollmentStats(1);
     
     expect(stats.total).toBe(2);
@@ -294,6 +330,7 @@ describe('TrainingModulesComponent', () => {
   });
 
   it('should calculate completion rate correctly', () => {
+    component.enrollments = mockEnrollments; // Ensure enrollments are set
     const completionRate = component.getCompletionRate(1);
     expect(completionRate).toBe(50); // 1 completed out of 2 total
   });

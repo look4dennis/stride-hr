@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { of, throwError } from 'rxjs';
 
@@ -86,6 +86,16 @@ describe('PerformanceReviewComponent', () => {
         const employeeServiceSpy = jasmine.createSpyObj('EmployeeService', ['getEmployees']);
         const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
         const modalServiceSpy = jasmine.createSpyObj('NgbModal', ['open']);
+        modalServiceSpy.open.and.returnValue({
+            result: Promise.resolve(),
+            close: jasmine.createSpy('close'),
+            dismiss: jasmine.createSpy('dismiss')
+        });
+        const activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
+            params: of({}),
+            queryParams: of({}),
+            snapshot: { params: {}, queryParams: {} }
+        });
 
         await TestBed.configureTestingModule({
             imports: [PerformanceReviewComponent, ReactiveFormsModule],
@@ -93,7 +103,8 @@ describe('PerformanceReviewComponent', () => {
                 { provide: PerformanceService, useValue: performanceServiceSpy },
                 { provide: EmployeeService, useValue: employeeServiceSpy },
                 { provide: Router, useValue: routerSpy },
-                { provide: NgbModal, useValue: modalServiceSpy }
+                { provide: NgbModal, useValue: modalServiceSpy },
+                { provide: ActivatedRoute, useValue: activatedRouteSpy }
             ]
         }).compileComponents();
 
@@ -166,14 +177,29 @@ describe('PerformanceReviewComponent', () => {
     });
 
     it('should open create modal', () => {
-        const mockModalRef = { close: jasmine.createSpy(), dismiss: jasmine.createSpy() };
+        const mockModalRef = { 
+            close: jasmine.createSpy(), 
+            dismiss: jasmine.createSpy(),
+            result: Promise.resolve()
+        };
         mockModalService.open.and.returnValue(mockModalRef as any);
+
+        // Initialize component and ViewChild
+        component.ngOnInit();
+        fixture.detectChanges();
+
+        // Create a proper mock template reference
+        const mockTemplateRef = {
+            createEmbeddedView: jasmine.createSpy('createEmbeddedView'),
+            elementRef: { nativeElement: document.createElement('div') }
+        };
+        component.reviewModal = mockTemplateRef as any;
 
         component.openCreateModal();
 
         expect(component.isEditMode).toBeFalse();
         expect(component.currentReview).toBeNull();
-        expect(mockModalService.open).toHaveBeenCalled();
+        expect(mockModalService.open).toHaveBeenCalledWith(mockTemplateRef, { size: 'lg' });
     });
 
     it('should populate form for editing', () => {
@@ -192,12 +218,24 @@ describe('PerformanceReviewComponent', () => {
 
         mockPerformanceService.createPerformanceReview.and.returnValue(of(newReview));
 
+        // Ensure form has valid goals array
         component.reviewForm.patchValue({
             employeeId: 1,
             reviewPeriod: 'Q2 2024',
             startDate: '2024-04-01',
             endDate: '2024-06-30'
         });
+
+        // Ensure goals array has valid data
+        const goalsArray = component.reviewForm.get('goals') as any;
+        if (goalsArray && goalsArray.controls && goalsArray.controls.length > 0) {
+            goalsArray.controls[0].patchValue({
+                title: 'Test Goal',
+                description: 'Test Description',
+                targetValue: 'Test Target',
+                weight: 25
+            });
+        }
 
         component.saveReview(mockModalRef);
 

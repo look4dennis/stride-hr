@@ -24,9 +24,11 @@ describe('SidebarComponent', () => {
 
   beforeEach(async () => {
     const authServiceSpy = jasmine.createSpyObj('AuthService', [], {
-      currentUser: mockUser
+      currentUser$: of(mockUser)
     });
-    const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
+    const routerSpy = jasmine.createSpyObj('Router', ['navigate'], {
+      url: '/dashboard'
+    });
 
     await TestBed.configureTestingModule({
       imports: [SidebarComponent],

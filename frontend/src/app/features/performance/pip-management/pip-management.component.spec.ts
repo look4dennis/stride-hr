@@ -96,6 +96,11 @@ describe('PIPManagementComponent', () => {
     const employeeServiceSpy = jasmine.createSpyObj('EmployeeService', ['getEmployees']);
     const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
     const modalServiceSpy = jasmine.createSpyObj('NgbModal', ['open']);
+    modalServiceSpy.open.and.returnValue({
+      result: Promise.resolve(),
+      close: jasmine.createSpy('close'),
+      dismiss: jasmine.createSpy('dismiss')
+    });
 
     await TestBed.configureTestingModule({
       imports: [PIPManagementComponent, ReactiveFormsModule],
@@ -118,6 +123,7 @@ describe('PIPManagementComponent', () => {
   beforeEach(() => {
     mockEmployeeService.getEmployees.and.returnValue(of({ items: mockEmployees, totalCount: 1, page: 1, pageSize: 10, totalPages: 1 }));
     mockPerformanceService.getPIPs.and.returnValue(of(mockPIPs));
+    mockModalService.open.and.returnValue({ close: jasmine.createSpy(), dismiss: jasmine.createSpy() } as any);
   });
 
   it('should create', () => {
@@ -187,6 +193,14 @@ describe('PIPManagementComponent', () => {
   it('should open create modal', () => {
     const mockModalRef = { close: jasmine.createSpy(), dismiss: jasmine.createSpy() };
     mockModalService.open.and.returnValue(mockModalRef as any);
+    
+    // Initialize component and ensure ViewChild is available
+    component.ngOnInit();
+    fixture.detectChanges();
+
+    // Mock the template reference to avoid NG0906 error
+    const mockTemplateRef = jasmine.createSpyObj('TemplateRef', ['createEmbeddedView']);
+    component.pipModal = mockTemplateRef;
 
     component.openCreateModal();
 
@@ -210,20 +224,31 @@ describe('PIPManagementComponent', () => {
     const newPIP = { ...mockPIPs[0], id: 2 };
     
     mockPerformanceService.createPIP.and.returnValue(of(newPIP));
+    spyOn(component, 'loadPIPs');
     
+    // Initialize component and form
+    component.ngOnInit();
+    fixture.detectChanges();
+    component.isEditMode = false;
+    
+    // Set up a valid form
     component.pipForm.patchValue({
       employeeId: 1,
       title: 'New PIP',
       description: 'New PIP description',
       startDate: '2024-01-01',
       endDate: '2024-06-30',
-      supportResources: 'Resources'
+      supportResources: 'Resources',
+      improvementAreas: [],
+      milestones: []
     });
 
     component.savePIP(mockModalRef);
 
     expect(mockPerformanceService.createPIP).toHaveBeenCalled();
+    expect(component.loadPIPs).toHaveBeenCalled();
     expect(mockModalRef.close).toHaveBeenCalled();
+    expect(component.loading).toBeFalse();
   });
 
   it('should handle save PIP error', () => {
@@ -231,6 +256,7 @@ describe('PIPManagementComponent', () => {
     const consoleSpy = spyOn(console, 'error');
     
     mockPerformanceService.createPIP.and.returnValue(throwError('Error'));
+    fixture.detectChanges(); // Ensure component is initialized
     
     component.pipForm.patchValue({
       employeeId: 1,

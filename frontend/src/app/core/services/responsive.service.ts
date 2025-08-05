@@ -34,9 +34,11 @@ export class ResponsiveService {
     tablet: 992,
     desktop: 1200,
     largeDesktop: 1400
-  };
+  } as const;
 
   constructor() {
+    // Initialize with current breakpoint to ensure the subject has a value
+    this.breakpointSubject.next(this.getCurrentBreakpoint());
     this.initializeResponsiveListener();
   }
 
@@ -80,6 +82,20 @@ export class ResponsiveService {
         isLargeDesktop: false,
         screenWidth: 1200,
         screenHeight: 800,
+        orientation: 'landscape',
+        isTouch: false
+      };
+    }
+
+    // Ensure BREAKPOINTS is defined
+    if (!this.BREAKPOINTS) {
+      return {
+        isMobile: false,
+        isTablet: false,
+        isDesktop: true,
+        isLargeDesktop: false,
+        screenWidth: window.innerWidth || 1200,
+        screenHeight: window.innerHeight || 800,
         orientation: 'landscape',
         isTouch: false
       };

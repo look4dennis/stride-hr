@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, TemplateRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -593,5 +593,5 @@ export class PIPManagementComponent implements OnInit {
     return milestones.filter(m => m.status === MilestoneStatus.Overdue).length;
   }
 
-  pipModal: any;
+  @ViewChild('pipModal') pipModal!: TemplateRef<any>;
 }

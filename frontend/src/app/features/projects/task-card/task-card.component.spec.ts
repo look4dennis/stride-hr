@@ -100,7 +100,7 @@ describe('TaskCardComponent', () => {
 
   it('should display hours information', () => {
     fixture.detectChanges();
-    const hoursInfo = fixture.nativeElement.querySelector('.text-muted');
+    const hoursInfo = fixture.nativeElement.querySelector('small.text-muted');
     expect(hoursInfo.textContent).toContain('4h / 8h');
   });
 
@@ -144,7 +144,7 @@ describe('TaskCardComponent', () => {
     component.task = unassignedTask;
     fixture.detectChanges();
 
-    const unassignedText = fixture.nativeElement.querySelector('.text-muted');
+    const unassignedText = fixture.nativeElement.querySelector('span.text-muted.small');
     expect(unassignedText.textContent).toContain('Unassigned');
   });
 

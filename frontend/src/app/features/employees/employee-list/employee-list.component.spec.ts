@@ -109,7 +109,7 @@ describe('EmployeeListComponent', () => {
     expect(component.searchForm).toBeDefined();
   });
 
-  it('should load employees on init', () => {
+  it('should load employees on init', (done) => {
     component.ngOnInit();
     
     expect(component.loading).toBe(true);
@@ -119,6 +119,7 @@ describe('EmployeeListComponent', () => {
       expect(component.employees).toEqual(mockEmployees);
       expect(component.pagedResult).toEqual(mockPagedResult);
       expect(component.loading).toBe(false);
+      done();
     }, 600);
   });
 
@@ -280,8 +281,16 @@ describe('EmployeeListComponent', () => {
   });
 
   it('should navigate to correct page', () => {
-    component.pagedResult = mockPagedResult;
+    // Set up pagedResult with multiple pages
+    component.pagedResult = {
+      ...mockPagedResult,
+      totalPages: 3,
+      totalCount: 30
+    };
     spyOn(component, 'loadEmployees');
+    
+    // Ensure form is properly initialized
+    fixture.detectChanges();
 
     component.goToPage(2);
 

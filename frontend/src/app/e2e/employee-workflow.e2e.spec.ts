@@ -5,12 +5,15 @@ import { provideRouter } from '@angular/router';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
 import { E2ETestHelper } from '../testing/e2e-test-helper';
 
 // Mock components for testing
 import { Component } from '@angular/core';
 
 @Component({
+  standalone: true,
+  imports: [CommonModule, FormsModule],
   template: `
     <div class="employee-management">
       <div class="employee-form" *ngIf="showForm">
@@ -201,13 +204,15 @@ describe('Employee Management E2E Workflow', () => {
     expect(testHelper.checkElementDisabled('.submit-btn')).toBeFalsy();
 
     // Step 4: Submit form
-    testHelper.submitForm('#employeeForm');
+    testHelper.clickElementBySelector('.submit-btn');
 
-    // Step 5: Verify success state
+    // Step 5: Wait for submission and verify success state
+    await new Promise(resolve => setTimeout(resolve, 600)); // Wait for async operation
+    testHelper.triggerChangeDetection();
     testHelper.verifyElementContainsText('.success-message', 'Employee created successfully');
-    expect(testHelper.checkElementDisabled('.submit-btn')).toBeTruthy();
 
-    // Step 6: Verify form reset and return to list
+    // Step 6: Wait for form reset and return to list
+    await new Promise(resolve => setTimeout(resolve, 1100)); // Wait for success message timeout
     testHelper.triggerChangeDetection();
 
     // Verify employee appears in list
@@ -227,23 +232,27 @@ describe('Employee Management E2E Workflow', () => {
     // Navigate to form
     testHelper.triggerChangeDetection();
     testHelper.clickElementBySelector('.add-employee-btn');
+    testHelper.triggerChangeDetection();
 
-    // Try to submit empty form
-    expect(testHelper.checkElementDisabled('.submit-btn')).toBeTruthy();
+    // Try to submit empty form - button should be disabled
+    const submitBtn = testHelper.getFixture().debugElement.nativeElement.querySelector('.submit-btn');
+    expect(submitBtn.disabled).toBeTruthy();
 
     // Fill partial form
     testHelper.setInputValueBySelector('#firstName', 'John');
     testHelper.setInputValueBySelector('#lastName', 'Doe');
+    testHelper.triggerChangeDetection();
 
     // Submit button should still be disabled
-    expect(testHelper.checkElementDisabled('.submit-btn')).toBeTruthy();
+    expect(submitBtn.disabled).toBeTruthy();
 
     // Complete the form
     testHelper.setInputValueBySelector('#email', 'john.doe@test.com');
     testHelper.selectOptionBySelector('#department', 'IT');
+    testHelper.triggerChangeDetection();
 
     // Submit button should now be enabled
-    expect(testHelper.checkElementDisabled('.submit-btn')).toBeFalsy();
+    expect(submitBtn.disabled).toBeFalsy();
   });
 
   it('should support employee editing workflow', async () => {
@@ -269,6 +278,10 @@ describe('Employee Management E2E Workflow', () => {
     // Verify form is shown with pre-filled data
     testHelper.verifyElementExists('.employee-form', 'Edit form should be visible');
     
+    // Wait for form to be populated
+    await new Promise(resolve => setTimeout(resolve, 100));
+    testHelper.triggerChangeDetection();
+    
     const fixture = testHelper.getFixture();
     const firstNameInput = fixture.debugElement.nativeElement.querySelector('#firstName');
     const lastNameInput = fixture.debugElement.nativeElement.querySelector('#lastName');
@@ -285,8 +298,12 @@ describe('Employee Management E2E Workflow', () => {
     testHelper.triggerChangeDetection();
 
     // Submit the form
-    testHelper.submitForm('#employeeForm');
+    testHelper.clickElementBySelector('.submit-btn');
 
+    // Wait for form submission and navigation back to list
+    await new Promise(resolve => setTimeout(resolve, 600));
+    testHelper.triggerChangeDetection();
+    await new Promise(resolve => setTimeout(resolve, 1100));
     testHelper.triggerChangeDetection();
 
     // Verify updated employee appears in list

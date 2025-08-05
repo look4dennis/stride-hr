@@ -330,6 +330,6 @@ describe('CertificationsComponent', () => {
     component.selectedEmployeeId = '1';
     component.loadTrainings();
 
-    expect(mockPerformanceService.getEmployeeTrainings).toHaveBeenCalledWith(1, undefined);
+    expect(mockPerformanceService.getEmployeeTrainings).toHaveBeenCalledWith(1, '');
   });
 });

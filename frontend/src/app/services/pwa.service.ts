@@ -52,25 +52,41 @@ export class PwaService {
       return;
     }
 
-    // Check for updates when app becomes stable
-    const appIsStable$ = this.appRef.isStable.pipe(
-      first(isStable => isStable === true)
-    );
-    const everySixHours$ = interval(6 * 60 * 60 * 1000);
-    const everySixHoursOnceAppIsStable$ = concat(appIsStable$, everySixHours$);
+    try {
+      // Check for updates when app becomes stable
+      const appIsStable$ = this.appRef.isStable.pipe(
+        first(isStable => isStable === true)
+      );
+      const everySixHours$ = interval(6 * 60 * 60 * 1000);
+      const everySixHoursOnceAppIsStable$ = concat(appIsStable$, everySixHours$);
 
-    everySixHoursOnceAppIsStable$.subscribe(() => {
-      this.swUpdate.checkForUpdate();
-    });
-
-    // Handle version updates
-    this.swUpdate.versionUpdates
-      .pipe(
-        filter((evt): evt is VersionReadyEvent => evt.type === 'VERSION_READY')
-      )
-      .subscribe(() => {
-        this.updateAvailableSubject.next(true);
+      everySixHoursOnceAppIsStable$.subscribe({
+        next: () => {
+          this.swUpdate.checkForUpdate().catch(error => {
+            console.warn('Error checking for updates:', error);
+          });
+        },
+        error: (error) => {
+          console.error('Error in update checking subscription:', error);
+        }
       });
+
+      // Handle version updates
+      this.swUpdate.versionUpdates
+        .pipe(
+          filter((evt): evt is VersionReadyEvent => evt.type === 'VERSION_READY')
+        )
+        .subscribe({
+          next: () => {
+            this.updateAvailableSubject.next(true);
+          },
+          error: (error) => {
+            console.error('Error handling version updates:', error);
+          }
+        });
+    } catch (error) {
+      console.error('Error initializing service worker updates:', error);
+    }
   }
 
   /**

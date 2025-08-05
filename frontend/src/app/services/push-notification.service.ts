@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, BehaviorSubject } from 'rxjs';
+import { Observable, BehaviorSubject, firstValueFrom } from 'rxjs';
 import { environment } from '../../environments/environment';
 
 export interface NotificationPayload {
@@ -186,7 +186,7 @@ export class PushNotificationService {
     };
 
     try {
-      await this.http.post(`${this.API_URL}/notifications/subscribe`, subscriptionData).toPromise();
+      await firstValueFrom(this.http.post(`${this.API_URL}/notifications/subscribe`, subscriptionData));
       console.log('Push subscription sent to server');
     } catch (error) {
       console.error('Error sending subscription to server:', error);
@@ -198,9 +198,9 @@ export class PushNotificationService {
    */
   private async removeSubscriptionFromServer(subscription: PushSubscription): Promise<void> {
     try {
-      await this.http.post(`${this.API_URL}/notifications/unsubscribe`, {
+      await firstValueFrom(this.http.post(`${this.API_URL}/notifications/unsubscribe`, {
         endpoint: subscription.endpoint
-      }).toPromise();
+      }));
       console.log('Push subscription removed from server');
     } catch (error) {
       console.error('Error removing subscription from server:', error);

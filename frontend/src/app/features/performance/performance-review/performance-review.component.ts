@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, TemplateRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -494,5 +494,5 @@ export class PerformanceReviewComponent implements OnInit {
     return 'bg-danger';
   }
 
-  reviewModal: any;
+  @ViewChild('reviewModal') reviewModal!: TemplateRef<any>;
 }
