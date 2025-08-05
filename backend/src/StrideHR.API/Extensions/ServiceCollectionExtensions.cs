@@ -256,7 +256,12 @@ public static class ServiceCollectionExtensions
         services.AddDbContext<StrideHRDbContext>(options =>
             options.UseMySql(
                 configuration.GetConnectionString("DefaultConnection"),
-                ServerVersion.AutoDetect(configuration.GetConnectionString("DefaultConnection"))));
+                new MySqlServerVersion(new Version(8, 0, 33)),
+                mysqlOptions =>
+                {
+                    mysqlOptions.EnableRetryOnFailure();
+                    mysqlOptions.CommandTimeout(60);
+                }));
 
         // Add JWT Authentication
         services.AddJwtAuthentication(configuration);
@@ -285,6 +290,8 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IPayrollFormulaRepository, PayrollFormulaRepository>();
         services.AddScoped<IPayslipTemplateRepository, PayslipTemplateRepository>();
         services.AddScoped<IPayslipGenerationRepository, PayslipGenerationRepository>();
+        services.AddScoped<IPayrollAuditTrailRepository, PayrollAuditTrailRepository>();
+        services.AddScoped<IPayrollErrorCorrectionRepository, PayrollErrorCorrectionRepository>();
         services.AddScoped<IExchangeRateRepository, ExchangeRateRepository>();
         services.AddScoped<IBudgetRepository, BudgetRepository>();
         
