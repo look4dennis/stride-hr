@@ -1,0 +1,1 @@
+export { EmployeeCreateComponent } from './employee-create.component';

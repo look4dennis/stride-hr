@@ -651,8 +651,12 @@ export class EmployeeListComponent implements OnInit {
 
   onPageSizeChange(event: any): void {
     const pageSize = parseInt(event.target.value);
+    const formValue = this.searchForm.value;
     const criteria: EmployeeSearchCriteria = {
-      ...this.searchForm.value,
+      searchTerm: formValue.searchTerm || undefined,
+      department: formValue.department || undefined,
+      designation: formValue.designation || undefined,
+      status: formValue.status || undefined,
       page: 1,
       pageSize: pageSize
     };
@@ -661,8 +665,12 @@ export class EmployeeListComponent implements OnInit {
 
   goToPage(page: number): void {
     if (page >= 1 && page <= (this.pagedResult?.totalPages || 1)) {
+      const formValue = this.searchForm.value;
       const criteria: EmployeeSearchCriteria = {
-        ...this.searchForm.value,
+        searchTerm: formValue.searchTerm || undefined,
+        department: formValue.department || undefined,
+        designation: formValue.designation || undefined,
+        status: formValue.status || undefined,
         page: page,
         pageSize: this.pagedResult?.pageSize || 10
       };

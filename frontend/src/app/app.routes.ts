@@ -35,6 +35,11 @@ export const routes: Routes = [
             data: { roles: ['HR', 'Admin', 'Manager'] }
           },
           {
+            path: 'add',
+            loadComponent: () => import('./features/employees/employee-create').then(m => m.EmployeeCreateComponent),
+            data: { roles: ['HR', 'Admin'] }
+          },
+          {
             path: 'org-chart',
             loadComponent: () => import('./features/employees/org-chart').then(m => m.OrgChartComponent),
             data: { roles: ['HR', 'Admin', 'Manager'] }
