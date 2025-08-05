@@ -13,4 +13,8 @@ public interface IJwtService
     Task<UserInfo?> GetUserInfoFromTokenAsync(string token);
     bool IsTokenExpired(string token);
     DateTime GetTokenExpiration(string token);
+    bool ValidateTokenStructure(string token);
+    string ExtractEmployeeId(string token);
+    string ExtractOrganizationId(string token);
+    string ExtractBranchId(string token);
 }

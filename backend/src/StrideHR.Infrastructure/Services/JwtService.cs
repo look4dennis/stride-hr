@@ -36,8 +36,9 @@ public class JwtService : IJwtService
             new("EmployeeCode", employee.EmployeeId),
             new("FullName", $"{employee.FirstName} {employee.LastName}"),
             new("BranchId", employee.BranchId.ToString()),
-            new("Department", employee.Department),
-            new("Designation", employee.Designation),
+            new("OrganizationId", employee.Branch?.OrganizationId.ToString() ?? "0"),
+            new("Department", employee.Department ?? string.Empty),
+            new("Designation", employee.Designation ?? string.Empty),
             new("IsFirstLogin", user.IsFirstLogin.ToString()),
             new("ForcePasswordChange", user.ForcePasswordChange.ToString()),
             new("IsTwoFactorEnabled", user.IsTwoFactorEnabled.ToString()),
@@ -154,6 +155,7 @@ public class JwtService : IJwtService
         if (principal == null)
             return null;
 
+        // Validate token structure and extract required claims
         var userIdClaim = principal.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
         if (!int.TryParse(userIdClaim, out var userId))
             return null;
@@ -166,6 +168,10 @@ public class JwtService : IJwtService
         if (!int.TryParse(branchIdClaim, out var branchId))
             return null;
 
+        var organizationIdClaim = principal.FindFirst("OrganizationId")?.Value;
+        if (!int.TryParse(organizationIdClaim, out var organizationId))
+            organizationId = 0; // Default fallback
+
         return new UserInfo
         {
             Id = userId,
@@ -174,6 +180,7 @@ public class JwtService : IJwtService
             Email = principal.FindFirst(JwtRegisteredClaimNames.Email)?.Value ?? string.Empty,
             FullName = principal.FindFirst("FullName")?.Value ?? string.Empty,
             BranchId = branchId,
+            OrganizationId = organizationId,
             Roles = principal.FindAll("role").Select(c => c.Value).ToList(),
             Permissions = principal.FindAll("permission").Select(c => c.Value).ToList(),
             IsFirstLogin = bool.TryParse(principal.FindFirst("IsFirstLogin")?.Value, out var isFirstLogin) && isFirstLogin,
@@ -207,6 +214,88 @@ public class JwtService : IJwtService
         catch
         {
             return DateTime.MinValue;
+        }
+    }
+
+    public bool ValidateTokenStructure(string token)
+    {
+        try
+        {
+            var principal = ValidateToken(token);
+            if (principal == null)
+                return false;
+
+            // Validate required claims are present
+            var requiredClaims = new[]
+            {
+                JwtRegisteredClaimNames.Sub,
+                JwtRegisteredClaimNames.UniqueName,
+                JwtRegisteredClaimNames.Email,
+                "EmployeeId",
+                "BranchId",
+                "OrganizationId"
+            };
+
+            foreach (var claimType in requiredClaims)
+            {
+                var claim = principal.FindFirst(claimType);
+                if (claim == null || string.IsNullOrEmpty(claim.Value))
+                    return false;
+            }
+
+            // Validate numeric claims can be parsed
+            var numericClaims = new[] { JwtRegisteredClaimNames.Sub, "EmployeeId", "BranchId", "OrganizationId" };
+            foreach (var claimType in numericClaims)
+            {
+                var claimValue = principal.FindFirst(claimType)?.Value;
+                if (!int.TryParse(claimValue, out _))
+                    return false;
+            }
+
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    public string ExtractEmployeeId(string token)
+    {
+        try
+        {
+            var principal = ValidateToken(token);
+            return principal?.FindFirst("EmployeeId")?.Value ?? string.Empty;
+        }
+        catch
+        {
+            return string.Empty;
+        }
+    }
+
+    public string ExtractOrganizationId(string token)
+    {
+        try
+        {
+            var principal = ValidateToken(token);
+            return principal?.FindFirst("OrganizationId")?.Value ?? string.Empty;
+        }
+        catch
+        {
+            return string.Empty;
+        }
+    }
+
+    public string ExtractBranchId(string token)
+    {
+        try
+        {
+            var principal = ValidateToken(token);
+            return principal?.FindFirst("BranchId")?.Value ?? string.Empty;
+        }
+        catch
+        {
+            return string.Empty;
         }
     }
 }

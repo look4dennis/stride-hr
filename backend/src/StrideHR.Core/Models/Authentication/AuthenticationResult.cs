@@ -20,6 +20,7 @@ public class UserInfo
     public string FullName { get; set; } = string.Empty;
     public string ProfilePhoto { get; set; } = string.Empty;
     public int BranchId { get; set; }
+    public int OrganizationId { get; set; }
     public string BranchName { get; set; } = string.Empty;
     public List<string> Roles { get; set; } = new();
     public List<string> Permissions { get; set; } = new();

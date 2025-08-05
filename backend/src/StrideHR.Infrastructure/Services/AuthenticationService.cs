@@ -3,6 +3,7 @@ using StrideHR.Core.Entities;
 using StrideHR.Core.Interfaces.Repositories;
 using StrideHR.Core.Interfaces.Services;
 using StrideHR.Core.Models.Authentication;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace StrideHR.Infrastructure.Services;
 
@@ -150,7 +151,8 @@ public class AuthenticationService : IAuthenticationService
                     FullName = user.Employee.FullName,
                     ProfilePhoto = user.Employee.ProfilePhoto ?? string.Empty,
                     BranchId = user.Employee.BranchId,
-                    BranchName = user.Employee.Branch.Name,
+                    OrganizationId = user.Employee.Branch?.OrganizationId ?? 0,
+                    BranchName = user.Employee.Branch?.Name ?? string.Empty,
                     Roles = roles,
                     Permissions = permissions,
                     IsFirstLogin = user.IsFirstLogin,
@@ -187,7 +189,7 @@ public class AuthenticationService : IAuthenticationService
                 };
             }
 
-            var userIdClaim = principal.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            var userIdClaim = principal.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
             if (!int.TryParse(userIdClaim, out var userId))
             {
                 return new RefreshTokenResult
