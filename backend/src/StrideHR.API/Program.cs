@@ -77,8 +77,8 @@ try
     app.UseHttpsRedirection();
     app.UseCors("AllowAll");
 
+    // Correct middleware pipeline ordering for authentication and authorization
     app.UseAuthentication();
-    app.UseMiddleware<JwtMiddleware>();
     app.UseAuthorization();
 
     app.MapControllers();

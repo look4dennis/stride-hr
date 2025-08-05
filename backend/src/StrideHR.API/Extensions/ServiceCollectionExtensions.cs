@@ -15,6 +15,8 @@ using StrideHR.Infrastructure.Authorization;
 using StrideHR.Infrastructure.Data;
 using StrideHR.Infrastructure.Repositories;
 using StrideHR.Infrastructure.Services;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using System.Text;
 
 namespace StrideHR.API.Extensions;
@@ -58,7 +60,7 @@ public static class ServiceCollectionExtensions
                 ClockSkew = TimeSpan.FromMinutes(jwtSettings.ClockSkewMinutes)
             };
 
-            // Handle SignalR connections
+            // Handle SignalR connections and add comprehensive error handling
             options.Events = new JwtBearerEvents
             {
                 OnMessageReceived = context =>
@@ -75,10 +77,121 @@ public static class ServiceCollectionExtensions
                 },
                 OnAuthenticationFailed = context =>
                 {
+                    var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<JwtBearerHandler>>();
+                    var remoteIp = context.Request.HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
+                    var userAgent = context.Request.Headers.UserAgent.ToString();
+                    
+                    // Set appropriate response headers based on error type
                     if (context.Exception.GetType() == typeof(SecurityTokenExpiredException))
                     {
                         context.Response.Headers["Token-Expired"] = "true";
+                        context.Response.Headers["WWW-Authenticate"] = "Bearer error=\"invalid_token\", error_description=\"The access token expired\"";
+                        
+                        logger.LogWarning("Security Event: JWT token expired for request to {Path} from {RemoteIpAddress} using {UserAgent}", 
+                            context.Request.Path, remoteIp, userAgent);
                     }
+                    else if (context.Exception.GetType() == typeof(SecurityTokenInvalidSignatureException))
+                    {
+                        context.Response.Headers["WWW-Authenticate"] = "Bearer error=\"invalid_token\", error_description=\"The access token signature is invalid\"";
+                        
+                        logger.LogWarning("Security Event: JWT token has invalid signature for request to {Path} from {RemoteIpAddress} using {UserAgent}", 
+                            context.Request.Path, remoteIp, userAgent);
+                    }
+                    else if (context.Exception.GetType() == typeof(SecurityTokenValidationException))
+                    {
+                        context.Response.Headers["WWW-Authenticate"] = "Bearer error=\"invalid_token\", error_description=\"The access token is invalid\"";
+                        
+                        logger.LogWarning("Security Event: JWT token validation failed for request to {Path} from {RemoteIpAddress} using {UserAgent}: {Exception}", 
+                            context.Request.Path, remoteIp, userAgent, context.Exception.Message);
+                    }
+                    else if (context.Exception.GetType() == typeof(SecurityTokenMalformedException))
+                    {
+                        context.Response.Headers["WWW-Authenticate"] = "Bearer error=\"invalid_token\", error_description=\"The access token is malformed\"";
+                        
+                        logger.LogWarning("Security Event: Malformed JWT token for request to {Path} from {RemoteIpAddress} using {UserAgent}", 
+                            context.Request.Path, remoteIp, userAgent);
+                    }
+                    else
+                    {
+                        context.Response.Headers["WWW-Authenticate"] = "Bearer error=\"invalid_token\", error_description=\"Authentication failed\"";
+                        
+                        logger.LogError(context.Exception, "Security Event: JWT authentication failed for request to {Path} from {RemoteIpAddress} using {UserAgent}", 
+                            context.Request.Path, remoteIp, userAgent);
+                    }
+                    
+                    // Let the default authentication handling proceed
+                    return Task.CompletedTask;
+                },
+                OnTokenValidated = context =>
+                {
+                    var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<JwtBearerHandler>>();
+                    var remoteIp = context.Request.HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
+                    var userAgent = context.Request.Headers.UserAgent.ToString();
+                    
+                    var userIdClaim = context.Principal?.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+                    var employeeIdClaim = context.Principal?.FindFirst("EmployeeId")?.Value;
+                    var organizationIdClaim = context.Principal?.FindFirst("OrganizationId")?.Value;
+                    var branchIdClaim = context.Principal?.FindFirst("BranchId")?.Value;
+                    
+                    // Validate required claims are present
+                    if (string.IsNullOrEmpty(employeeIdClaim))
+                    {
+                        logger.LogWarning("Security Event: JWT token missing required EmployeeId claim for User {UserId} from {RemoteIpAddress}", 
+                            userIdClaim, remoteIp);
+                        context.Fail("Missing required EmployeeId claim");
+                        return Task.CompletedTask;
+                    }
+                    
+                    logger.LogInformation("Security Event: JWT token validated successfully for User {UserId}, Employee {EmployeeId}, Organization {OrganizationId}, Branch {BranchId} from {RemoteIpAddress} using {UserAgent}", 
+                        userIdClaim, employeeIdClaim, organizationIdClaim, branchIdClaim, remoteIp, userAgent);
+                    
+                    // Add user info to context items for easy access
+                    if (context.Principal != null)
+                    {
+                        context.HttpContext.Items["User"] = context.Principal;
+                        if (userIdClaim != null) context.HttpContext.Items["UserId"] = userIdClaim;
+                        if (employeeIdClaim != null) context.HttpContext.Items["EmployeeId"] = employeeIdClaim;
+                        if (branchIdClaim != null) context.HttpContext.Items["BranchId"] = branchIdClaim;
+                        if (organizationIdClaim != null) context.HttpContext.Items["OrganizationId"] = organizationIdClaim;
+                        
+                        // Add roles and permissions for easy access
+                        var roles = context.Principal.FindAll(ClaimTypes.Role).Select(c => c.Value).ToList();
+                        var permissions = context.Principal.FindAll("permission").Select(c => c.Value).ToList();
+                        context.HttpContext.Items["UserRoles"] = roles;
+                        context.HttpContext.Items["UserPermissions"] = permissions;
+                    }
+                    
+                    return Task.CompletedTask;
+                },
+                OnChallenge = context =>
+                {
+                    var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<JwtBearerHandler>>();
+                    var remoteIp = context.Request.HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
+                    var userAgent = context.Request.Headers.UserAgent.ToString();
+                    
+                    logger.LogWarning("Security Event: JWT authentication challenge for request to {Path} from {RemoteIpAddress} using {UserAgent}: {Error} - {ErrorDescription}", 
+                        context.Request.Path, remoteIp, userAgent, context.Error, context.ErrorDescription);
+                    
+                    // Customize challenge response
+                    if (string.IsNullOrEmpty(context.Error))
+                    {
+                        context.Error = "invalid_token";
+                        context.ErrorDescription = "Authentication required";
+                    }
+                    
+                    return Task.CompletedTask;
+                },
+                OnForbidden = context =>
+                {
+                    var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<JwtBearerHandler>>();
+                    var remoteIp = context.Request.HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
+                    var userAgent = context.Request.Headers.UserAgent.ToString();
+                    var userIdClaim = context.Principal?.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+                    var employeeIdClaim = context.Principal?.FindFirst("EmployeeId")?.Value;
+                    
+                    logger.LogWarning("Security Event: Access forbidden for User {UserId}, Employee {EmployeeId} to {Path} from {RemoteIpAddress} using {UserAgent}", 
+                        userIdClaim, employeeIdClaim, context.Request.Path, remoteIp, userAgent);
+                    
                     return Task.CompletedTask;
                 }
             };
@@ -318,6 +431,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IRoleService, RoleService>();
         services.AddScoped<IUserManagementService, UserManagementService>();
         services.AddScoped<IAuditLogService, AuditLogService>();
+        services.AddScoped<ISecurityEventService, SecurityEventService>();
         services.AddScoped<IDataEncryptionService, DataEncryptionService>();
         services.AddScoped<IEmployeeService, EmployeeService>();
         services.AddScoped<IOrganizationService, OrganizationService>();
@@ -471,6 +585,9 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IAuthorizationHandler, PermissionAuthorizationHandler>();
         services.AddScoped<IAuthorizationHandler, BranchAccessAuthorizationHandler>();
         services.AddScoped<IAuthorizationHandler, RoleHierarchyAuthorizationHandler>();
+        
+        // Add HTTP context accessor for authorization handlers
+        services.AddHttpContextAccessor();
 
         // Add HttpContextAccessor for authorization handlers
         services.AddHttpContextAccessor();
