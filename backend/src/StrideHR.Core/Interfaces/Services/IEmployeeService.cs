@@ -141,7 +141,11 @@ public interface IEmployeeService
     /// <returns>Binary photo data if exists, null otherwise</returns>
     Task<byte[]?> GetProfilePhotoAsync(int employeeId);
     Task DeleteProfilePhotoAsync(int employeeId);
+    
+    #endregion
 
+    #region Employee Management Operations
+    
     // Employee ID generation
     Task<string> GenerateEmployeeIdAsync(int branchId);
 
@@ -159,4 +163,6 @@ public interface IEmployeeService
     // Validation
     Task<bool> ValidateEmployeeDataAsync(CreateEmployeeDto dto);
     Task<bool> ValidateEmployeeUpdateAsync(int id, UpdateEmployeeDto dto);
+    
+    #endregion
 }

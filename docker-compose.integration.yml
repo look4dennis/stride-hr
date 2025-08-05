@@ -1,0 +1,173 @@
+version: '3.8'
+
+services:
+  mysql-test:
+    image: mysql:8.0
+    container_name: stridehr-mysql-test
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-testpassword}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-StrideHR_Test}
+      MYSQL_USER: ${MYSQL_USER:-testuser}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-testpass123}
+    ports:
+      - "${MYSQL_TEST_PORT:-3307}:3306"
+    volumes:
+      - mysql_test_data:/var/lib/mysql
+      - ./docker/mysql/init:/docker-entrypoint-initdb.d
+      - ./docker/mysql/conf.d:/etc/mysql/conf.d
+    networks:
+      - stridehr-test-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+      interval: 10s
+
+  redis-test:
+    image: redis:7-alpine
+    container_name: stridehr-redis-test
+    ports:
+      - "${REDIS_TEST_PORT:-6380}:6379"
+    volumes:
+      - redis_test_data:/data
+      - ./docker/redis/redis.conf:/usr/local/etc/redis/redis.conf
+    networks:
+      - stridehr-test-network
+    restart: unless-stopped
+    command: redis-server /usr/local/etc/redis/redis.conf
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      timeout: 10s
+      retries: 5
+      interval: 5s
+
+  api-test:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: final
+    container_name: stridehr-api-test
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Testing
+      - ASPNETCORE_URLS=http://+:8080
+      - ConnectionStrings__DefaultConnection=Server=mysql-test;Database=${MYSQL_DATABASE:-StrideHR_Test};User=${MYSQL_USER:-testuser};Password=${MYSQL_PASSWORD:-testpass123};Port=3306;
+      - Redis__ConnectionString=stridehr-redis-test:6379
+      - JWT__SecretKey=${JWT_SECRET_KEY:-test-super-secret-jwt-key-for-integration-testing}
+      - JWT__Issuer=${JWT_ISSUER:-StrideHR-Test}
+      - JWT__Audience=${JWT_AUDIENCE:-StrideHR-Test-Users}
+      - Logging__LogLevel__Default=Information
+      - Logging__LogLevel__Microsoft=Warning
+      - Logging__LogLevel__System=Warning
+    ports:
+      - "${API_TEST_PORT:-5001}:8080"
+    depends_on:
+      mysql-test:
+        condition: service_healthy
+      redis-test:
+        condition: service_healthy
+    networks:
+      - stridehr-test-network
+    restart: unless-stopped
+    volumes:
+      - ./backend/logs:/app/logs
+      - ./backend/uploads:/app/uploads
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+      interval: 15s
+
+  frontend-test:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      target: final
+    container_name: stridehr-frontend-test
+    environment:
+      - NODE_ENV=test
+    ports:
+      - "${FRONTEND_TEST_PORT:-4201}:80"
+    depends_on:
+      api-test:
+        condition: service_healthy
+    networks:
+      - stridehr-test-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80"]
+      timeout: 10s
+      retries: 3
+      interval: 10s
+
+  # Integration test runner
+  integration-tests:
+    build:
+      context: .
+      dockerfile: Dockerfile.integration-tests
+    container_name: stridehr-integration-tests
+    environment:
+      - API_BASE_URL=http://api-test:8080
+      - FRONTEND_BASE_URL=http://frontend-test:80
+      - DATABASE_CONNECTION=Server=mysql-test;Database=${MYSQL_DATABASE:-StrideHR_Test};User=${MYSQL_USER:-testuser};Password=${MYSQL_PASSWORD:-testpass123};Port=3306;
+      - REDIS_CONNECTION=stridehr-redis-test:6379
+    depends_on:
+      api-test:
+        condition: service_healthy
+      frontend-test:
+        condition: service_healthy
+    networks:
+      - stridehr-test-network
+    volumes:
+      - ./test-results:/app/test-results
+    profiles:
+      - integration-tests
+
+  # Load testing service
+  load-tests:
+    image: loadimpact/k6:latest
+    container_name: stridehr-load-tests
+    environment:
+      - API_BASE_URL=http://api-test:8080
+    depends_on:
+      api-test:
+        condition: service_healthy
+    networks:
+      - stridehr-test-network
+    volumes:
+      - ./load-tests:/scripts
+      - ./test-results:/results
+    command: run /scripts/load-test.js
+    profiles:
+      - load-tests
+
+  # Security testing service
+  security-tests:
+    image: owasp/zap2docker-stable
+    container_name: stridehr-security-tests
+    depends_on:
+      api-test:
+        condition: service_healthy
+      frontend-test:
+        condition: service_healthy
+    networks:
+      - stridehr-test-network
+    volumes:
+      - ./test-results:/zap/wrk
+    command: zap-baseline.py -t http://api-test:8080 -J security-report.json
+    profiles:
+      - security-tests
+
+volumes:
+  mysql_test_data:
+    driver: local
+  redis_test_data:
+    driver: local
+
+networks:
+  stridehr-test-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.21.0.0/16
