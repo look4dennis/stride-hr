@@ -333,7 +333,7 @@ describe('AttendanceService', () => {
       originalGeolocation = navigator.geolocation;
       
       // Reset any existing spy
-      if (geolocationSpy) {
+      if (geolocationSpy && geolocationSpy.calls) {
         geolocationSpy.calls.reset();
       }
     });
@@ -357,7 +357,10 @@ describe('AttendanceService', () => {
         }
       };
 
-      geolocationSpy = spyOn(navigator.geolocation, 'getCurrentPosition').and.callFake((success: any) => {
+      if (!geolocationSpy || !geolocationSpy.calls) {
+        geolocationSpy = spyOn(navigator.geolocation, 'getCurrentPosition');
+      }
+      geolocationSpy.and.callFake((success: any) => {
         success(mockPosition);
       });
 
@@ -369,7 +372,10 @@ describe('AttendanceService', () => {
     });
 
     it('should handle geolocation error', async () => {
-      geolocationSpy = spyOn(navigator.geolocation, 'getCurrentPosition').and.callFake((success: any, error: any) => {
+      if (!geolocationSpy || !geolocationSpy.calls) {
+        geolocationSpy = spyOn(navigator.geolocation, 'getCurrentPosition');
+      }
+      geolocationSpy.and.callFake((success: any, error: any) => {
         error(new Error('Geolocation failed'));
       });
 

@@ -329,6 +329,8 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IPayslipTemplateService, PayslipTemplateService>();
         services.AddScoped<IPayslipGenerationService, PayslipGenerationService>();
         services.AddScoped<IPayslipDesignerService, PayslipDesignerService>();
+        services.AddScoped<IPayrollReportingService, PayrollReportingService>();
+        services.AddScoped<IPayrollErrorCorrectionService, PayrollErrorCorrectionService>();
         services.AddScoped<ICurrencyService, CurrencyService>();
         services.AddScoped<ITimeZoneService, TimeZoneService>();
         services.AddScoped<IFinancialReportingService, FinancialReportingService>();

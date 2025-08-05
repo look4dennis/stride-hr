@@ -448,6 +448,7 @@ describe('FinancialAnalyticsComponent', () => {
   });
 
   it('should display loading state correctly', () => {
+    component.ngOnInit();
     component.loading = true;
     fixture.detectChanges();
 
@@ -456,6 +457,7 @@ describe('FinancialAnalyticsComponent', () => {
   });
 
   it('should display dashboard cards when data is available', () => {
+    component.ngOnInit();
     component.loading = false;
     component.dashboardData = mockDashboardData;
     fixture.detectChanges();
@@ -465,6 +467,7 @@ describe('FinancialAnalyticsComponent', () => {
   });
 
   it('should display financial summary data in table', () => {
+    component.ngOnInit();
     component.loading = false;
     component.financialSummary = mockFinancialSummary;
     fixture.detectChanges();

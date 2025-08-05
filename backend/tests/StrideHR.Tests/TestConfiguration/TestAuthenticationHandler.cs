@@ -18,9 +18,13 @@ public class TestAuthenticationHandler : AuthenticationHandler<AuthenticationSch
     {
         var claims = new[]
         {
-            new Claim("EmployeeId", "1"),
+            new Claim(ClaimTypes.NameIdentifier, "1"), // User ID
+            new Claim("EmployeeId", "1"), // Employee ID
             new Claim(ClaimTypes.Name, "Test Employee"),
-            new Claim(ClaimTypes.Email, "test.employee@test.com")
+            new Claim(ClaimTypes.Email, "test.employee@test.com"),
+            new Claim("BranchId", "1"),
+            new Claim("Department", "IT"),
+            new Claim("Designation", "Developer")
         };
 
         var identity = new ClaimsIdentity(claims, "Test");

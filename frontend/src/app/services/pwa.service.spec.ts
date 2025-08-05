@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
-import { ApplicationRef, NgZone } from '@angular/core';
+import { ApplicationRef, NgZone, ChangeDetectorRef } from '@angular/core';
 import { SwUpdate } from '@angular/service-worker';
-import { of, BehaviorSubject } from 'rxjs';
+import { of, BehaviorSubject, Subject } from 'rxjs';
 import { PwaService } from './pwa.service';
 import { provideZoneChangeDetection } from '@angular/core';
 
@@ -48,13 +48,22 @@ describe('PwaService', () => {
     const mockNgZone = {
       run: (fn: Function) => fn(),
       runOutsideAngular: (fn: Function) => fn(),
-      onStable: of(true),
-      onUnstable: of(false),
-      onError: of(null),
-      onMicrotaskEmpty: of(true),
+      onStable: new Subject(),
+      onUnstable: new Subject(),
+      onError: new Subject(),
+      onMicrotaskEmpty: new Subject(),
       hasPendingMicrotasks: false,
       hasPendingMacrotasks: false,
       isStable: true
+    };
+
+    // Create a mock ChangeDetectorRef
+    const mockChangeDetectorRef = {
+      markForCheck: jasmine.createSpy('markForCheck'),
+      detectChanges: jasmine.createSpy('detectChanges'),
+      checkNoChanges: jasmine.createSpy('checkNoChanges'),
+      detach: jasmine.createSpy('detach'),
+      reattach: jasmine.createSpy('reattach')
     };
 
     TestBed.configureTestingModule({
@@ -63,6 +72,7 @@ describe('PwaService', () => {
         { provide: SwUpdate, useValue: swUpdateSpy },
         { provide: ApplicationRef, useValue: appRefSpy },
         { provide: NgZone, useValue: mockNgZone },
+        { provide: ChangeDetectorRef, useValue: mockChangeDetectorRef },
         provideZoneChangeDetection({ eventCoalescing: true })
       ]
     });

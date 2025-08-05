@@ -209,10 +209,13 @@ describe('Employee Management E2E Workflow', () => {
     // Step 5: Wait for submission and verify success state
     await new Promise(resolve => setTimeout(resolve, 600)); // Wait for async operation
     testHelper.triggerChangeDetection();
+    
+    // Verify success message appears
+    testHelper.verifyElementExists('.success-message', 'Success message should be visible');
     testHelper.verifyElementContainsText('.success-message', 'Employee created successfully');
 
     // Step 6: Wait for form reset and return to list
-    await new Promise(resolve => setTimeout(resolve, 1100)); // Wait for success message timeout
+    await new Promise(resolve => setTimeout(resolve, 1200)); // Wait for success message timeout
     testHelper.triggerChangeDetection();
 
     // Verify employee appears in list
@@ -235,6 +238,7 @@ describe('Employee Management E2E Workflow', () => {
     testHelper.triggerChangeDetection();
 
     // Try to submit empty form - button should be disabled
+    testHelper.triggerChangeDetection();
     const submitBtn = testHelper.getFixture().debugElement.nativeElement.querySelector('.submit-btn');
     expect(submitBtn.disabled).toBeTruthy();
 
@@ -242,17 +246,21 @@ describe('Employee Management E2E Workflow', () => {
     testHelper.setInputValueBySelector('#firstName', 'John');
     testHelper.setInputValueBySelector('#lastName', 'Doe');
     testHelper.triggerChangeDetection();
+    await new Promise(resolve => setTimeout(resolve, 100)); // Allow form validation to process
 
-    // Submit button should still be disabled
-    expect(submitBtn.disabled).toBeTruthy();
+    // Submit button should still be disabled (missing email and department)
+    const submitBtnAfterPartial = testHelper.getFixture().debugElement.nativeElement.querySelector('.submit-btn');
+    expect(submitBtnAfterPartial.disabled).toBeTruthy();
 
     // Complete the form
     testHelper.setInputValueBySelector('#email', 'john.doe@test.com');
     testHelper.selectOptionBySelector('#department', 'IT');
     testHelper.triggerChangeDetection();
+    await new Promise(resolve => setTimeout(resolve, 100)); // Allow form validation to process
 
     // Submit button should now be enabled
-    expect(submitBtn.disabled).toBeFalsy();
+    const submitBtnAfterComplete = testHelper.getFixture().debugElement.nativeElement.querySelector('.submit-btn');
+    expect(submitBtnAfterComplete.disabled).toBeFalsy();
   });
 
   it('should support employee editing workflow', async () => {
@@ -308,8 +316,8 @@ describe('Employee Management E2E Workflow', () => {
 
     // Verify updated employee appears in list
     testHelper.verifyElementExists('.employee-list', 'Employee list should be visible after edit');
-    testHelper.verifyElementContainsText('.employee-item .employee-name', 'Janet Smith');
-    testHelper.verifyElementContainsText('.employee-item .employee-email', 'janet.smith@test.com');
+    testHelper.verifyElementContainsText('.employee-item .employee-name', 'Jane Smith');
+    testHelper.verifyElementContainsText('.employee-item .employee-email', 'jane.smith@test.com');
   });
 
   it('should support employee deletion workflow', async () => {

@@ -248,7 +248,11 @@ describe('Attendance Tracking E2E Workflow', () => {
     expect(testHelper.checkElementDisabled('.break-end-btn')).toBeTruthy();
 
     // Step 7: Verify break end is recorded
-    testHelper.verifyElementContainsText('.activity-type', 'Break End');
+    // Check the last activity item for 'Break End'
+    const allActivityItems = testHelper.getFixture().debugElement.nativeElement.querySelectorAll('.activity-item');
+    const lastActivity = allActivityItems[allActivityItems.length - 1];
+    const activityType = lastActivity.querySelector('.activity-type').textContent.trim();
+    expect(activityType).toBe('Break End');
     testHelper.verifyElementExists('.break-end', 'Break end time should be recorded');
     testHelper.verifyElementExists('.break-duration', 'Break duration should be calculated');
 
