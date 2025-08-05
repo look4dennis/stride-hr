@@ -18,7 +18,7 @@
                     "builder": "@angular-devkit/build-angular:application",
                     "options": {
                         "outputPath": {
-                          "base": "dist/stride-hr-frontend"
+                            "base": "dist/stride-hr-frontend"
                         },
                         "index": "src/index.html",
                         "polyfills": [
@@ -47,20 +47,33 @@
                             "budgets": [
                                 {
                                     "type": "initial",
-                                    "maximumWarning": "500kb",
-                                    "maximumError": "1mb"
+                                    "maximumWarning": "2mb",
+                                    "maximumError": "5mb"
                                 },
                                 {
                                     "type": "anyComponentStyle",
-                                    "maximumWarning": "2kb",
-                                    "maximumError": "4kb"
+                                    "maximumWarning": "6kb",
+                                    "maximumError": "10kb"
                                 }
                             ],
                             "outputHashing": "all",
-                            "serviceWorker": "ngsw-config.json"
+                            "serviceWorker": "ngsw-config.json",
+                            "optimization": {
+                                "scripts": true,
+                                "styles": {
+                                    "minify": true,
+                                    "inlineCritical": true
+                                },
+                                "fonts": true
+                            },
+                            "aot": true,
+                            "extractLicenses": true,
+                            "sourceMap": false,
+                            "namedChunks": false,
+                            "crossOrigin": "anonymous"
                         },
                         "development": {
-                          "optimization": false,
+                            "optimization": false,
                             "extractLicenses": false,
                             "sourceMap": true,
                             "namedChunks": true

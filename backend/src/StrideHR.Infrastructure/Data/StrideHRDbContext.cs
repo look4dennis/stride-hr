@@ -185,6 +185,9 @@ public class StrideHRDbContext : DbContext
         // Apply configurations
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(StrideHRDbContext).Assembly);
 
+        // Apply performance optimizations
+        DatabaseOptimizations.ConfigurePerformanceIndexes(modelBuilder);
+
         // Global query filter for soft delete
         foreach (var entityType in modelBuilder.Model.GetEntityTypes())
         {

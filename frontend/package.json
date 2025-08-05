@@ -5,9 +5,15 @@
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
+    "build:prod": "ng build --configuration production",
+    "build:analyze": "ng build --configuration production --stats-json && npx webpack-bundle-analyzer dist/stride-hr-frontend/stats.json",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "lint": "ng lint"
+    "test:coverage": "ng test --code-coverage",
+    "lint": "ng lint",
+    "performance:audit": "lighthouse http://localhost:4200 --output html --output-path ./performance-audit.html",
+    "performance:test": "ng test --include='**/*.performance.spec.ts'",
+    "preload:analyze": "node scripts/analyze-preload.js"
   },
   "private": true,
   "dependencies": {
@@ -46,6 +52,8 @@
     "karma-coverage": "~2.2.0",
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
+    "lighthouse": "^11.4.0",
+    "webpack-bundle-analyzer": "^4.10.1",
     "typescript": "~5.5.4"
   }
 }
