@@ -576,11 +576,34 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ICalendarIntegrationService, CalendarIntegrationService>();
         services.AddScoped<IExternalIntegrationService, ExternalIntegrationService>();
         
-        // Add SignalR
-        services.AddSignalR();
+        // Add SignalR with enhanced configuration for resilience
+        services.AddSignalR(options =>
+        {
+            // Configure hub options for production readiness and resilience
+            options.EnableDetailedErrors = builder.Environment.IsDevelopment();
+            options.HandshakeTimeout = TimeSpan.FromSeconds(30);
+            options.KeepAliveInterval = TimeSpan.FromSeconds(15);
+            options.ClientTimeoutInterval = TimeSpan.FromSeconds(60);
+            options.MaximumReceiveMessageSize = 32 * 1024; // 32KB
+            options.StreamBufferCapacity = 10;
+            options.MaximumParallelInvocationsPerClient = 1;
+            
+            // Enhanced resilience settings
+            options.SupportedProtocols = new List<string> { "json", "messagepack" };
+        })
+        .AddJsonProtocol(options =>
+        {
+            // Configure JSON serialization for SignalR
+            options.PayloadSerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase;
+            options.PayloadSerializerOptions.WriteIndented = builder.Environment.IsDevelopment();
+            options.PayloadSerializerOptions.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull;
+        })
+        .AddMessagePackProtocol(); // Add MessagePack for better performance and resilience
         
         // Add background services
         services.AddHostedService<StrideHR.API.Services.NotificationBackgroundService>();
+        services.AddHostedService<StrideHR.API.Services.NotificationProcessingService>();
+        services.AddHostedService<StrideHR.API.Services.SignalRConnectionRecoveryService>();
         
         // Register employee repository (generic)
         services.AddScoped<IRepository<Employee>, Repository<Employee>>();
