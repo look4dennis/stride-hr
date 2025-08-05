@@ -36,7 +36,7 @@ public static class DatabaseOptimizations
         ConfigureLeaveIndexes(modelBuilder);
         
         // Performance management indexes
-        ConfigurePerformanceIndexes(modelBuilder);
+        ConfigurePerformanceManagementIndexes(modelBuilder);
     }
 
     private static void ConfigureEmployeeIndexes(ModelBuilder modelBuilder)
@@ -77,8 +77,8 @@ public static class DatabaseOptimizations
             .HasDatabaseName("IX_EmployeeRole_Employee_Active");
 
         modelBuilder.Entity<RolePermission>()
-            .HasIndex(rp => new { rp.RoleId, rp.IsActive })
-            .HasDatabaseName("IX_RolePermission_Role_Active");
+            .HasIndex(rp => new { rp.RoleId, rp.IsGranted })
+            .HasDatabaseName("IX_RolePermission_Role_Granted");
     }
 
     private static void ConfigureAttendanceIndexes(ModelBuilder modelBuilder)
@@ -98,16 +98,16 @@ public static class DatabaseOptimizations
 
         // Break records indexes
         modelBuilder.Entity<BreakRecord>()
-            .HasIndex(b => new { b.AttendanceRecordId, b.BreakStartTime })
+            .HasIndex(b => new { b.AttendanceRecordId, b.StartTime })
             .HasDatabaseName("IX_BreakRecord_Attendance_Start");
 
         // Shift management indexes
         modelBuilder.Entity<ShiftAssignment>()
-            .HasIndex(sa => new { sa.EmployeeId, sa.Date })
-            .HasDatabaseName("IX_ShiftAssignment_Employee_Date");
+            .HasIndex(sa => new { sa.EmployeeId, sa.StartDate })
+            .HasDatabaseName("IX_ShiftAssignment_Employee_StartDate");
 
         modelBuilder.Entity<ShiftSwapRequest>()
-            .HasIndex(ssr => new { ssr.RequestingEmployeeId, ssr.Status })
+            .HasIndex(ssr => new { ssr.RequesterId, ssr.Status })
             .HasDatabaseName("IX_ShiftSwap_Employee_Status");
     }
 
@@ -128,13 +128,13 @@ public static class DatabaseOptimizations
 
         // Payroll adjustments
         modelBuilder.Entity<PayrollAdjustment>()
-            .HasIndex(pa => new { pa.PayrollRecordId, pa.AdjustmentType })
+            .HasIndex(pa => new { pa.PayrollRecordId, pa.Type })
             .HasDatabaseName("IX_PayrollAdjustment_Record_Type");
 
         // Exchange rates for multi-currency
         modelBuilder.Entity<ExchangeRate>()
-            .HasIndex(er => new { er.FromCurrency, er.ToCurrency, er.Date })
-            .HasDatabaseName("IX_ExchangeRate_Currencies_Date");
+            .HasIndex(er => new { er.FromCurrency, er.ToCurrency, er.EffectiveDate })
+            .HasDatabaseName("IX_ExchangeRate_Currencies_EffectiveDate");
     }
 
     private static void ConfigureProjectIndexes(ModelBuilder modelBuilder)
@@ -153,12 +153,12 @@ public static class DatabaseOptimizations
             .HasDatabaseName("IX_ProjectTask_Project_Status");
 
         modelBuilder.Entity<ProjectTask>()
-            .HasIndex(pt => new { pt.AssignedToId, pt.Status })
+            .HasIndex(pt => new { pt.AssignedToEmployeeId, pt.Status })
             .HasDatabaseName("IX_ProjectTask_Assignee_Status");
 
         modelBuilder.Entity<ProjectAssignment>()
-            .HasIndex(pa => new { pa.EmployeeId, pa.IsActive })
-            .HasDatabaseName("IX_ProjectAssignment_Employee_Active");
+            .HasIndex(pa => new { pa.EmployeeId, pa.UnassignedDate })
+            .HasDatabaseName("IX_ProjectAssignment_Employee_Unassigned");
 
         // DSR (Daily Status Report) indexes
         modelBuilder.Entity<DSR>()
@@ -178,12 +178,8 @@ public static class DatabaseOptimizations
             .HasDatabaseName("IX_AuditLog_User_Timestamp");
 
         modelBuilder.Entity<AuditLog>()
-            .HasIndex(al => new { al.EntityType, al.EntityId })
-            .HasDatabaseName("IX_AuditLog_Entity");
-
-        modelBuilder.Entity<AuditLog>()
-            .HasIndex(al => new { al.Action, al.Timestamp })
-            .HasDatabaseName("IX_AuditLog_Action_Timestamp");
+            .HasIndex(al => new { al.EventType, al.Timestamp })
+            .HasDatabaseName("IX_AuditLog_EventType_Timestamp");
 
         modelBuilder.Entity<AuditLog>()
             .HasIndex(al => al.Timestamp)
@@ -218,15 +214,15 @@ public static class DatabaseOptimizations
             .HasDatabaseName("IX_LeaveRequest_DateRange");
 
         modelBuilder.Entity<LeaveBalance>()
-            .HasIndex(lb => new { lb.EmployeeId, lb.LeaveTypeId, lb.Year })
-            .HasDatabaseName("IX_LeaveBalance_Employee_Type_Year");
+            .HasIndex(lb => new { lb.EmployeeId, lb.LeavePolicyId, lb.Year })
+            .HasDatabaseName("IX_LeaveBalance_Employee_Policy_Year");
 
         modelBuilder.Entity<LeaveApprovalHistory>()
-            .HasIndex(lah => new { lah.LeaveRequestId, lah.ApprovalLevel })
+            .HasIndex(lah => new { lah.LeaveRequestId, lah.Level })
             .HasDatabaseName("IX_LeaveApproval_Request_Level");
     }
 
-    private static void ConfigurePerformanceIndexes(ModelBuilder modelBuilder)
+    private static void ConfigurePerformanceManagementIndexes(ModelBuilder modelBuilder)
     {
         // Performance management indexes
         modelBuilder.Entity<PerformanceReview>()
@@ -271,8 +267,7 @@ public static class DatabaseOptimizations
         // Configure query tracking behavior
         options.UseQueryTrackingBehavior(QueryTrackingBehavior.TrackAll);
 
-        // Configure command timeout
-        options.UseCommandTimeout(30); // 30 seconds timeout
+        // Configure command timeout - this is typically set in connection string or DbContext configuration
     }
 
     /// <summary>
@@ -293,7 +288,7 @@ public static class DatabaseOptimizations
         public static IQueryable<Employee> GetActiveEmployeesByBranch(DbContext context, int branchId)
         {
             return context.Set<Employee>()
-                .Where(e => e.BranchId == branchId && e.Status == EmployeeStatus.Active)
+                .Where(e => e.BranchId == branchId && e.Status == Core.Enums.EmployeeStatus.Active)
                 .AsNoTracking(); // Use AsNoTracking for read-only queries
         }
 

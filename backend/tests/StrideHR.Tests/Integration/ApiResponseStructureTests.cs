@@ -1,4 +1,6 @@
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Authorization;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Text;
@@ -25,7 +27,7 @@ public class ApiResponseStructureTests : IClassFixture<TestWebApplicationFactory
         _factory = factory;
         _output = output;
         _client = _factory.CreateClient();
-        _seeder = new TestDataSeeder(_factory.Services.CreateScope().ServiceProvider);
+        _seeder = new TestDataSeeder(_factory.Services.CreateScope().ServiceProvider.GetRequiredService<StrideHR.Infrastructure.Data.StrideHRDbContext>());
     }
 
     [Fact]

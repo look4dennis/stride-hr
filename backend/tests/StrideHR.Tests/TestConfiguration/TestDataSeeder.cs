@@ -46,6 +46,9 @@ public class TestDataSeeder
         }
     }
 
+    // Alias for SeedAllAsync to maintain compatibility with existing tests
+    public Task SeedTestDataAsync() => SeedAllAsync();
+
     public async Task ClearAllAsync()
     {
         try

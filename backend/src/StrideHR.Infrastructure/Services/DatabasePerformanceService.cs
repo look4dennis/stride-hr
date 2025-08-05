@@ -179,7 +179,7 @@ public class DatabasePerformanceService
         var stopwatch = Stopwatch.StartNew();
         var activeProjects = await _context.Projects
             .Include(p => p.Tasks)
-            .Where(p => p.Status == Core.Enums.ProjectStatus.InProgress)
+            .Where(p => p.Status == Core.Enums.ProjectStatus.Active)
             .ToListAsync();
         stopwatch.Stop();
 
@@ -198,7 +198,7 @@ public class DatabasePerformanceService
         var assignmentCount = await _context.ProjectAssignments
             .Include(pa => pa.Employee)
             .Include(pa => pa.Project)
-            .Where(pa => pa.IsActive)
+            .Where(pa => pa.UnassignedDate == null)
             .CountAsync();
         stopwatch.Stop();
 

@@ -174,7 +174,7 @@ public class SignalRConnectionRecoveryTests : IDisposable
     public async Task ExecuteAsync_ShouldProcessRecoveryPeriodically()
     {
         // Arrange
-        var mockClients = new Mock<IHubCallerClients>();
+        var mockClients = new Mock<IHubClients>();
         var mockClientProxy = new Mock<IClientProxy>();
         
         _mockHubContext.Setup(h => h.Clients).Returns(mockClients.Object);

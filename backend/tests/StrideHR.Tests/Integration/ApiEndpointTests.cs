@@ -28,7 +28,11 @@ public class ApiEndpointTests : IClassFixture<TestWebApplicationFactory<Program>
         _factory = factory;
         _output = output;
         _client = _factory.CreateClient();
-        _seeder = new TestDataSeeder(_factory.Services.CreateScope().ServiceProvider);
+        
+        // Fix: Get the actual DbContext from services
+        using var scope = _factory.Services.CreateScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<StrideHR.Infrastructure.Data.StrideHRDbContext>();
+        _seeder = new TestDataSeeder(dbContext);
     }
 
     [Fact]

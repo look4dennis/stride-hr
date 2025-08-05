@@ -13,7 +13,7 @@ public class NotificationHubTests
     private readonly Mock<ILogger<NotificationHub>> _mockLogger;
     private readonly Mock<HubCallerContext> _mockContext;
     private readonly Mock<IHubCallerClients> _mockClients;
-    private readonly Mock<IClientProxy> _mockClientProxy;
+    private readonly Mock<ISingleClientProxy> _mockClientProxy;
     private readonly Mock<IGroupManager> _mockGroups;
     private readonly NotificationHub _hub;
 
@@ -22,7 +22,7 @@ public class NotificationHubTests
         _mockLogger = new Mock<ILogger<NotificationHub>>();
         _mockContext = new Mock<HubCallerContext>();
         _mockClients = new Mock<IHubCallerClients>();
-        _mockClientProxy = new Mock<IClientProxy>();
+        _mockClientProxy = new Mock<ISingleClientProxy>();
         _mockGroups = new Mock<IGroupManager>();
 
         _hub = new NotificationHub(_mockLogger.Object);

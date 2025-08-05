@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Moq;
 using StrideHR.Core.Models.Authorization;
 using StrideHR.Infrastructure.Authorization;
+using StrideHR.Tests.TestConfiguration;
 using System.Security.Claims;
 using Xunit;
 using FluentAssertions;
@@ -15,13 +16,13 @@ namespace StrideHR.Tests.Authorization;
 /// </summary>
 public class BranchAccessAuthorizationTests
 {
-    private readonly BranchAccessAuthorizationHandler _handler;
+    private readonly TestBranchAccessAuthorizationHandler _handler;
     private readonly Mock<IHttpContextAccessor> _mockHttpContextAccessor;
 
     public BranchAccessAuthorizationTests()
     {
-        _handler = new BranchAccessAuthorizationHandler();
         _mockHttpContextAccessor = new Mock<IHttpContextAccessor>();
+        _handler = new TestBranchAccessAuthorizationHandler(_mockHttpContextAccessor.Object);
     }
 
     #region Branch Access Requirement Tests

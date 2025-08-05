@@ -14,7 +14,7 @@ public class SignalRNotificationServiceTests
 {
     private readonly Mock<IHubContext<NotificationHub>> _mockHubContext;
     private readonly Mock<ILogger<SignalRNotificationService>> _mockLogger;
-    private readonly Mock<IHubCallerClients> _mockClients;
+    private readonly Mock<IHubClients> _mockClients;
     private readonly Mock<IClientProxy> _mockClientProxy;
     private readonly SignalRNotificationService _service;
 
@@ -22,7 +22,7 @@ public class SignalRNotificationServiceTests
     {
         _mockHubContext = new Mock<IHubContext<NotificationHub>>();
         _mockLogger = new Mock<ILogger<SignalRNotificationService>>();
-        _mockClients = new Mock<IHubCallerClients>();
+        _mockClients = new Mock<IHubClients>();
         _mockClientProxy = new Mock<IClientProxy>();
 
         _mockHubContext.Setup(h => h.Clients).Returns(_mockClients.Object);

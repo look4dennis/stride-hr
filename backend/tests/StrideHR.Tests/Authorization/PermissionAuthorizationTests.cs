@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Moq;
 using StrideHR.Core.Models.Authorization;
 using StrideHR.Infrastructure.Authorization;
+using StrideHR.Tests.TestConfiguration;
 using System.Security.Claims;
 using Xunit;
 using FluentAssertions;
@@ -15,12 +16,12 @@ namespace StrideHR.Tests.Authorization;
 /// </summary>
 public class PermissionAuthorizationTests
 {
-    private readonly PermissionAuthorizationHandler _handler;
+    private readonly TestPermissionAuthorizationHandler _handler;
     private readonly Mock<IHttpContextAccessor> _mockHttpContextAccessor;
 
     public PermissionAuthorizationTests()
     {
-        _handler = new PermissionAuthorizationHandler();
+        _handler = new TestPermissionAuthorizationHandler();
         _mockHttpContextAccessor = new Mock<IHttpContextAccessor>();
     }
 

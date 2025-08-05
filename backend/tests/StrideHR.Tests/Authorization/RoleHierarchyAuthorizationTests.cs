@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.Authorization;
 using Moq;
 using StrideHR.Core.Models.Authorization;
 using StrideHR.Infrastructure.Authorization;
+using StrideHR.Core.Interfaces.Services;
+using StrideHR.Tests.TestConfiguration;
 using System.Security.Claims;
 using Xunit;
 using FluentAssertions;
@@ -14,11 +16,17 @@ namespace StrideHR.Tests.Authorization;
 /// </summary>
 public class RoleHierarchyAuthorizationTests
 {
-    private readonly RoleHierarchyAuthorizationHandler _handler;
+    private readonly TestRoleHierarchyAuthorizationHandler _handler;
+    private readonly Mock<IRoleService> _mockRoleService;
 
     public RoleHierarchyAuthorizationTests()
     {
-        _handler = new RoleHierarchyAuthorizationHandler();
+        _mockRoleService = new Mock<IRoleService>();
+        _handler = new TestRoleHierarchyAuthorizationHandler(_mockRoleService.Object);
+
+        // Setup default role hierarchy levels
+        _mockRoleService.Setup(x => x.GetMaxHierarchyLevelAsync(It.IsAny<List<string>>()))
+            .ReturnsAsync((List<string> roles) => roles.Max(r => _roleHierarchy.TryGetValue(r, out var level) ? level : 0));
     }
 
     #region Role Hierarchy Level Tests

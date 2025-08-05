@@ -225,10 +225,6 @@
 
 - [x] 8. Complete Cross-Browser and Mobile Testing
 
-
-
-
-
   - Test functionality across Chrome, Firefox, Safari, and Edge browsers
   - Validate mobile browser compatibility and responsive design
   - Test PWA functionality on mobile devices
@@ -236,13 +232,10 @@
 
 - [x] 8.1 Implement Automated Cross-Browser Testing
 
-
   - Set up Selenium-based testing across major browsers
   - Create browser compatibility test suite for critical workflows
   - Test responsive design and mobile browser functionality
   - _Requirements: 9.1, 9.2_
-
-
 
 - [ ] 8.2 Validate Mobile and PWA Functionality
   - Test PWA installation and offline functionality on mobile devices

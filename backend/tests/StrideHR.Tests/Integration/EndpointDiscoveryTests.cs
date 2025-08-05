@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using System.Net;
+using StrideHR.Infrastructure.Data;
 using System.Net.Http.Headers;
 using System.Reflection;
 using System.Text;
@@ -28,7 +30,9 @@ public class EndpointDiscoveryTests : IClassFixture<TestWebApplicationFactory<Pr
         _factory = factory;
         _output = output;
         _client = _factory.CreateClient();
-        _seeder = new TestDataSeeder(_factory.Services.CreateScope().ServiceProvider);
+        var scope = _factory.Services.CreateScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<StrideHRDbContext>();
+        _seeder = new TestDataSeeder(dbContext);
     }
 
     [Fact]
