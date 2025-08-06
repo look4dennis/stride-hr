@@ -13,6 +13,7 @@
   - _Requirements: 1.1, 1.2, 1.3, 1.6, 1.7_
 
 - [ ] 2. Fix Core Routing & Navigation System
+
   - Update app.routes.ts to use correct import paths for all lazy-loaded components
   - Fix employee-create, branch-management, and other problematic route imports
   - Implement proper error handling for failed route loads with user-friendly fallback pages
