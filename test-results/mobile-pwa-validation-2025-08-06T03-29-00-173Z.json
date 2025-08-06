@@ -1,0 +1,154 @@
+{
+  "timestamp": "2025-08-06T03:28:59.980Z",
+  "baseUrl": "http://localhost:4200",
+  "tests": {
+    "connectivity": {
+      "status": "completed",
+      "results": [
+        {
+          "url": "/",
+          "status": 0,
+          "passed": false,
+          "duration": 0,
+          "message": "Connection failed: "
+        },
+        {
+          "url": "/manifest.webmanifest",
+          "status": 0,
+          "passed": false,
+          "duration": 0,
+          "message": "Connection failed: "
+        },
+        {
+          "url": "/ngsw-worker.js",
+          "status": 0,
+          "passed": false,
+          "duration": 0,
+          "message": "Connection failed: "
+        },
+        {
+          "url": "/assets/icons/icon-192x192.png",
+          "status": 0,
+          "passed": false,
+          "duration": 0,
+          "message": "Connection failed: "
+        },
+        {
+          "url": "/dashboard",
+          "status": 0,
+          "passed": false,
+          "duration": 0,
+          "message": "Connection failed: "
+        },
+        {
+          "url": "/employees",
+          "status": 0,
+          "passed": false,
+          "duration": 0,
+          "message": "Connection failed: "
+        },
+        {
+          "url": "/attendance",
+          "status": 0,
+          "passed": false,
+          "duration": 0,
+          "message": "Connection failed: "
+        }
+      ]
+    },
+    "manifest": {
+      "status": "completed",
+      "results": [
+        {
+          "test": "Manifest accessibility",
+          "passed": false,
+          "value": "Error: "
+        }
+      ]
+    },
+    "serviceWorker": {
+      "status": "completed",
+      "results": [
+        {
+          "test": "Service Worker accessibility",
+          "passed": false,
+          "value": "Error: "
+        }
+      ]
+    },
+    "responsive": {
+      "status": "completed",
+      "results": [
+        {
+          "viewport": "All",
+          "test": "Responsive design test",
+          "passed": false,
+          "value": "Error: "
+        }
+      ]
+    },
+    "performance": {
+      "status": "completed",
+      "results": [
+        {
+          "page": "Home Page",
+          "url": "/",
+          "loadTime": 0,
+          "passed": false,
+          "status": 0,
+          "error": ""
+        },
+        {
+          "page": "Dashboard",
+          "url": "/dashboard",
+          "loadTime": 0,
+          "passed": false,
+          "status": 0,
+          "error": ""
+        },
+        {
+          "page": "Employee List",
+          "url": "/employees",
+          "loadTime": 0,
+          "passed": false,
+          "status": 0,
+          "error": ""
+        },
+        {
+          "page": "Attendance",
+          "url": "/attendance",
+          "loadTime": 0,
+          "passed": false,
+          "status": 0,
+          "error": ""
+        }
+      ]
+    },
+    "touchInteractions": {
+      "status": "completed",
+      "results": [
+        {
+          "test": "Touch interaction analysis",
+          "passed": false,
+          "value": "Error: "
+        }
+      ]
+    },
+    "offlineCapability": {
+      "status": "completed",
+      "results": [
+        {
+          "test": "Offline capability analysis",
+          "passed": false,
+          "value": "Error: "
+        }
+      ]
+    }
+  },
+  "summary": {
+    "total": 16,
+    "passed": 0,
+    "failed": 16,
+    "passRate": 0
+  }
+}

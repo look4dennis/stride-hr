@@ -16,6 +16,9 @@
     "test:edge": "ng test --browsers=Edge --watch=false --single-run=true",
     "test:safari": "ng test --browsers=Safari --watch=false --single-run=true",
     "test:mobile": "ng test --browsers=ChromeMobile --watch=false --single-run=true",
+    "test:mobile-pwa": "node scripts/mobile-pwa-tests.js",
+    "test:mobile-pwa:dev": "BASE_URL=http://localhost:4200 node scripts/mobile-pwa-tests.js",
+    "test:mobile-pwa:prod": "BASE_URL=http://localhost:4200 node scripts/mobile-pwa-tests.js",
     "e2e:cross-browser": "node scripts/run-cross-browser-tests.js",
     "lint": "ng lint",
     "performance:audit": "lighthouse http://localhost:4200 --output html --output-path ./performance-audit.html",
@@ -65,6 +68,8 @@
     "selenium-webdriver": "^4.15.0",
     "@types/selenium-webdriver": "^4.1.20",
     "lighthouse": "^11.4.0",
+    "playwright": "^1.40.0",
+    "@playwright/test": "^1.40.0",
     "webpack-bundle-analyzer": "^4.10.1",
     "typescript": "~5.5.4"
   }
