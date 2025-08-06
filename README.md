@@ -58,25 +58,25 @@ strideHR follows a modern, scalable architecture designed for enterprise use:
 
 ## 🚀 Quick Start
 
-### Using Docker (Recommended)
+### Prerequisites
+1. **MySQL 8.0+** installed on your local machine (C: drive)
+2. **Node.js 18+** and npm
+3. **.NET 8 SDK**
+4. **Redis** (optional for development)
+
+### Database Setup
 ```bash
-# Clone the repository
-git clone https://github.com/look4dennis/stride-hr.git
-cd stride-hr
+# Run the database setup script (Windows PowerShell)
+.\scripts\setup-database.ps1
 
-# Start all services
-docker-compose up -d
-
-# Access the application
-# Frontend: http://localhost:4200
-# API: http://localhost:5000
-# API Documentation: http://localhost:5000/swagger
+# Or manually create the database using MySQL
+mysql -u root -p < backend/database-init.sql
 ```
 
 ### Manual Setup
 ```bash
 # Backend setup
-cd src/StrideHR.API
+cd backend/src/StrideHR.API
 dotnet restore
 dotnet ef database update
 dotnet run
@@ -86,6 +86,24 @@ cd frontend
 npm install
 ng serve
 ```
+
+### Using Docker (API and Frontend only)
+```bash
+# Note: MySQL should be running locally, not in Docker
+# Start Redis and application services
+docker-compose up -d
+
+# Access the application
+# Frontend: http://localhost:4200
+# API: http://localhost:5000
+# API Documentation: http://localhost:5000/api-docs
+```
+
+### Default Super Admin Credentials
+After first startup, use these credentials to log in:
+- **Username**: Superadmin
+- **Password**: adminsuper2025$
+- **Email**: superadmin@stridehr.com
 
 ## 📚 Documentation
 

@@ -23,6 +23,10 @@ try
     builder.Services.AddControllers();
     builder.Services.AddApplicationServices(builder.Configuration);
     builder.Services.AddSwaggerDocumentation();
+    
+    // Add database services
+    builder.Services.AddScoped<DatabaseInitializationService>();
+    builder.Services.AddScoped<DatabaseHealthCheckService>();
 
     // Add CORS
     builder.Services.AddCors(options =>
@@ -37,6 +41,18 @@ try
     });
 
     var app = builder.Build();
+
+    // Initialize database on startup
+    using (var scope = app.Services.CreateScope())
+    {
+        var dbInitService = scope.ServiceProvider.GetRequiredService<DatabaseInitializationService>();
+        var initResult = await dbInitService.InitializeDatabaseAsync();
+        if (!initResult)
+        {
+            Log.Fatal("Failed to initialize database. Application will not start.");
+            return;
+        }
+    }
 
     // Configure the HTTP request pipeline
     app.UseMiddleware<GlobalExceptionMiddleware>();
@@ -87,11 +103,20 @@ try
     app.MapHub<StrideHR.API.Hubs.NotificationHub>("/hubs/notification");
 
     // Legacy health check endpoint for backward compatibility
-    app.MapGet("/health", async (StrideHR.API.Services.HealthCheckService healthService) =>
+    app.MapGet("/health", async (StrideHR.API.Services.HealthCheckService healthService, DatabaseHealthCheckService dbHealthService) =>
     {
         var health = await healthService.GetSystemHealthAsync();
-        return health.Status == StrideHR.API.Services.HealthStatus.Healthy 
-            ? Results.Ok(new { Status = "Healthy", Timestamp = DateTime.UtcNow })
+        var dbHealth = await dbHealthService.CheckHealthAsync();
+        
+        var overallHealthy = health.Status == StrideHR.API.Services.HealthStatus.Healthy && dbHealth.IsHealthy;
+        
+        return overallHealthy 
+            ? Results.Ok(new { 
+                Status = "Healthy", 
+                Timestamp = DateTime.UtcNow,
+                Database = new { Status = "Healthy", CheckedAt = dbHealth.CheckedAt },
+                System = health
+            })
             : Results.Problem("System is unhealthy", statusCode: 503);
     })
     .WithName("HealthCheck")
