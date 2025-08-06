@@ -274,11 +274,30 @@ public class AuthController : ControllerBase
     [Authorize]
     public async Task<IActionResult> GetCurrentUser()
     {
-        var userInfo = HttpContext.Items["User"] as UserInfo;
-        if (userInfo == null)
+        var principal = HttpContext.Items["User"] as ClaimsPrincipal ?? User;
+        if (principal == null)
         {
             return Unauthorized(new { success = false, message = "User information not available" });
         }
+
+        // Extract user information from claims
+        var userInfo = new
+        {
+            id = int.TryParse(principal.FindFirst(ClaimTypes.NameIdentifier)?.Value, out var userId) ? userId : 0,
+            employeeId = int.TryParse(principal.FindFirst("EmployeeId")?.Value, out var empId) ? empId : 0,
+            username = principal.FindFirst(ClaimTypes.Name)?.Value ?? principal.FindFirst("unique_name")?.Value,
+            email = principal.FindFirst(ClaimTypes.Email)?.Value ?? principal.FindFirst("email")?.Value,
+            fullName = principal.FindFirst("FullName")?.Value,
+            profilePhoto = principal.FindFirst("ProfilePhoto")?.Value,
+            branchId = int.TryParse(principal.FindFirst("BranchId")?.Value, out var branchId) ? branchId : 0,
+            organizationId = int.TryParse(principal.FindFirst("OrganizationId")?.Value, out var orgId) ? orgId : 0,
+            branchName = principal.FindFirst("BranchName")?.Value,
+            roles = principal.FindAll(ClaimTypes.Role).Select(c => c.Value).ToArray(),
+            permissions = principal.FindAll("permission").Select(c => c.Value).ToArray(),
+            isFirstLogin = bool.TryParse(principal.FindFirst("IsFirstLogin")?.Value, out var isFirst) && isFirst,
+            forcePasswordChange = bool.TryParse(principal.FindFirst("ForcePasswordChange")?.Value, out var forceChange) && forceChange,
+            isTwoFactorEnabled = bool.TryParse(principal.FindFirst("IsTwoFactorEnabled")?.Value, out var is2FA) && is2FA
+        };
 
         return Ok(new
         {

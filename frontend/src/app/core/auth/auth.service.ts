@@ -6,13 +6,19 @@ import { environment } from '../../../environments/environment';
 
 export interface User {
   id: number;
-  employeeId: string;
-  firstName: string;
-  lastName: string;
+  employeeId: number;
+  username: string;
   email: string;
-  branchId: number;
-  roles: string[];
+  fullName: string;
   profilePhoto?: string;
+  branchId: number;
+  organizationId: number;
+  branchName?: string;
+  roles: string[];
+  permissions: string[];
+  isFirstLogin: boolean;
+  forcePasswordChange: boolean;
+  isTwoFactorEnabled: boolean;
 }
 
 export interface LoginRequest {
@@ -21,10 +27,14 @@ export interface LoginRequest {
 }
 
 export interface AuthResponse {
-  token: string;
-  refreshToken: string;
-  user: User;
-  expiresAt: string;
+  success: boolean;
+  message: string;
+  data: {
+    token: string;
+    refreshToken: string;
+    user: User;
+    expiresAt: string;
+  };
 }
 
 @Injectable({
@@ -58,18 +68,10 @@ export class AuthService {
   }
 
   login(credentials: LoginRequest): Observable<AuthResponse> {
-    // Temporarily use the test endpoint that works
-    return this.http.post<any>(`${this.API_URL}/TestAuth/simple-login`, credentials)
+    return this.http.post<AuthResponse>(`${this.API_URL}/auth/login`, credentials)
       .pipe(
         tap(response => {
-          // Extract the auth data from the API response
-          const authResponse: AuthResponse = {
-            token: response.data.token,
-            refreshToken: response.data.refreshToken,
-            user: response.data.user,
-            expiresAt: response.data.expiresAt
-          };
-          this.setAuthData(authResponse);
+          this.setAuthData(response);
         })
       );
   }
@@ -101,13 +103,13 @@ export class AuthService {
   }
 
   private setAuthData(authResponse: AuthResponse): void {
-    localStorage.setItem('token', authResponse.token);
-    localStorage.setItem('refreshToken', authResponse.refreshToken);
-    localStorage.setItem('user', JSON.stringify(authResponse.user));
-    localStorage.setItem('tokenExpiry', authResponse.expiresAt);
+    localStorage.setItem('token', authResponse.data.token);
+    localStorage.setItem('refreshToken', authResponse.data.refreshToken);
+    localStorage.setItem('user', JSON.stringify(authResponse.data.user));
+    localStorage.setItem('tokenExpiry', authResponse.data.expiresAt);
 
-    this.tokenSubject.next(authResponse.token);
-    this.currentUserSubject.next(authResponse.user);
+    this.tokenSubject.next(authResponse.data.token);
+    this.currentUserSubject.next(authResponse.data.user);
   }
 
   private clearAuthData(): void {

@@ -46,9 +46,7 @@ namespace StrideHR.Infrastructure.Migrations
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
@@ -81,8 +79,8 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasDefaultValue(3);
 
                     b.Property<decimal>("PassingScore")
-                        .HasPrecision(5, 2)
-                        .HasColumnType("decimal(5,2)");
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("RetakeWaitingPeriodHours")
                         .ValueGeneratedOnAdd()
@@ -144,9 +142,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
@@ -164,7 +160,8 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("tinyint(1)");
 
                     b.Property<decimal>("PointsEarned")
-                        .HasColumnType("decimal(65,30)");
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("SelectedAnswers")
                         .IsRequired()
@@ -185,7 +182,7 @@ namespace StrideHR.Infrastructure.Migrations
 
                     b.HasIndex("AssessmentQuestionId");
 
-                    b.ToTable("AssessmentAnswers");
+                    b.ToTable("AssessmentAnswer");
                 });
 
             modelBuilder.Entity("StrideHR.Core.Entities.AssessmentAttempt", b =>
@@ -206,9 +203,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("datetime(6)");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
@@ -229,13 +224,15 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("tinyint(1)");
 
                     b.Property<decimal?>("MaxScore")
-                        .HasColumnType("decimal(65,30)");
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("Notes")
                         .HasColumnType("longtext");
 
                     b.Property<decimal?>("Score")
-                        .HasColumnType("decimal(65,30)");
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<DateTime>("StartedAt")
                         .HasColumnType("datetime(6)");
@@ -282,9 +279,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
@@ -315,8 +310,8 @@ namespace StrideHR.Infrastructure.Migrations
 
                     b.Property<decimal>("Points")
                         .ValueGeneratedOnAdd()
-                        .HasPrecision(5, 2)
-                        .HasColumnType("decimal(5,2)")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)")
                         .HasDefaultValue(1m);
 
                     b.Property<string>("QuestionText")
@@ -371,14 +366,13 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
 
                     b.Property<decimal?>("CurrentValue")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<DateTime?>("DeletedAt")
@@ -388,6 +382,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("longtext");
 
                     b.Property<decimal?>("DepreciationRate")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(5,2)");
 
                     b.Property<string>("Description")
@@ -431,6 +426,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("datetime(6)");
 
                     b.Property<decimal?>("PurchasePrice")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("SerialNumber")
@@ -506,9 +502,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("varchar(1000)");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
@@ -595,9 +589,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("datetime(6)");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
@@ -607,6 +599,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("varchar(3)");
 
                     b.Property<decimal?>("DamageCharges")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("DamageNotes")
@@ -698,12 +691,11 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("datetime(6)");
 
                     b.Property<decimal?>("Cost")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
@@ -791,6 +783,90 @@ namespace StrideHR.Infrastructure.Migrations
                     b.ToTable("AssetMaintenances", (string)null);
                 });
 
+            modelBuilder.Entity("StrideHR.Core.Entities.AttendanceAlert", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("AlertDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("AlertMessage")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("AlertType")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("BranchId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("DeletedBy")
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("EmployeeId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<bool>("IsRead")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<bool>("IsResolved")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Metadata")
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime?>("ReadAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("ResolutionNotes")
+                        .HasColumnType("longtext");
+
+                    b.Property<int?>("ResolvedById")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("ResolvedDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<int>("Severity")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BranchId");
+
+                    b.HasIndex("EmployeeId");
+
+                    b.HasIndex("ResolvedById");
+
+                    b.ToTable("AttendanceAlerts");
+                });
+
             modelBuilder.Entity("StrideHR.Core.Entities.AttendancePolicy", b =>
                 {
                     b.Property<int>("Id")
@@ -803,9 +879,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
@@ -849,8 +923,8 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("varchar(100)");
 
                     b.Property<decimal>("OvertimeRate")
-                        .HasPrecision(5, 2)
-                        .HasColumnType("decimal(5,2)");
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<bool>("RequireLocationTracking")
                         .HasColumnType("tinyint(1)");
@@ -868,7 +942,7 @@ namespace StrideHR.Infrastructure.Migrations
 
                     b.HasIndex("BranchId");
 
-                    b.ToTable("AttendancePolicies");
+                    b.ToTable("AttendancePolicy");
                 });
 
             modelBuilder.Entity("StrideHR.Core.Entities.AttendanceRecord", b =>
@@ -931,9 +1005,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("varchar(500)");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
@@ -1005,17 +1077,8 @@ namespace StrideHR.Infrastructure.Migrations
 
                     b.HasIndex("ShiftId");
 
-                    b.HasIndex("Date", "Status")
-                        .HasDatabaseName("IX_Attendance_Date_Status");
-
-                    b.HasIndex("EmployeeId", "CreatedAt")
-                        .HasDatabaseName("IX_Attendance_Employee_Created");
-
                     b.HasIndex("EmployeeId", "Date")
                         .IsUnique();
-
-                    b.HasIndex("EmployeeId", "Date", "Status")
-                        .HasDatabaseName("IX_Attendance_Employee_Date_Status");
 
                     b.ToTable("AttendanceRecords");
                 });
@@ -1032,9 +1095,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("longtext");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
@@ -1051,7 +1112,7 @@ namespace StrideHR.Infrastructure.Migrations
 
                     b.Property<string>("EventType")
                         .IsRequired()
-                        .HasColumnType("varchar(255)");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("IpAddress")
                         .HasColumnType("longtext");
@@ -1082,14 +1143,7 @@ namespace StrideHR.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Timestamp")
-                        .HasDatabaseName("IX_AuditLog_Timestamp");
-
-                    b.HasIndex("EventType", "Timestamp")
-                        .HasDatabaseName("IX_AuditLog_EventType_Timestamp");
-
-                    b.HasIndex("UserId", "Timestamp")
-                        .HasDatabaseName("IX_AuditLog_User_Timestamp");
+                    b.HasIndex("UserId");
 
                     b.ToTable("AuditLogs");
                 });
@@ -1126,9 +1180,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("varchar(3)");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
@@ -1212,10 +1264,18 @@ namespace StrideHR.Infrastructure.Migrations
                     b.Property<int>("AttendanceRecordId")
                         .HasColumnType("int");
 
+                    b.Property<DateTime?>("BreakEndTime")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<DateTime>("BreakStartTime")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("BreakType")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
@@ -1235,17 +1295,21 @@ namespace StrideHR.Infrastructure.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("tinyint(1)");
 
-                    b.Property<double?>("Latitude")
-                        .HasPrecision(10, 8)
-                        .HasColumnType("double");
+                    b.Property<bool>("IsPaid")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<decimal?>("Latitude")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("Location")
+                        .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("varchar(200)");
 
-                    b.Property<double?>("Longitude")
-                        .HasPrecision(11, 8)
-                        .HasColumnType("double");
+                    b.Property<decimal?>("Longitude")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("Notes")
                         .HasMaxLength(500)
@@ -1255,6 +1319,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("datetime(6)");
 
                     b.Property<string>("TimeZone")
+                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("varchar(100)");
 
@@ -1269,8 +1334,7 @@ namespace StrideHR.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AttendanceRecordId", "StartTime")
-                        .HasDatabaseName("IX_BreakRecord_Attendance_Start");
+                    b.HasIndex("AttendanceRecordId");
 
                     b.ToTable("BreakRecords");
                 });
@@ -1284,7 +1348,8 @@ namespace StrideHR.Infrastructure.Migrations
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<decimal>("ActualAmount")
-                        .HasColumnType("decimal(65,30)");
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<DateTime?>("ApprovedAt")
                         .HasColumnType("datetime(6)");
@@ -1299,16 +1364,15 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal>("BudgetedAmount")
-                        .HasColumnType("decimal(65,30)");
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("Category")
                         .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<int>("CreatedBy")
                         .HasColumnType("int");
@@ -1349,10 +1413,12 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("longtext");
 
                     b.Property<decimal>("Variance")
-                        .HasColumnType("decimal(65,30)");
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal>("VariancePercentage")
-                        .HasColumnType("decimal(65,30)");
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("Year")
                         .HasColumnType("int");
@@ -1384,9 +1450,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
@@ -1461,9 +1525,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("longtext");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
@@ -1532,9 +1594,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("varchar(100)");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
@@ -1567,17 +1627,15 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime>("IssuedDate")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("Notes")
                         .HasMaxLength(1000)
                         .HasColumnType("varchar(1000)");
 
                     b.Property<decimal?>("Score")
-                        .HasPrecision(5, 2)
-                        .HasColumnType("decimal(5,2)");
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("Status")
                         .IsRequired()
@@ -1630,9 +1688,7 @@ namespace StrideHR.Infrastructure.Migrations
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
@@ -1725,9 +1781,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("text");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
@@ -1809,9 +1863,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("varchar(1000)");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
@@ -1868,17 +1920,15 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("varchar(2000)");
 
                     b.Property<decimal>("ConfidenceScore")
-                        .HasPrecision(5, 4)
-                        .HasColumnType("decimal(5,4)");
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("CorrectResponse")
                         .HasMaxLength(2000)
                         .HasColumnType("varchar(2000)");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
@@ -1965,8 +2015,8 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("varchar(100)");
 
                     b.Property<decimal?>("ConfidenceScore")
-                        .HasPrecision(5, 4)
-                        .HasColumnType("decimal(5,4)");
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("Content")
                         .IsRequired()
@@ -1977,9 +2027,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
@@ -2043,9 +2091,7 @@ namespace StrideHR.Infrastructure.Migrations
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
@@ -2068,6 +2114,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal>("HoursWorked")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(4,2)");
 
                     b.Property<bool>("IsDeleted")
@@ -2115,11 +2162,7 @@ namespace StrideHR.Infrastructure.Migrations
 
                     b.HasIndex("TaskId");
 
-                    b.HasIndex("EmployeeId", "Date")
-                        .HasDatabaseName("IX_DSR_Employee_Date");
-
-                    b.HasIndex("ProjectId", "Date")
-                        .HasDatabaseName("IX_DSR_Project_Date");
+                    b.HasIndex("EmployeeId", "Date");
 
                     b.ToTable("DSRs", (string)null);
                 });
@@ -2150,9 +2193,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("varchar(1000)");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
@@ -2233,9 +2274,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("varchar(100)");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
@@ -2304,22 +2343,11 @@ namespace StrideHR.Infrastructure.Migrations
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("ApprovalComments")
-                        .HasColumnType("longtext");
-
-                    b.Property<DateTime?>("ApprovedAt")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<int?>("ApprovedBy")
-                        .HasColumnType("int");
-
                     b.Property<int?>("ApprovedByEmployeeId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
@@ -2333,19 +2361,28 @@ namespace StrideHR.Infrastructure.Migrations
                     b.Property<int>("DocumentRetentionPolicyId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("ExecutedBy")
+                    b.Property<int>("DocumentsArchived")
                         .HasColumnType("int");
 
-                    b.Property<int?>("ExecutedByEmployeeId")
+                    b.Property<int>("DocumentsDeleted")
                         .HasColumnType("int");
 
-                    b.Property<DateTime?>("ExecutedDate")
-                        .HasColumnType("datetime(6)");
+                    b.Property<int>("DocumentsProcessed")
+                        .HasColumnType("int");
 
-                    b.Property<string>("ExecutionNotes")
+                    b.Property<TimeSpan>("Duration")
+                        .HasColumnType("time(6)");
+
+                    b.Property<string>("ErrorMessage")
                         .HasColumnType("longtext");
 
-                    b.Property<int>("GeneratedDocumentId")
+                    b.Property<DateTime>("ExecutionDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("ExecutionLog")
+                        .HasColumnType("longtext");
+
+                    b.Property<int?>("GeneratedDocumentId")
                         .HasColumnType("int");
 
                     b.Property<bool>("IsApproved")
@@ -2354,10 +2391,13 @@ namespace StrideHR.Infrastructure.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("tinyint(1)");
 
+                    b.Property<bool>("IsSuccessful")
+                        .HasColumnType("tinyint(1)");
+
                     b.Property<bool>("RequiredApproval")
                         .HasColumnType("tinyint(1)");
 
-                    b.Property<DateTime>("ScheduledDate")
+                    b.Property<DateTime?>("ScheduledDate")
                         .HasColumnType("datetime(6)");
 
                     b.Property<string>("Status")
@@ -2375,8 +2415,6 @@ namespace StrideHR.Infrastructure.Migrations
                     b.HasIndex("ApprovedByEmployeeId");
 
                     b.HasIndex("DocumentRetentionPolicyId");
-
-                    b.HasIndex("ExecutedByEmployeeId");
 
                     b.HasIndex("GeneratedDocumentId");
 
@@ -2404,9 +2442,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("varchar(2000)");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<int>("CreatedBy")
                         .HasColumnType("int");
@@ -2493,9 +2529,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("varchar(1000)");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
@@ -2611,9 +2645,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("LONGTEXT");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<int>("CreatedBy")
                         .HasColumnType("int");
@@ -2717,9 +2749,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("longtext");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<int>("CreatedBy")
                         .HasColumnType("int");
@@ -2761,7 +2791,7 @@ namespace StrideHR.Infrastructure.Migrations
 
                     b.HasIndex("DocumentTemplateId");
 
-                    b.ToTable("DocumentTemplateVersions");
+                    b.ToTable("DocumentTemplateVersion");
                 });
 
             modelBuilder.Entity("StrideHR.Core.Entities.EmailCampaign", b =>
@@ -2782,9 +2812,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("datetime(6)");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<int>("CreatedBy")
                         .HasColumnType("int");
@@ -2908,9 +2936,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("datetime(6)");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
@@ -3033,9 +3059,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("varchar(100)");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
@@ -3142,9 +3166,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
@@ -3244,26 +3266,15 @@ namespace StrideHR.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("BranchId");
+
                     b.HasIndex("Email")
                         .IsUnique();
 
                     b.HasIndex("EmployeeId")
                         .IsUnique();
 
-                    b.HasIndex("JoiningDate")
-                        .HasDatabaseName("IX_Employee_JoiningDate");
-
-                    b.HasIndex("BranchId", "Status")
-                        .HasDatabaseName("IX_Employee_Branch_Status");
-
-                    b.HasIndex("Department", "Status")
-                        .HasDatabaseName("IX_Employee_Department_Status");
-
-                    b.HasIndex("FirstName", "LastName")
-                        .HasDatabaseName("IX_Employee_FullName");
-
-                    b.HasIndex("ReportingManagerId", "Status")
-                        .HasDatabaseName("IX_Employee_Manager_Status");
+                    b.HasIndex("ReportingManagerId");
 
                     b.ToTable("Employees");
                 });
@@ -3286,9 +3297,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("datetime(6)");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
@@ -3341,7 +3350,7 @@ namespace StrideHR.Infrastructure.Migrations
 
                     b.HasIndex("EmployeeId");
 
-                    b.ToTable("EmployeeExit");
+                    b.ToTable("EmployeeExits");
                 });
 
             modelBuilder.Entity("StrideHR.Core.Entities.EmployeeExitTask", b =>
@@ -3362,9 +3371,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("longtext");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
@@ -3401,7 +3408,123 @@ namespace StrideHR.Infrastructure.Migrations
 
                     b.HasIndex("EmployeeExitId");
 
-                    b.ToTable("EmployeeExitTask");
+                    b.ToTable("EmployeeExitTasks");
+                });
+
+            modelBuilder.Entity("StrideHR.Core.Entities.EmployeeOnboarding", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime?>("CompletedDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("DeletedBy")
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("EmployeeId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsCompleted")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("Notes")
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime>("OnboardingDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("OnboardingManager")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EmployeeId");
+
+                    b.ToTable("EmployeeOnboardings");
+                });
+
+            modelBuilder.Entity("StrideHR.Core.Entities.EmployeeOnboardingTask", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("AssignedTo")
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime?>("CompletedDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("CompletionNotes")
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("DeletedBy")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime>("DueDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<int>("EmployeeOnboardingId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsCompleted")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("TaskName")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EmployeeOnboardingId");
+
+                    b.ToTable("EmployeeOnboardingTasks");
                 });
 
             modelBuilder.Entity("StrideHR.Core.Entities.EmployeeRole", b =>
@@ -3416,9 +3539,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("datetime(6)");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
@@ -3452,10 +3573,9 @@ namespace StrideHR.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("RoleId");
+                    b.HasIndex("EmployeeId");
 
-                    b.HasIndex("EmployeeId", "IsActive")
-                        .HasDatabaseName("IX_EmployeeRole_Employee_Active");
+                    b.HasIndex("RoleId");
 
                     b.ToTable("EmployeeRoles");
                 });
@@ -3469,9 +3589,7 @@ namespace StrideHR.Infrastructure.Migrations
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
@@ -3505,8 +3623,8 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("datetime(6)");
 
                     b.Property<decimal>("Rate")
-                        .HasPrecision(18, 6)
-                        .HasColumnType("decimal(18,6)");
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("Source")
                         .IsRequired()
@@ -3533,7 +3651,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasDatabaseName("IX_ExchangeRate_IsActive");
 
                     b.HasIndex("FromCurrency", "ToCurrency", "EffectiveDate")
-                        .HasDatabaseName("IX_ExchangeRate_Currencies_EffectiveDate");
+                        .HasDatabaseName("IX_ExchangeRate_Currencies_Date");
 
                     b.ToTable("ExchangeRates");
                 });
@@ -3567,9 +3685,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("varchar(1000)");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
@@ -3614,10 +3730,12 @@ namespace StrideHR.Infrastructure.Migrations
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<decimal>("AlertThreshold")
-                        .HasColumnType("decimal(65,30)");
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal>("BudgetLimit")
-                        .HasColumnType("decimal(65,30)");
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("BudgetName")
                         .IsRequired()
@@ -3627,9 +3745,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
@@ -3711,15 +3827,14 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("longtext");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
 
                     b.Property<decimal>("CurrentUtilization")
-                        .HasColumnType("decimal(65,30)");
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime(6)");
@@ -3753,7 +3868,8 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("datetime(6)");
 
                     b.Property<decimal>("ThresholdPercentage")
-                        .HasColumnType("decimal(65,30)");
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime(6)");
@@ -3767,7 +3883,7 @@ namespace StrideHR.Infrastructure.Migrations
 
                     b.HasIndex("ResolvedByEmployeeId");
 
-                    b.ToTable("ExpenseBudgetAlerts");
+                    b.ToTable("ExpenseBudgetAlert");
                 });
 
             modelBuilder.Entity("StrideHR.Core.Entities.ExpenseCategory", b =>
@@ -3784,9 +3900,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("varchar(20)");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
@@ -3888,9 +4002,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("varchar(50)");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
@@ -3980,9 +4092,7 @@ namespace StrideHR.Infrastructure.Migrations
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
@@ -4033,7 +4143,8 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("longtext");
 
                     b.Property<decimal?>("ViolationAmount")
-                        .HasColumnType("decimal(65,30)");
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<DateTime>("ViolationDate")
                         .HasColumnType("datetime(6)");
@@ -4087,9 +4198,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("varchar(100)");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
@@ -4170,9 +4279,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
@@ -4257,9 +4364,7 @@ namespace StrideHR.Infrastructure.Migrations
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
@@ -4336,9 +4441,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("longtext");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<int>("CreatedBy")
                         .HasColumnType("int");
@@ -4403,9 +4506,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("LONGTEXT");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
@@ -4545,9 +4646,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("datetime(6)");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
@@ -4678,9 +4777,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("varchar(2000)");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
@@ -4724,9 +4821,7 @@ namespace StrideHR.Infrastructure.Migrations
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
@@ -4806,9 +4901,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("varchar(1000)");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
@@ -4873,9 +4966,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
@@ -4933,9 +5024,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
@@ -4977,7 +5066,7 @@ namespace StrideHR.Infrastructure.Migrations
 
                     b.HasIndex("BranchId", "Date");
 
-                    b.ToTable("Holidays");
+                    b.ToTable("Holiday");
                 });
 
             modelBuilder.Entity("StrideHR.Core.Entities.IntegrationLog", b =>
@@ -4989,9 +5078,7 @@ namespace StrideHR.Infrastructure.Migrations
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
@@ -5057,9 +5144,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasDefaultValue("#007bff");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
@@ -5146,9 +5231,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("LONGTEXT");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
@@ -5290,9 +5373,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("varchar(1000)");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
@@ -5352,9 +5433,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("varchar(100)");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
@@ -5431,9 +5510,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("varchar(2000)");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
@@ -5494,9 +5571,7 @@ namespace StrideHR.Infrastructure.Migrations
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
@@ -5564,18 +5639,18 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("datetime(6)");
 
                     b.Property<decimal>("AccrualRate")
-                        .HasColumnType("decimal(65,30)");
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("AccrualType")
                         .HasColumnType("int");
 
                     b.Property<decimal>("AccruedDays")
-                        .HasColumnType("decimal(65,30)");
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
@@ -5634,12 +5709,11 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal>("AccrualRate")
-                        .HasColumnType("decimal(65,30)");
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
@@ -5709,9 +5783,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("varchar(1000)");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
@@ -5750,9 +5822,6 @@ namespace StrideHR.Infrastructure.Migrations
 
                     b.HasIndex("LeaveRequestId");
 
-                    b.HasIndex("LeaveRequestId", "Level")
-                        .HasDatabaseName("IX_LeaveApproval_Request_Level");
-
                     b.ToTable("LeaveApprovalHistories");
                 });
 
@@ -5765,15 +5834,15 @@ namespace StrideHR.Infrastructure.Migrations
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<decimal>("AllocatedDays")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal>("CarriedForwardDays")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
@@ -5788,6 +5857,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal>("EncashedDays")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<bool>("IsDeleted")
@@ -5803,6 +5873,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("longtext");
 
                     b.Property<decimal>("UsedDays")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("Year")
@@ -5813,8 +5884,7 @@ namespace StrideHR.Infrastructure.Migrations
                     b.HasIndex("LeavePolicyId");
 
                     b.HasIndex("EmployeeId", "LeavePolicyId", "Year")
-                        .IsUnique()
-                        .HasDatabaseName("IX_LeaveBalance_Employee_Policy_Year");
+                        .IsUnique();
 
                     b.ToTable("LeaveBalances");
                 });
@@ -5828,15 +5898,13 @@ namespace StrideHR.Infrastructure.Migrations
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
 
                     b.Property<DateTime>("Date")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("date");
 
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime(6)");
@@ -5903,9 +5971,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("varchar(2000)");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
@@ -5920,15 +5986,18 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal>("EncashedDays")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal>("EncashmentAmount")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<DateTime>("EncashmentDate")
                         .HasColumnType("datetime(6)");
 
                     b.Property<decimal>("EncashmentRate")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<bool>("IsDeleted")
@@ -5983,9 +6052,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
@@ -6002,6 +6069,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("varchar(500)");
 
                     b.Property<decimal>("EncashmentRate")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<bool>("IsActive")
@@ -6068,6 +6136,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal>("ApprovedDays")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("AttachmentPath")
@@ -6079,9 +6148,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("varchar(1000)");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
@@ -6096,7 +6163,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime>("EndDate")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("date");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("tinyint(1)");
@@ -6126,16 +6193,18 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("datetime(6)");
 
                     b.Property<decimal>("RequestedDays")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<DateTime>("StartDate")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("date");
 
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
                     b.Property<decimal>("TotalDays")
-                        .HasColumnType("decimal(65,30)");
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime(6)");
@@ -6153,11 +6222,7 @@ namespace StrideHR.Infrastructure.Migrations
 
                     b.HasIndex("Status");
 
-                    b.HasIndex("EmployeeId", "Status")
-                        .HasDatabaseName("IX_LeaveRequest_Employee_Status");
-
-                    b.HasIndex("StartDate", "EndDate")
-                        .HasDatabaseName("IX_LeaveRequest_DateRange");
+                    b.HasIndex("StartDate", "EndDate");
 
                     b.ToTable("LeaveRequests");
                 });
@@ -6182,9 +6247,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("longtext");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
@@ -6262,14 +6325,7 @@ namespace StrideHR.Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.HasIndex("IsRead", "CreatedAt")
-                        .HasDatabaseName("IX_Notification_Read_Created");
-
-                    b.HasIndex("Type", "CreatedAt")
-                        .HasDatabaseName("IX_Notification_Type_Created");
-
-                    b.HasIndex("UserId", "IsRead")
-                        .HasDatabaseName("IX_Notification_User_Read");
+                    b.HasIndex("UserId", "IsRead");
 
                     b.ToTable("Notifications", (string)null);
                 });
@@ -6283,9 +6339,7 @@ namespace StrideHR.Infrastructure.Migrations
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
@@ -6376,9 +6430,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("json");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
@@ -6410,8 +6462,8 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("time(6)");
 
                     b.Property<decimal>("OvertimeRate")
-                        .HasPrecision(5, 2)
-                        .HasColumnType("decimal(5,2)");
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("Phone")
                         .IsRequired()
@@ -6456,9 +6508,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("datetime(6)");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
@@ -6497,8 +6547,8 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal>("ProgressPercentage")
-                        .HasPrecision(5, 2)
-                        .HasColumnType("decimal(5,2)");
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("Status")
                         .HasColumnType("int");
@@ -6537,9 +6587,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("varchar(1000)");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
@@ -6638,9 +6686,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
@@ -6696,10 +6742,194 @@ namespace StrideHR.Infrastructure.Migrations
                     b.HasIndex("Type")
                         .HasDatabaseName("IX_PayrollAdjustment_Type");
 
-                    b.HasIndex("PayrollRecordId", "Type")
-                        .HasDatabaseName("IX_PayrollAdjustment_Record_Type");
-
                     b.ToTable("PayrollAdjustments");
+                });
+
+            modelBuilder.Entity("StrideHR.Core.Entities.PayrollAuditTrail", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("Action")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ActionDescription")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("AdditionalData")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("DeletedBy")
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("EmployeeId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("IPAddress")
+                        .HasColumnType("longtext");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("NewValues")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("OldValues")
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("PayrollRecordId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Reason")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("SessionId")
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime>("Timestamp")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("UserAgent")
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EmployeeId");
+
+                    b.HasIndex("PayrollRecordId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("PayrollAuditTrails");
+                });
+
+            modelBuilder.Entity("StrideHR.Core.Entities.PayrollErrorCorrection", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ApprovalNotes")
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime?>("ApprovedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<int?>("ApprovedBy")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ApprovedByUserId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CorrectedValues")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("CorrectionData")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("DeletedBy")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("ErrorDescription")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("ErrorType")
+                        .HasColumnType("int");
+
+                    b.Property<decimal?>("ImpactAmount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("OriginalValues")
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("PayrollRecordId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("ProcessedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<int?>("ProcessedBy")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ProcessedByUserId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ProcessingNotes")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Reason")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime>("RequestedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<int>("RequestedBy")
+                        .HasColumnType("int");
+
+                    b.Property<int>("RequestedByUserId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ApprovedByUserId");
+
+                    b.HasIndex("PayrollRecordId");
+
+                    b.HasIndex("ProcessedByUserId");
+
+                    b.HasIndex("RequestedByUserId");
+
+                    b.ToTable("PayrollErrorCorrections");
                 });
 
             modelBuilder.Entity("StrideHR.Core.Entities.PayrollFormula", b =>
@@ -6717,9 +6947,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("json");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
@@ -6842,9 +7070,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
@@ -6881,8 +7107,8 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal>("ExchangeRate")
-                        .HasPrecision(18, 6)
-                        .HasColumnType("decimal(18,6)");
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal>("FoodAllowance")
                         .HasPrecision(18, 2)
@@ -6935,12 +7161,12 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal>("OvertimeHours")
-                        .HasPrecision(8, 2)
-                        .HasColumnType("decimal(8,2)");
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal>("OvertimeRate")
-                        .HasPrecision(8, 2)
-                        .HasColumnType("decimal(8,2)");
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("PayrollMonth")
                         .HasColumnType("int");
@@ -7009,23 +7235,14 @@ namespace StrideHR.Infrastructure.Migrations
 
                     b.HasIndex("EmployeeId1");
 
-                    b.HasIndex("ProcessedAt")
-                        .HasDatabaseName("IX_Payroll_ProcessedAt");
-
                     b.HasIndex("ProcessedBy");
 
                     b.HasIndex("Status")
                         .HasDatabaseName("IX_PayrollRecord_Status");
 
-                    b.HasIndex("EmployeeId", "Status")
-                        .HasDatabaseName("IX_Payroll_Employee_Status");
-
                     b.HasIndex("EmployeeId", "PayrollYear", "PayrollMonth")
                         .IsUnique()
                         .HasDatabaseName("IX_PayrollRecord_Employee_Period");
-
-                    b.HasIndex("PayrollYear", "PayrollMonth", "Status")
-                        .HasDatabaseName("IX_Payroll_Period_Status");
 
                     b.ToTable("PayrollRecords");
                 });
@@ -7051,9 +7268,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
@@ -7115,9 +7330,7 @@ namespace StrideHR.Infrastructure.Migrations
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
@@ -7245,9 +7458,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<int>("CreatedBy")
                         .HasColumnType("int");
@@ -7397,9 +7608,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("varchar(100)");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
@@ -7471,9 +7680,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("datetime(6)");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
@@ -7510,8 +7717,8 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("varchar(1000)");
 
                     b.Property<decimal>("ProgressPercentage")
-                        .HasPrecision(5, 2)
-                        .HasColumnType("decimal(5,2)");
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("datetime(6)");
@@ -7543,10 +7750,9 @@ namespace StrideHR.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ManagerId");
+                    b.HasIndex("EmployeeId");
 
-                    b.HasIndex("EmployeeId", "Status")
-                        .HasDatabaseName("IX_PerformanceGoal_Employee_Status");
+                    b.HasIndex("ManagerId");
 
                     b.ToTable("PerformanceGoals");
                 });
@@ -7567,9 +7773,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("datetime(6)");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
@@ -7605,8 +7809,8 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal>("ProgressPercentage")
-                        .HasPrecision(5, 2)
-                        .HasColumnType("decimal(5,2)");
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("SupportNeeded")
                         .HasMaxLength(1000)
@@ -7641,9 +7845,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("datetime(6)");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
@@ -7729,14 +7931,13 @@ namespace StrideHR.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("EmployeeId");
+
                     b.HasIndex("HRId");
 
                     b.HasIndex("ManagerId");
 
                     b.HasIndex("PerformanceReviewId");
-
-                    b.HasIndex("EmployeeId", "Status")
-                        .HasDatabaseName("IX_PIP_Employee_Status");
 
                     b.ToTable("PerformanceImprovementPlans");
                 });
@@ -7763,9 +7964,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("datetime(6)");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
@@ -7804,8 +8003,8 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal?>("OverallScore")
-                        .HasPrecision(5, 2)
-                        .HasColumnType("decimal(5,2)");
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<bool>("RequiresPIP")
                         .HasColumnType("tinyint(1)");
@@ -7838,10 +8037,9 @@ namespace StrideHR.Infrastructure.Migrations
 
                     b.HasIndex("ApprovedBy");
 
-                    b.HasIndex("ManagerId");
+                    b.HasIndex("EmployeeId");
 
-                    b.HasIndex("EmployeeId", "ReviewPeriod")
-                        .HasDatabaseName("IX_PerformanceReview_Employee_Period");
+                    b.HasIndex("ManagerId");
 
                     b.ToTable("PerformanceReviews");
                 });
@@ -7860,9 +8058,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("varchar(50)");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
@@ -7924,12 +8120,11 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal>("Budget")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
@@ -7987,11 +8182,7 @@ namespace StrideHR.Infrastructure.Migrations
 
                     b.HasIndex("Status");
 
-                    b.HasIndex("StartDate", "EndDate")
-                        .HasDatabaseName("IX_Project_DateRange");
-
-                    b.HasIndex("Status", "Priority")
-                        .HasDatabaseName("IX_Project_Status_Priority");
+                    b.HasIndex("StartDate", "EndDate");
 
                     b.ToTable("Projects", (string)null);
                 });
@@ -8009,9 +8200,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("longtext");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
@@ -8066,9 +8255,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
@@ -8143,9 +8330,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("datetime(6)");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
@@ -8160,6 +8345,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal?>("HourlyRate")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<bool>("IsDeleted")
@@ -8192,9 +8378,6 @@ namespace StrideHR.Infrastructure.Migrations
 
                     b.HasIndex("ProjectId");
 
-                    b.HasIndex("EmployeeId", "UnassignedDate")
-                        .HasDatabaseName("IX_ProjectAssignment_Employee_Unassigned");
-
                     b.HasIndex("ProjectId", "EmployeeId");
 
                     b.ToTable("ProjectAssignments", (string)null);
@@ -8213,9 +8396,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("longtext");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
@@ -8267,9 +8448,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
@@ -8320,9 +8499,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
@@ -8341,7 +8518,8 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("datetime(6)");
 
                     b.Property<decimal>("Impact")
-                        .HasColumnType("decimal(65,30)");
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("tinyint(1)");
@@ -8351,7 +8529,8 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("longtext");
 
                     b.Property<decimal>("Probability")
-                        .HasColumnType("decimal(65,30)");
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("ProjectId")
                         .HasColumnType("int");
@@ -8398,9 +8577,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
@@ -8458,13 +8635,7 @@ namespace StrideHR.Infrastructure.Migrations
 
                     b.HasIndex("Status");
 
-                    b.HasIndex("AssignedToEmployeeId", "Status")
-                        .HasDatabaseName("IX_ProjectTask_Assignee_Status");
-
                     b.HasIndex("ProjectId", "DisplayOrder");
-
-                    b.HasIndex("ProjectId", "Status")
-                        .HasDatabaseName("IX_ProjectTask_Project_Status");
 
                     b.ToTable("ProjectTasks", (string)null);
                 });
@@ -8478,9 +8649,7 @@ namespace StrideHR.Infrastructure.Migrations
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
@@ -8564,9 +8733,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<int>("CreatedBy")
                         .HasColumnType("int");
@@ -8652,9 +8819,7 @@ namespace StrideHR.Infrastructure.Migrations
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
@@ -8733,9 +8898,7 @@ namespace StrideHR.Infrastructure.Migrations
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<int>("CreatedBy")
                         .HasColumnType("int");
@@ -8817,9 +8980,7 @@ namespace StrideHR.Infrastructure.Migrations
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
@@ -8897,9 +9058,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<int?>("CreatedBy")
                         .HasColumnType("int");
@@ -8980,9 +9139,7 @@ namespace StrideHR.Infrastructure.Migrations
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
@@ -9035,9 +9192,7 @@ namespace StrideHR.Infrastructure.Migrations
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
@@ -9073,9 +9228,6 @@ namespace StrideHR.Infrastructure.Migrations
 
                     b.HasIndex("PermissionId");
 
-                    b.HasIndex("RoleId", "IsGranted")
-                        .HasDatabaseName("IX_RolePermission_Role_Granted");
-
                     b.HasIndex("RoleId", "PermissionId")
                         .IsUnique();
 
@@ -9097,9 +9249,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("time(6)");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
@@ -9142,8 +9292,8 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal>("OvertimeMultiplier")
-                        .HasPrecision(5, 2)
-                        .HasColumnType("decimal(5,2)");
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<TimeSpan>("StartTime")
                         .HasColumnType("time(6)");
@@ -9191,9 +9341,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("varchar(100)");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
@@ -9236,9 +9384,6 @@ namespace StrideHR.Infrastructure.Migrations
 
                     b.HasIndex("ShiftId");
 
-                    b.HasIndex("EmployeeId", "StartDate")
-                        .HasDatabaseName("IX_ShiftAssignment_Employee_StartDate");
-
                     b.HasIndex("EmployeeId", "ShiftId", "StartDate")
                         .IsUnique();
 
@@ -9278,9 +9423,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
@@ -9344,9 +9487,7 @@ namespace StrideHR.Infrastructure.Migrations
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
@@ -9414,9 +9555,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("datetime(6)");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
@@ -9474,14 +9613,13 @@ namespace StrideHR.Infrastructure.Migrations
 
                     b.HasIndex("ApprovedByEmployeeId");
 
+                    b.HasIndex("RequesterId");
+
                     b.HasIndex("RequesterShiftAssignmentId");
 
                     b.HasIndex("TargetEmployeeId");
 
                     b.HasIndex("TargetShiftAssignmentId");
-
-                    b.HasIndex("RequesterId", "Status")
-                        .HasDatabaseName("IX_ShiftSwap_Employee_Status");
 
                     b.ToTable("ShiftSwapRequests");
                 });
@@ -9495,9 +9633,7 @@ namespace StrideHR.Infrastructure.Migrations
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
@@ -9574,9 +9710,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("datetime(6)");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
@@ -9687,9 +9821,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("varchar(2000)");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
@@ -9743,9 +9875,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
@@ -9804,9 +9934,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
@@ -9911,9 +10039,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("double");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
@@ -9999,9 +10125,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("tinyint(1)");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
@@ -10086,9 +10210,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("datetime(6)");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
@@ -10185,9 +10307,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("varchar(2000)");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
@@ -10273,9 +10393,7 @@ namespace StrideHR.Infrastructure.Migrations
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
@@ -10342,9 +10460,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
@@ -10432,9 +10548,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("datetime(6)");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
@@ -10486,9 +10600,7 @@ namespace StrideHR.Infrastructure.Migrations
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("AssignedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<int>("AssignedBy")
                         .HasColumnType("int");
@@ -10497,9 +10609,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("datetime(6)");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
@@ -10579,9 +10689,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("JSON");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
@@ -10672,9 +10780,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("datetime(6)");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
@@ -10699,8 +10805,8 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("longtext");
 
                     b.Property<decimal>("ProgressPercentage")
-                        .HasPrecision(5, 2)
-                        .HasColumnType("decimal(5,2)");
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<DateTime?>("StartedAt")
                         .HasColumnType("datetime(6)");
@@ -10753,12 +10859,11 @@ namespace StrideHR.Infrastructure.Migrations
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<decimal?>("CalculatedMileageAmount")
-                        .HasColumnType("decimal(65,30)");
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
@@ -10786,10 +10891,12 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("tinyint(1)");
 
                     b.Property<decimal?>("MileageDistance")
-                        .HasColumnType("decimal(65,30)");
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal?>("MileageRate")
-                        .HasColumnType("decimal(65,30)");
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<int?>("ProjectId")
                         .HasColumnType("int");
@@ -10838,12 +10945,11 @@ namespace StrideHR.Infrastructure.Migrations
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<decimal>("Amount")
-                        .HasColumnType("decimal(65,30)");
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
@@ -10911,9 +11017,7 @@ namespace StrideHR.Infrastructure.Migrations
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
@@ -11002,14 +11106,8 @@ namespace StrideHR.Infrastructure.Migrations
                     b.HasIndex("EmployeeId")
                         .IsUnique();
 
-                    b.HasIndex("LastLoginAt")
-                        .HasDatabaseName("IX_User_LastLogin");
-
                     b.HasIndex("Username")
                         .IsUnique();
-
-                    b.HasIndex("Email", "IsActive")
-                        .HasDatabaseName("IX_User_Email_Active");
 
                     b.ToTable("Users");
                 });
@@ -11027,9 +11125,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("varchar(255)");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
@@ -11091,9 +11187,7 @@ namespace StrideHR.Infrastructure.Migrations
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
@@ -11170,9 +11264,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
@@ -11238,9 +11330,7 @@ namespace StrideHR.Infrastructure.Migrations
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<int>("CreatedBy")
                         .HasColumnType("int");
@@ -11306,9 +11396,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
@@ -11641,6 +11729,29 @@ namespace StrideHR.Infrastructure.Migrations
                     b.Navigation("Technician");
                 });
 
+            modelBuilder.Entity("StrideHR.Core.Entities.AttendanceAlert", b =>
+                {
+                    b.HasOne("StrideHR.Core.Entities.Branch", "Branch")
+                        .WithMany()
+                        .HasForeignKey("BranchId");
+
+                    b.HasOne("StrideHR.Core.Entities.Employee", "Employee")
+                        .WithMany()
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("StrideHR.Core.Entities.Employee", "ResolvedBy")
+                        .WithMany()
+                        .HasForeignKey("ResolvedById");
+
+                    b.Navigation("Branch");
+
+                    b.Navigation("Employee");
+
+                    b.Navigation("ResolvedBy");
+                });
+
             modelBuilder.Entity("StrideHR.Core.Entities.AttendancePolicy", b =>
                 {
                     b.HasOne("StrideHR.Core.Entities.Branch", "Branch")
@@ -11941,21 +12052,13 @@ namespace StrideHR.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("StrideHR.Core.Entities.Employee", "ExecutedByEmployee")
-                        .WithMany()
-                        .HasForeignKey("ExecutedByEmployeeId");
-
                     b.HasOne("StrideHR.Core.Entities.GeneratedDocument", "GeneratedDocument")
                         .WithMany()
-                        .HasForeignKey("GeneratedDocumentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("GeneratedDocumentId");
 
                     b.Navigation("ApprovedByEmployee");
 
                     b.Navigation("DocumentRetentionPolicy");
-
-                    b.Navigation("ExecutedByEmployee");
 
                     b.Navigation("GeneratedDocument");
                 });
@@ -12123,6 +12226,28 @@ namespace StrideHR.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("EmployeeExit");
+                });
+
+            modelBuilder.Entity("StrideHR.Core.Entities.EmployeeOnboarding", b =>
+                {
+                    b.HasOne("StrideHR.Core.Entities.Employee", "Employee")
+                        .WithMany()
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Employee");
+                });
+
+            modelBuilder.Entity("StrideHR.Core.Entities.EmployeeOnboardingTask", b =>
+                {
+                    b.HasOne("StrideHR.Core.Entities.EmployeeOnboarding", "EmployeeOnboarding")
+                        .WithMany("Tasks")
+                        .HasForeignKey("EmployeeOnboardingId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("EmployeeOnboarding");
                 });
 
             modelBuilder.Entity("StrideHR.Core.Entities.EmployeeRole", b =>
@@ -12874,6 +12999,64 @@ namespace StrideHR.Infrastructure.Migrations
                     b.Navigation("ApprovedByEmployee");
 
                     b.Navigation("PayrollRecord");
+                });
+
+            modelBuilder.Entity("StrideHR.Core.Entities.PayrollAuditTrail", b =>
+                {
+                    b.HasOne("StrideHR.Core.Entities.Employee", "Employee")
+                        .WithMany()
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("StrideHR.Core.Entities.PayrollRecord", "PayrollRecord")
+                        .WithMany()
+                        .HasForeignKey("PayrollRecordId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("StrideHR.Core.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Employee");
+
+                    b.Navigation("PayrollRecord");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("StrideHR.Core.Entities.PayrollErrorCorrection", b =>
+                {
+                    b.HasOne("StrideHR.Core.Entities.User", "ApprovedByUser")
+                        .WithMany()
+                        .HasForeignKey("ApprovedByUserId");
+
+                    b.HasOne("StrideHR.Core.Entities.PayrollRecord", "PayrollRecord")
+                        .WithMany()
+                        .HasForeignKey("PayrollRecordId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("StrideHR.Core.Entities.User", "ProcessedByUser")
+                        .WithMany()
+                        .HasForeignKey("ProcessedByUserId");
+
+                    b.HasOne("StrideHR.Core.Entities.User", "RequestedByUser")
+                        .WithMany()
+                        .HasForeignKey("RequestedByUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ApprovedByUser");
+
+                    b.Navigation("PayrollRecord");
+
+                    b.Navigation("ProcessedByUser");
+
+                    b.Navigation("RequestedByUser");
                 });
 
             modelBuilder.Entity("StrideHR.Core.Entities.PayrollFormula", b =>
@@ -14071,6 +14254,11 @@ namespace StrideHR.Infrastructure.Migrations
                 });
 
             modelBuilder.Entity("StrideHR.Core.Entities.EmployeeExit", b =>
+                {
+                    b.Navigation("Tasks");
+                });
+
+            modelBuilder.Entity("StrideHR.Core.Entities.EmployeeOnboarding", b =>
                 {
                     b.Navigation("Tasks");
                 });

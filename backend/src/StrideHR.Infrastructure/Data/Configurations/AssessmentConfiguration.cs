@@ -42,8 +42,7 @@ public class AssessmentConfiguration : IEntityTypeConfiguration<Assessment>
         builder.Property(a => a.IsActive)
             .HasDefaultValue(true);
 
-        builder.Property(a => a.CreatedAt)
-            .HasDefaultValueSql("CURRENT_TIMESTAMP");
+        builder.Property(a => a.CreatedAt);
 
         // Relationships
         builder.HasOne(a => a.TrainingModule)

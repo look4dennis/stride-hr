@@ -25,14 +25,14 @@ namespace StrideHR.Infrastructure.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     ToCurrency = table.Column<string>(type: "varchar(3)", maxLength: 3, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    Rate = table.Column<decimal>(type: "decimal(18,6)", precision: 18, scale: 6, nullable: false),
+                    Rate = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     EffectiveDate = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     ExpiryDate = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     IsActive = table.Column<bool>(type: "tinyint(1)", nullable: false, defaultValue: true),
                     Source = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     LastUpdated = table.Column<DateTime>(type: "datetime(6)", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -70,7 +70,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     MetaDescription = table.Column<string>(type: "varchar(300)", maxLength: 300, nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -115,7 +115,7 @@ namespace StrideHR.Infrastructure.Migrations
                     DefaultMetadata = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     DefaultExpiryDuration = table.Column<TimeSpan>(type: "time(6)", nullable: true),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -155,12 +155,12 @@ namespace StrideHR.Infrastructure.Migrations
                     RegistrationNumber = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     NormalWorkingHours = table.Column<TimeSpan>(type: "time(6)", nullable: false),
-                    OvertimeRate = table.Column<decimal>(type: "decimal(5,2)", precision: 5, scale: 2, nullable: false),
+                    OvertimeRate = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     ProductiveHoursThreshold = table.Column<int>(type: "int", nullable: false),
                     BranchIsolationEnabled = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     ConfigurationSettings = table.Column<string>(type: "json", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -194,7 +194,7 @@ namespace StrideHR.Infrastructure.Migrations
                     Description = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     IsActive = table.Column<bool>(type: "tinyint(1)", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -223,7 +223,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     HierarchyLevel = table.Column<int>(type: "int", nullable: false),
                     IsActive = table.Column<bool>(type: "tinyint(1)", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -276,7 +276,7 @@ namespace StrideHR.Infrastructure.Migrations
                     ComplianceSettings = table.Column<string>(type: "json", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     IsActive = table.Column<bool>(type: "tinyint(1)", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -323,7 +323,7 @@ namespace StrideHR.Infrastructure.Migrations
                     PolicyDescription = table.Column<string>(type: "varchar(1000)", maxLength: 1000, nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     OrganizationId = table.Column<int>(type: "int", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -356,7 +356,7 @@ namespace StrideHR.Infrastructure.Migrations
                     PermissionId = table.Column<int>(type: "int", nullable: false),
                     IsGranted = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     ExpiresAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -405,7 +405,7 @@ namespace StrideHR.Infrastructure.Migrations
                     SerialNumber = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     PurchaseDate = table.Column<DateTime>(type: "datetime(6)", nullable: true),
-                    PurchasePrice = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
+                    PurchasePrice = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: true),
                     PurchaseCurrency = table.Column<string>(type: "varchar(3)", maxLength: 3, nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Vendor = table.Column<string>(type: "varchar(200)", maxLength: 200, nullable: true)
@@ -423,11 +423,11 @@ namespace StrideHR.Infrastructure.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     ImageUrl = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    DepreciationRate = table.Column<decimal>(type: "decimal(5,2)", nullable: true),
-                    CurrentValue = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
+                    DepreciationRate = table.Column<decimal>(type: "decimal(5,2)", precision: 18, scale: 2, nullable: true),
+                    CurrentValue = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: true),
                     LastMaintenanceDate = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     NextMaintenanceDate = table.Column<DateTime>(type: "datetime(6)", nullable: true),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -451,7 +451,7 @@ namespace StrideHR.Infrastructure.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "AttendancePolicies",
+                name: "AttendancePolicy",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -467,10 +467,10 @@ namespace StrideHR.Infrastructure.Migrations
                     MaxBreaksPerDay = table.Column<int>(type: "int", nullable: false),
                     RequireLocationTracking = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     LocationRadius = table.Column<double>(type: "double", precision: 10, scale: 2, nullable: false),
-                    OvertimeRate = table.Column<decimal>(type: "decimal(5,2)", precision: 5, scale: 2, nullable: false),
+                    OvertimeRate = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     MinimumOvertimeHours = table.Column<TimeSpan>(type: "time(6)", nullable: false),
                     IsActive = table.Column<bool>(type: "tinyint(1)", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -483,9 +483,9 @@ namespace StrideHR.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_AttendancePolicies", x => x.Id);
+                    table.PrimaryKey("PK_AttendancePolicy", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_AttendancePolicies_Branches_BranchId",
+                        name: "FK_AttendancePolicy_Branches_BranchId",
                         column: x => x.BranchId,
                         principalTable: "Branches",
                         principalColumn: "Id",
@@ -522,7 +522,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     BranchId = table.Column<int>(type: "int", nullable: true),
                     IsGlobal = table.Column<bool>(type: "tinyint(1)", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -592,7 +592,7 @@ namespace StrideHR.Infrastructure.Migrations
                     ReportingManagerId = table.Column<int>(type: "int", nullable: true),
                     Notes = table.Column<string>(type: "varchar(1000)", maxLength: 1000, nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -622,7 +622,7 @@ namespace StrideHR.Infrastructure.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "Holidays",
+                name: "Holiday",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -635,7 +635,7 @@ namespace StrideHR.Infrastructure.Migrations
                     IsOptional = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     Description = table.Column<string>(type: "varchar(500)", maxLength: 500, nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -648,9 +648,9 @@ namespace StrideHR.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Holidays", x => x.Id);
+                    table.PrimaryKey("PK_Holiday", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Holidays_Branches_BranchId",
+                        name: "FK_Holiday_Branches_BranchId",
                         column: x => x.BranchId,
                         principalTable: "Branches",
                         principalColumn: "Id",
@@ -677,9 +677,9 @@ namespace StrideHR.Infrastructure.Migrations
                     IsCarryForwardAllowed = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     MaxCarryForwardDays = table.Column<int>(type: "int", nullable: false),
                     IsEncashmentAllowed = table.Column<bool>(type: "tinyint(1)", nullable: false),
-                    EncashmentRate = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    EncashmentRate = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     IsActive = table.Column<bool>(type: "tinyint(1)", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -727,7 +727,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Designation = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -780,9 +780,9 @@ namespace StrideHR.Infrastructure.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     WorkingDays = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    OvertimeMultiplier = table.Column<decimal>(type: "decimal(5,2)", precision: 5, scale: 2, nullable: false),
+                    OvertimeMultiplier = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     IsActive = table.Column<bool>(type: "tinyint(1)", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -849,7 +849,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     IsDefault = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     IsActive = table.Column<bool>(type: "tinyint(1)", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -891,7 +891,7 @@ namespace StrideHR.Infrastructure.Migrations
                     RequiresJustification = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     IsActive = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     Priority = table.Column<int>(type: "int", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -930,7 +930,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Vendor = table.Column<string>(type: "varchar(200)", maxLength: 200, nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    Cost = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
+                    Cost = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: true),
                     Currency = table.Column<string>(type: "varchar(3)", maxLength: 3, nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     WorkPerformed = table.Column<string>(type: "varchar(1000)", maxLength: 1000, nullable: true)
@@ -944,7 +944,7 @@ namespace StrideHR.Infrastructure.Migrations
                     NextMaintenanceDate = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     DocumentUrl = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -980,6 +980,63 @@ namespace StrideHR.Infrastructure.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
+                name: "AttendanceAlerts",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    EmployeeId = table.Column<int>(type: "int", nullable: false),
+                    AlertType = table.Column<int>(type: "int", nullable: false),
+                    Message = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Severity = table.Column<int>(type: "int", nullable: false),
+                    AlertDate = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    IsResolved = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    ResolvedDate = table.Column<DateTime>(type: "datetime(6)", nullable: true),
+                    ResolvedById = table.Column<int>(type: "int", nullable: true),
+                    ResolutionNotes = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    BranchId = table.Column<int>(type: "int", nullable: true),
+                    IsRead = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    ReadAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
+                    AlertMessage = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Metadata = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
+                    CreatedBy = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    UpdatedBy = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    IsDeleted = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    DeletedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
+                    DeletedBy = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AttendanceAlerts", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_AttendanceAlerts_Branches_BranchId",
+                        column: x => x.BranchId,
+                        principalTable: "Branches",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_AttendanceAlerts_Employees_EmployeeId",
+                        column: x => x.EmployeeId,
+                        principalTable: "Employees",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_AttendanceAlerts_Employees_ResolvedById",
+                        column: x => x.ResolvedById,
+                        principalTable: "Employees",
+                        principalColumn: "Id");
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
                 name: "Budgets",
                 columns: table => new
                 {
@@ -992,10 +1049,10 @@ namespace StrideHR.Infrastructure.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Year = table.Column<int>(type: "int", nullable: false),
                     Month = table.Column<int>(type: "int", nullable: false),
-                    BudgetedAmount = table.Column<decimal>(type: "decimal(65,30)", nullable: false),
-                    ActualAmount = table.Column<decimal>(type: "decimal(65,30)", nullable: false),
-                    Variance = table.Column<decimal>(type: "decimal(65,30)", nullable: false),
-                    VariancePercentage = table.Column<decimal>(type: "decimal(65,30)", nullable: false),
+                    BudgetedAmount = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    ActualAmount = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    Variance = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    VariancePercentage = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     Currency = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Status = table.Column<int>(type: "int", nullable: false),
@@ -1006,7 +1063,7 @@ namespace StrideHR.Infrastructure.Migrations
                     ApprovedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedByEmployeeId = table.Column<int>(type: "int", nullable: false),
                     ApprovedByEmployeeId = table.Column<int>(type: "int", nullable: true),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     UpdatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -1055,7 +1112,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     IsActive = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     LastSyncAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -1099,7 +1156,7 @@ namespace StrideHR.Infrastructure.Migrations
                     SatisfactionRating = table.Column<int>(type: "int", nullable: true),
                     FeedbackComments = table.Column<string>(type: "varchar(1000)", maxLength: 1000, nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -1153,7 +1210,7 @@ namespace StrideHR.Infrastructure.Migrations
                     UpdatedBy = table.Column<int>(type: "int", nullable: false),
                     RelatedArticleIds = table.Column<string>(type: "json", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -1186,7 +1243,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Intent = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    ConfidenceScore = table.Column<decimal>(type: "decimal(5,4)", precision: 5, scale: 4, nullable: false),
+                    ConfidenceScore = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     WasHelpful = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     UserFeedback = table.Column<string>(type: "varchar(1000)", maxLength: 1000, nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -1198,7 +1255,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     IsTrainingData = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     ProcessedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -1246,7 +1303,7 @@ namespace StrideHR.Infrastructure.Migrations
                     CreatedBy = table.Column<int>(type: "int", nullable: false),
                     LastReviewDate = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     NextReviewDate = table.Column<DateTime>(type: "datetime(6)", nullable: true),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     UpdatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -1301,7 +1358,7 @@ namespace StrideHR.Infrastructure.Migrations
                     RequiresApproval = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     ApprovalWorkflow = table.Column<string>(type: "varchar(500)", maxLength: 500, nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     UpdatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -1329,7 +1386,7 @@ namespace StrideHR.Infrastructure.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "EmployeeExit",
+                name: "EmployeeExits",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -1351,7 +1408,7 @@ namespace StrideHR.Infrastructure.Migrations
                     AreAssetsReturned = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     AssetReturnNotes = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -1364,9 +1421,46 @@ namespace StrideHR.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_EmployeeExit", x => x.Id);
+                    table.PrimaryKey("PK_EmployeeExits", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_EmployeeExit_Employees_EmployeeId",
+                        name: "FK_EmployeeExits_Employees_EmployeeId",
+                        column: x => x.EmployeeId,
+                        principalTable: "Employees",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "EmployeeOnboardings",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    EmployeeId = table.Column<int>(type: "int", nullable: false),
+                    OnboardingDate = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    OnboardingManager = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    IsCompleted = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    CompletedDate = table.Column<DateTime>(type: "datetime(6)", nullable: true),
+                    Notes = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
+                    CreatedBy = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    UpdatedBy = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    IsDeleted = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    DeletedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
+                    DeletedBy = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_EmployeeOnboardings", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_EmployeeOnboardings_Employees_EmployeeId",
                         column: x => x.EmployeeId,
                         principalTable: "Employees",
                         principalColumn: "Id",
@@ -1385,7 +1479,7 @@ namespace StrideHR.Infrastructure.Migrations
                     AssignedDate = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     ExpiryDate = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     IsActive = table.Column<bool>(type: "tinyint(1)", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -1428,18 +1522,18 @@ namespace StrideHR.Infrastructure.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Description = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    BudgetLimit = table.Column<decimal>(type: "decimal(65,30)", nullable: false),
+                    BudgetLimit = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     Currency = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Period = table.Column<int>(type: "int", nullable: false),
                     StartDate = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     EndDate = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     IsActive = table.Column<bool>(type: "tinyint(1)", nullable: false),
-                    AlertThreshold = table.Column<decimal>(type: "decimal(65,30)", nullable: false),
+                    AlertThreshold = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     SendAlerts = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     Notes = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -1502,7 +1596,7 @@ namespace StrideHR.Infrastructure.Migrations
                     AdvanceAmount = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: true),
                     Notes = table.Column<string>(type: "varchar(500)", maxLength: 500, nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -1549,7 +1643,7 @@ namespace StrideHR.Infrastructure.Migrations
                     LastSyncAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<int>(type: "int", nullable: false),
                     CreatedByEmployeeId = table.Column<int>(type: "int", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     UpdatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -1616,7 +1710,7 @@ namespace StrideHR.Infrastructure.Migrations
                     EscalatedById = table.Column<int>(type: "int", nullable: true),
                     EscalationReason = table.Column<string>(type: "varchar(500)", maxLength: 500, nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -1695,7 +1789,7 @@ namespace StrideHR.Infrastructure.Migrations
                     Version = table.Column<int>(type: "int", nullable: false),
                     ParentDocumentId = table.Column<int>(type: "int", nullable: true),
                     IsCurrentVersion = table.Column<bool>(type: "tinyint(1)", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -1757,8 +1851,8 @@ namespace StrideHR.Infrastructure.Migrations
                     FoodAllowance = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     OtherAllowances = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     TotalAllowances = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
-                    OvertimeHours = table.Column<decimal>(type: "decimal(8,2)", precision: 8, scale: 2, nullable: false),
-                    OvertimeRate = table.Column<decimal>(type: "decimal(8,2)", precision: 8, scale: 2, nullable: false),
+                    OvertimeHours = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    OvertimeRate = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     OvertimeAmount = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     TaxDeduction = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     ProvidentFund = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
@@ -1777,7 +1871,7 @@ namespace StrideHR.Infrastructure.Migrations
                     LeaveDeduction = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     Currency = table.Column<string>(type: "varchar(3)", maxLength: 3, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    ExchangeRate = table.Column<decimal>(type: "decimal(18,6)", precision: 18, scale: 6, nullable: false),
+                    ExchangeRate = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     BaseCurrency = table.Column<string>(type: "varchar(3)", maxLength: 3, nullable: false, defaultValue: "USD")
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Status = table.Column<int>(type: "int", nullable: false),
@@ -1792,7 +1886,7 @@ namespace StrideHR.Infrastructure.Migrations
                     PayslipPath = table.Column<string>(type: "varchar(500)", maxLength: 500, nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     EmployeeId1 = table.Column<int>(type: "int", nullable: true),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -1870,7 +1964,7 @@ namespace StrideHR.Infrastructure.Migrations
                     CreatedBy = table.Column<int>(type: "int", nullable: false),
                     LastModifiedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     LastModifiedBy = table.Column<int>(type: "int", nullable: true),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     UpdatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -1927,14 +2021,14 @@ namespace StrideHR.Infrastructure.Migrations
                     TargetDate = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     WeightPercentage = table.Column<int>(type: "int", nullable: false),
                     Status = table.Column<int>(type: "int", nullable: false),
-                    ProgressPercentage = table.Column<decimal>(type: "decimal(5,2)", precision: 5, scale: 2, nullable: false),
+                    ProgressPercentage = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     Notes = table.Column<string>(type: "varchar(1000)", maxLength: 1000, nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     CompletedDate = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     FinalRating = table.Column<int>(type: "int", nullable: true),
                     ManagerComments = table.Column<string>(type: "varchar(1000)", maxLength: 1000, nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -1978,7 +2072,7 @@ namespace StrideHR.Infrastructure.Migrations
                     DueDate = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     Status = table.Column<int>(type: "int", nullable: false),
                     OverallRating = table.Column<int>(type: "int", nullable: true),
-                    OverallScore = table.Column<decimal>(type: "decimal(5,2)", precision: 5, scale: 2, nullable: true),
+                    OverallScore = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: true),
                     EmployeeSelfAssessment = table.Column<string>(type: "varchar(2000)", maxLength: 2000, nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     ManagerComments = table.Column<string>(type: "varchar(2000)", maxLength: 2000, nullable: true)
@@ -1993,7 +2087,7 @@ namespace StrideHR.Infrastructure.Migrations
                     CompletedDate = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     ApprovedDate = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     ApprovedBy = table.Column<int>(type: "int", nullable: true),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -2041,12 +2135,12 @@ namespace StrideHR.Infrastructure.Migrations
                     StartDate = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     EndDate = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     EstimatedHours = table.Column<int>(type: "int", nullable: false),
-                    Budget = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Budget = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     Status = table.Column<int>(type: "int", nullable: false),
                     Priority = table.Column<int>(type: "int", nullable: false),
                     CreatedByEmployeeId = table.Column<int>(type: "int", nullable: false),
                     BranchId = table.Column<int>(type: "int", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -2106,7 +2200,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     CreatedBy = table.Column<int>(type: "int", nullable: false),
                     BranchId = table.Column<int>(type: "int", nullable: true),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     UpdatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -2160,7 +2254,7 @@ namespace StrideHR.Infrastructure.Migrations
                     IsSystemTemplate = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     IsActive = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     CreatedBy = table.Column<int>(type: "int", nullable: true),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     UpdatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -2213,7 +2307,7 @@ namespace StrideHR.Infrastructure.Migrations
                     SatisfactionRating = table.Column<int>(type: "int", nullable: true),
                     FeedbackComments = table.Column<string>(type: "varchar(1000)", maxLength: 1000, nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -2277,7 +2371,7 @@ namespace StrideHR.Infrastructure.Migrations
                     RandomizeQuestions = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     Tags = table.Column<string>(type: "varchar(500)", maxLength: 500, nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -2330,7 +2424,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     ContentFiles = table.Column<string>(type: "JSON", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -2383,7 +2477,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     SecurityAnswerHash = table.Column<string>(type: "varchar(500)", maxLength: 500, nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -2424,7 +2518,7 @@ namespace StrideHR.Infrastructure.Migrations
                     IsActive = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     CreatedBy = table.Column<int>(type: "int", nullable: false),
                     CreatedByEmployeeId = table.Column<int>(type: "int", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     UpdatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -2459,14 +2553,14 @@ namespace StrideHR.Infrastructure.Migrations
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     LeavePolicyId = table.Column<int>(type: "int", nullable: false),
                     AccrualFrequency = table.Column<int>(type: "int", nullable: false),
-                    AccrualRate = table.Column<decimal>(type: "decimal(65,30)", nullable: false),
+                    AccrualRate = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     MaxAccrualDays = table.Column<int>(type: "int", nullable: false),
                     IsProRated = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     MinServiceMonths = table.Column<int>(type: "int", nullable: false),
                     EffectiveFrom = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     EffectiveTo = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     IsActive = table.Column<bool>(type: "tinyint(1)", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -2499,14 +2593,14 @@ namespace StrideHR.Infrastructure.Migrations
                     LeavePolicyId = table.Column<int>(type: "int", nullable: false),
                     Year = table.Column<int>(type: "int", nullable: false),
                     Month = table.Column<int>(type: "int", nullable: false),
-                    AccruedDays = table.Column<decimal>(type: "decimal(65,30)", nullable: false),
-                    AccrualRate = table.Column<decimal>(type: "decimal(65,30)", nullable: false),
+                    AccruedDays = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    AccrualRate = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     AccrualType = table.Column<int>(type: "int", nullable: false),
                     AccrualDate = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     Notes = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     IsProcessed = table.Column<bool>(type: "tinyint(1)", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -2544,11 +2638,11 @@ namespace StrideHR.Infrastructure.Migrations
                     EmployeeId = table.Column<int>(type: "int", nullable: false),
                     LeavePolicyId = table.Column<int>(type: "int", nullable: false),
                     Year = table.Column<int>(type: "int", nullable: false),
-                    AllocatedDays = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    UsedDays = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    CarriedForwardDays = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    EncashedDays = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    AllocatedDays = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    UsedDays = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    CarriedForwardDays = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    EncashedDays = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -2586,9 +2680,9 @@ namespace StrideHR.Infrastructure.Migrations
                     EmployeeId = table.Column<int>(type: "int", nullable: false),
                     LeavePolicyId = table.Column<int>(type: "int", nullable: false),
                     Year = table.Column<int>(type: "int", nullable: false),
-                    EncashedDays = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    EncashmentRate = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    EncashmentAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    EncashedDays = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    EncashmentRate = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    EncashmentAmount = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     EncashmentDate = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     Status = table.Column<int>(type: "int", nullable: false),
                     ApprovedBy = table.Column<int>(type: "int", nullable: true),
@@ -2597,7 +2691,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Comments = table.Column<string>(type: "varchar(2000)", maxLength: 2000, nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -2641,11 +2735,11 @@ namespace StrideHR.Infrastructure.Migrations
                     EmployeeId = table.Column<int>(type: "int", nullable: false),
                     LeavePolicyId = table.Column<int>(type: "int", nullable: false),
                     LeaveType = table.Column<int>(type: "int", nullable: false),
-                    StartDate = table.Column<DateTime>(type: "datetime(6)", nullable: false),
-                    EndDate = table.Column<DateTime>(type: "datetime(6)", nullable: false),
-                    RequestedDays = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    ApprovedDays = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    TotalDays = table.Column<decimal>(type: "decimal(65,30)", nullable: false),
+                    StartDate = table.Column<DateTime>(type: "date", nullable: false),
+                    EndDate = table.Column<DateTime>(type: "date", nullable: false),
+                    RequestedDays = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    ApprovedDays = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    TotalDays = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     Reason = table.Column<string>(type: "varchar(500)", maxLength: 500, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Comments = table.Column<string>(type: "varchar(1000)", maxLength: 1000, nullable: true)
@@ -2663,7 +2757,7 @@ namespace StrideHR.Infrastructure.Migrations
                     IsEmergency = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     AttachmentPath = table.Column<string>(type: "varchar(500)", maxLength: 500, nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -2741,7 +2835,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     CorrectedBy = table.Column<int>(type: "int", nullable: true),
                     CorrectedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -2791,7 +2885,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Notes = table.Column<string>(type: "varchar(500)", maxLength: 500, nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -2842,7 +2936,7 @@ namespace StrideHR.Infrastructure.Migrations
                     RelatedEntityId = table.Column<int>(type: "int", nullable: true),
                     Attendees = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -2879,7 +2973,7 @@ namespace StrideHR.Infrastructure.Migrations
                     Timestamp = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     Intent = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    ConfidenceScore = table.Column<decimal>(type: "decimal(5,4)", precision: 5, scale: 4, nullable: true),
+                    ConfidenceScore = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: true),
                     Entities = table.Column<string>(type: "json", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     RequiresAction = table.Column<bool>(type: "tinyint(1)", nullable: false),
@@ -2888,7 +2982,7 @@ namespace StrideHR.Infrastructure.Migrations
                     ActionData = table.Column<string>(type: "json", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     IsProcessed = table.Column<bool>(type: "tinyint(1)", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -2923,7 +3017,7 @@ namespace StrideHR.Infrastructure.Migrations
                     Comments = table.Column<string>(type: "varchar(1000)", maxLength: 1000, nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     ProvidedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -2953,7 +3047,7 @@ namespace StrideHR.Infrastructure.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "DocumentTemplateVersions",
+                name: "DocumentTemplateVersion",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -2969,7 +3063,7 @@ namespace StrideHR.Infrastructure.Migrations
                     CreatedBy = table.Column<int>(type: "int", nullable: false),
                     IsActive = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     CreatedByEmployeeId = table.Column<int>(type: "int", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     UpdatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -2980,15 +3074,15 @@ namespace StrideHR.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_DocumentTemplateVersions", x => x.Id);
+                    table.PrimaryKey("PK_DocumentTemplateVersion", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_DocumentTemplateVersions_DocumentTemplates_DocumentTemplateId",
+                        name: "FK_DocumentTemplateVersion_DocumentTemplates_DocumentTemplateId",
                         column: x => x.DocumentTemplateId,
                         principalTable: "DocumentTemplates",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_DocumentTemplateVersions_Employees_CreatedByEmployeeId",
+                        name: "FK_DocumentTemplateVersion_Employees_CreatedByEmployeeId",
                         column: x => x.CreatedByEmployeeId,
                         principalTable: "Employees",
                         principalColumn: "Id",
@@ -3034,7 +3128,7 @@ namespace StrideHR.Infrastructure.Migrations
                     LastDownloadedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     Notes = table.Column<string>(type: "varchar(2000)", maxLength: 2000, nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -3087,7 +3181,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     DamageNotes = table.Column<string>(type: "varchar(1000)", maxLength: 1000, nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    DamageCharges = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
+                    DamageCharges = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: true),
                     Currency = table.Column<string>(type: "varchar(3)", maxLength: 3, nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     InitiatedBy = table.Column<int>(type: "int", nullable: false),
@@ -3095,7 +3189,7 @@ namespace StrideHR.Infrastructure.Migrations
                     IsApproved = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     ApprovedBy = table.Column<int>(type: "int", nullable: true),
                     ApprovedDate = table.Column<DateTime>(type: "datetime(6)", nullable: true),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -3116,9 +3210,9 @@ namespace StrideHR.Infrastructure.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_AssetHandovers_EmployeeExit_EmployeeExitId",
+                        name: "FK_AssetHandovers_EmployeeExits_EmployeeExitId",
                         column: x => x.EmployeeExitId,
-                        principalTable: "EmployeeExit",
+                        principalTable: "EmployeeExits",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
@@ -3149,7 +3243,7 @@ namespace StrideHR.Infrastructure.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "EmployeeExitTask",
+                name: "EmployeeExitTasks",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -3165,7 +3259,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     CompletionNotes = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -3178,18 +3272,59 @@ namespace StrideHR.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_EmployeeExitTask", x => x.Id);
+                    table.PrimaryKey("PK_EmployeeExitTasks", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_EmployeeExitTask_EmployeeExit_EmployeeExitId",
+                        name: "FK_EmployeeExitTasks_EmployeeExits_EmployeeExitId",
                         column: x => x.EmployeeExitId,
-                        principalTable: "EmployeeExit",
+                        principalTable: "EmployeeExits",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "ExpenseBudgetAlerts",
+                name: "EmployeeOnboardingTasks",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    EmployeeOnboardingId = table.Column<int>(type: "int", nullable: false),
+                    TaskName = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Description = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    DueDate = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    IsCompleted = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    CompletedDate = table.Column<DateTime>(type: "datetime(6)", nullable: true),
+                    AssignedTo = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    CompletionNotes = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
+                    CreatedBy = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    UpdatedBy = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    IsDeleted = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    DeletedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
+                    DeletedBy = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_EmployeeOnboardingTasks", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_EmployeeOnboardingTasks_EmployeeOnboardings_EmployeeOnboardi~",
+                        column: x => x.EmployeeOnboardingId,
+                        principalTable: "EmployeeOnboardings",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "ExpenseBudgetAlert",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -3199,8 +3334,8 @@ namespace StrideHR.Infrastructure.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Message = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    CurrentUtilization = table.Column<decimal>(type: "decimal(65,30)", nullable: false),
-                    ThresholdPercentage = table.Column<decimal>(type: "decimal(65,30)", nullable: false),
+                    CurrentUtilization = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    ThresholdPercentage = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     AlertDate = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     IsResolved = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     ResolvedDate = table.Column<DateTime>(type: "datetime(6)", nullable: true),
@@ -3208,7 +3343,7 @@ namespace StrideHR.Infrastructure.Migrations
                     ResolutionNotes = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     ResolvedByEmployeeId = table.Column<int>(type: "int", nullable: true),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -3221,14 +3356,14 @@ namespace StrideHR.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ExpenseBudgetAlerts", x => x.Id);
+                    table.PrimaryKey("PK_ExpenseBudgetAlert", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ExpenseBudgetAlerts_Employees_ResolvedByEmployeeId",
+                        name: "FK_ExpenseBudgetAlert_Employees_ResolvedByEmployeeId",
                         column: x => x.ResolvedByEmployeeId,
                         principalTable: "Employees",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_ExpenseBudgetAlerts_ExpenseBudgets_ExpenseBudgetId",
+                        name: "FK_ExpenseBudgetAlert_ExpenseBudgets_ExpenseBudgetId",
                         column: x => x.ExpenseBudgetId,
                         principalTable: "ExpenseBudgets",
                         principalColumn: "Id",
@@ -3252,7 +3387,7 @@ namespace StrideHR.Infrastructure.Migrations
                     ApprovedAmount = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: true),
                     RejectionReason = table.Column<string>(type: "varchar(500)", maxLength: 500, nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -3299,7 +3434,7 @@ namespace StrideHR.Infrastructure.Migrations
                     ErrorMessage = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Duration = table.Column<TimeSpan>(type: "time(6)", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -3335,7 +3470,7 @@ namespace StrideHR.Infrastructure.Migrations
                     IsInternal = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     AttachmentPath = table.Column<string>(type: "varchar(500)", maxLength: 500, nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -3381,7 +3516,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     EscalatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     IsAutoEscalation = table.Column<bool>(type: "tinyint(1)", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -3434,7 +3569,7 @@ namespace StrideHR.Infrastructure.Migrations
                     CompletedById = table.Column<int>(type: "int", nullable: true),
                     CompletionNotes = table.Column<string>(type: "varchar(1000)", maxLength: 1000, nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -3483,7 +3618,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Notes = table.Column<string>(type: "varchar(1000)", maxLength: 1000, nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -3529,7 +3664,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     StepOrder = table.Column<int>(type: "int", nullable: false),
                     IsRequired = table.Column<bool>(type: "tinyint(1)", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -3577,7 +3712,7 @@ namespace StrideHR.Infrastructure.Migrations
                     UploadedBy = table.Column<int>(type: "int", nullable: false),
                     UploadedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     DownloadCount = table.Column<int>(type: "int", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -3621,7 +3756,7 @@ namespace StrideHR.Infrastructure.Migrations
                     PostedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     EditedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     IsDeleted = table.Column<bool>(type: "tinyint(1)", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -3670,7 +3805,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     ReadDuration = table.Column<TimeSpan>(type: "time(6)", nullable: true),
                     IsUniqueView = table.Column<bool>(type: "tinyint(1)", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -3717,7 +3852,7 @@ namespace StrideHR.Infrastructure.Migrations
                     IsApproved = table.Column<bool>(type: "tinyint(1)", nullable: false, defaultValue: false),
                     ApprovedBy = table.Column<int>(type: "int", nullable: true),
                     ApprovedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -3782,7 +3917,7 @@ namespace StrideHR.Infrastructure.Migrations
                     Version = table.Column<int>(type: "int", nullable: false, defaultValue: 1),
                     RegenerationReason = table.Column<string>(type: "varchar(500)", maxLength: 500, nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -3845,7 +3980,7 @@ namespace StrideHR.Infrastructure.Migrations
                     EmployeeId = table.Column<int>(type: "int", nullable: false),
                     ManagerId = table.Column<int>(type: "int", nullable: true),
                     CheckInDate = table.Column<DateTime>(type: "datetime(6)", nullable: false),
-                    ProgressPercentage = table.Column<decimal>(type: "decimal(5,2)", precision: 5, scale: 2, nullable: false),
+                    ProgressPercentage = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     EmployeeComments = table.Column<string>(type: "varchar(1000)", maxLength: 1000, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     ManagerComments = table.Column<string>(type: "varchar(1000)", maxLength: 1000, nullable: true)
@@ -3855,7 +3990,7 @@ namespace StrideHR.Infrastructure.Migrations
                     SupportNeeded = table.Column<string>(type: "varchar(1000)", maxLength: 1000, nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     NextCheckInDate = table.Column<DateTime>(type: "datetime(6)", nullable: true),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -3913,7 +4048,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     IsSubmitted = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     SubmittedDate = table.Column<DateTime>(type: "datetime(6)", nullable: true),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -3980,7 +4115,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     HRNotes = table.Column<string>(type: "varchar(2000)", maxLength: 2000, nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -4066,7 +4201,7 @@ namespace StrideHR.Infrastructure.Migrations
                     IsActive = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     AssignedBy = table.Column<int>(type: "int", nullable: false),
                     ReturnedBy = table.Column<int>(type: "int", nullable: true),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -4137,7 +4272,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     MileageDistance = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: true),
                     MileageRate = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: true),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -4186,7 +4321,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Details = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -4231,7 +4366,7 @@ namespace StrideHR.Infrastructure.Migrations
                     ResolvedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     ResolutionNotes = table.Column<string>(type: "varchar(2000)", maxLength: 2000, nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -4273,8 +4408,8 @@ namespace StrideHR.Infrastructure.Migrations
                     UnassignedDate = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     Role = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    HourlyRate = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    HourlyRate = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -4316,8 +4451,8 @@ namespace StrideHR.Infrastructure.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Severity = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    Probability = table.Column<decimal>(type: "decimal(65,30)", nullable: false),
-                    Impact = table.Column<decimal>(type: "decimal(65,30)", nullable: false),
+                    Probability = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    Impact = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     MitigationPlan = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Status = table.Column<string>(type: "longtext", nullable: false)
@@ -4326,7 +4461,7 @@ namespace StrideHR.Infrastructure.Migrations
                     IdentifiedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     ResolvedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     AssignedToEmployeeId = table.Column<int>(type: "int", nullable: true),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -4371,7 +4506,7 @@ namespace StrideHR.Infrastructure.Migrations
                     DueDate = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     AssignedToEmployeeId = table.Column<int>(type: "int", nullable: true),
                     DisplayOrder = table.Column<int>(type: "int", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -4416,16 +4551,16 @@ namespace StrideHR.Infrastructure.Migrations
                     DepartureDate = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     ReturnDate = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     TravelMode = table.Column<int>(type: "int", nullable: false),
-                    MileageDistance = table.Column<decimal>(type: "decimal(65,30)", nullable: true),
-                    MileageRate = table.Column<decimal>(type: "decimal(65,30)", nullable: true),
-                    CalculatedMileageAmount = table.Column<decimal>(type: "decimal(65,30)", nullable: true),
+                    MileageDistance = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: true),
+                    MileageRate = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: true),
+                    CalculatedMileageAmount = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: true),
                     VehicleDetails = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     RouteDetails = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     IsRoundTrip = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     ProjectId = table.Column<int>(type: "int", nullable: true),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -4476,7 +4611,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     ExportPath = table.Column<string>(type: "varchar(500)", maxLength: 500, nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -4530,7 +4665,7 @@ namespace StrideHR.Infrastructure.Migrations
                     EmailBody = table.Column<string>(type: "TEXT", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     CreatedBy = table.Column<int>(type: "int", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     UpdatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -4571,7 +4706,7 @@ namespace StrideHR.Infrastructure.Migrations
                     SharedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     ExpiresAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     IsActive = table.Column<bool>(type: "tinyint(1)", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -4619,7 +4754,7 @@ namespace StrideHR.Infrastructure.Migrations
                     IsInternal = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     AttachmentPath = table.Column<string>(type: "varchar(500)", maxLength: 500, nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -4661,7 +4796,7 @@ namespace StrideHR.Infrastructure.Migrations
                     ChangedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     Reason = table.Column<string>(type: "varchar(500)", maxLength: 500, nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -4715,7 +4850,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     AccessToken = table.Column<string>(type: "varchar(200)", maxLength: 200, nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -4776,7 +4911,7 @@ namespace StrideHR.Infrastructure.Migrations
                     ConditionalLogic = table.Column<string>(type: "varchar(2000)", maxLength: 2000, nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     IsActive = table.Column<bool>(type: "tinyint(1)", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -4825,7 +4960,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Notes = table.Column<string>(type: "varchar(1000)", maxLength: 1000, nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -4868,12 +5003,12 @@ namespace StrideHR.Infrastructure.Migrations
                     Type = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     TimeLimit = table.Column<int>(type: "int", nullable: false),
-                    PassingScore = table.Column<decimal>(type: "decimal(5,2)", precision: 5, scale: 2, nullable: false),
+                    PassingScore = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     MaxAttempts = table.Column<int>(type: "int", nullable: false, defaultValue: 3),
                     RetakeWaitingPeriodHours = table.Column<int>(type: "int", nullable: false, defaultValue: 24),
                     IsActive = table.Column<bool>(type: "tinyint(1)", nullable: false, defaultValue: true),
                     CreatedByEmployeeId = table.Column<int>(type: "int", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -4914,14 +5049,14 @@ namespace StrideHR.Infrastructure.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     CertificationNumber = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    IssuedDate = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
+                    IssuedDate = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     ExpiryDate = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     Status = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false, defaultValue: "Active")
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     CertificateFilePath = table.Column<string>(type: "varchar(500)", maxLength: 500, nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     IssuedBy = table.Column<int>(type: "int", nullable: false),
-                    Score = table.Column<decimal>(type: "decimal(5,2)", precision: 5, scale: 2, nullable: true),
+                    Score = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: true),
                     Notes = table.Column<string>(type: "varchar(1000)", maxLength: 1000, nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     IsExternalCertification = table.Column<bool>(type: "tinyint(1)", nullable: false, defaultValue: false),
@@ -4929,7 +5064,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     VerificationUrl = table.Column<string>(type: "varchar(500)", maxLength: 500, nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -4973,7 +5108,7 @@ namespace StrideHR.Infrastructure.Migrations
                     TrainingModuleId = table.Column<int>(type: "int", nullable: false),
                     EmployeeId = table.Column<int>(type: "int", nullable: false),
                     AssignedBy = table.Column<int>(type: "int", nullable: false),
-                    AssignedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
+                    AssignedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     DueDate = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     Status = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false, defaultValue: "Assigned")
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -4981,7 +5116,7 @@ namespace StrideHR.Infrastructure.Migrations
                     CompletedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     Notes = table.Column<string>(type: "varchar(1000)", maxLength: 1000, nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -5022,7 +5157,7 @@ namespace StrideHR.Infrastructure.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    EventType = table.Column<string>(type: "varchar(255)", nullable: false)
+                    EventType = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Description = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -5037,7 +5172,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Timestamp = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     IsSecurityEvent = table.Column<bool>(type: "tinyint(1)", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -5095,7 +5230,7 @@ namespace StrideHR.Infrastructure.Migrations
                     Parameters = table.Column<string>(type: "JSON", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     CreatedBy = table.Column<int>(type: "int", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     UpdatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -5150,7 +5285,7 @@ namespace StrideHR.Infrastructure.Migrations
                     IsGlobal = table.Column<bool>(type: "tinyint(1)", nullable: false, defaultValue: false),
                     TargetRole = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -5180,6 +5315,140 @@ namespace StrideHR.Infrastructure.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
+                name: "PayrollAuditTrails",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    PayrollRecordId = table.Column<int>(type: "int", nullable: false),
+                    EmployeeId = table.Column<int>(type: "int", nullable: false),
+                    Action = table.Column<int>(type: "int", nullable: false),
+                    ActionDescription = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    Timestamp = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    OldValues = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    NewValues = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Reason = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    IPAddress = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    UserAgent = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    SessionId = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    AdditionalData = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
+                    CreatedBy = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    UpdatedBy = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    IsDeleted = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    DeletedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
+                    DeletedBy = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PayrollAuditTrails", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_PayrollAuditTrails_Employees_EmployeeId",
+                        column: x => x.EmployeeId,
+                        principalTable: "Employees",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_PayrollAuditTrails_PayrollRecords_PayrollRecordId",
+                        column: x => x.PayrollRecordId,
+                        principalTable: "PayrollRecords",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_PayrollAuditTrails_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "PayrollErrorCorrections",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    PayrollRecordId = table.Column<int>(type: "int", nullable: false),
+                    ErrorType = table.Column<int>(type: "int", nullable: false),
+                    ErrorDescription = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    CorrectionData = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Status = table.Column<int>(type: "int", nullable: false),
+                    RequestedBy = table.Column<int>(type: "int", nullable: false),
+                    RequestedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    ApprovedBy = table.Column<int>(type: "int", nullable: true),
+                    ApprovedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
+                    ApprovalNotes = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    ProcessedBy = table.Column<int>(type: "int", nullable: true),
+                    ProcessedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
+                    ProcessingNotes = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Reason = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    OriginalValues = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    CorrectedValues = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    ImpactAmount = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: true),
+                    RequestedByUserId = table.Column<int>(type: "int", nullable: false),
+                    ApprovedByUserId = table.Column<int>(type: "int", nullable: true),
+                    ProcessedByUserId = table.Column<int>(type: "int", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
+                    CreatedBy = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    UpdatedBy = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    IsDeleted = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    DeletedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
+                    DeletedBy = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PayrollErrorCorrections", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_PayrollErrorCorrections_PayrollRecords_PayrollRecordId",
+                        column: x => x.PayrollRecordId,
+                        principalTable: "PayrollRecords",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_PayrollErrorCorrections_Users_ApprovedByUserId",
+                        column: x => x.ApprovedByUserId,
+                        principalTable: "Users",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_PayrollErrorCorrections_Users_ProcessedByUserId",
+                        column: x => x.ProcessedByUserId,
+                        principalTable: "Users",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_PayrollErrorCorrections_Users_RequestedByUserId",
+                        column: x => x.RequestedByUserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
                 name: "RefreshTokens",
                 columns: table => new
                 {
@@ -5197,7 +5466,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     CreatedByIp = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -5235,7 +5504,7 @@ namespace StrideHR.Infrastructure.Migrations
                     QuietHoursStart = table.Column<TimeSpan>(type: "time(6)", nullable: true),
                     QuietHoursEnd = table.Column<TimeSpan>(type: "time(6)", nullable: true),
                     WeekendNotifications = table.Column<bool>(type: "tinyint(1)", nullable: false, defaultValue: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -5278,7 +5547,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Location = table.Column<string>(type: "varchar(200)", maxLength: 200, nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -5322,7 +5591,7 @@ namespace StrideHR.Infrastructure.Migrations
                     AttemptCount = table.Column<int>(type: "int", nullable: false),
                     DeliveredAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     Status = table.Column<int>(type: "int", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -5359,7 +5628,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     ActionDate = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     EscalatedToId = table.Column<int>(type: "int", nullable: true),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -5402,12 +5671,12 @@ namespace StrideHR.Infrastructure.Migrations
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     EmployeeId = table.Column<int>(type: "int", nullable: false),
                     LeaveRequestId = table.Column<int>(type: "int", nullable: false),
-                    Date = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    Date = table.Column<DateTime>(type: "date", nullable: false),
                     IsFullDay = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     StartTime = table.Column<TimeSpan>(type: "time", nullable: true),
                     EndTime = table.Column<TimeSpan>(type: "time", nullable: true),
                     LeaveType = table.Column<int>(type: "int", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -5443,19 +5712,24 @@ namespace StrideHR.Infrastructure.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     AttendanceRecordId = table.Column<int>(type: "int", nullable: false),
-                    Type = table.Column<int>(type: "int", nullable: false),
-                    StartTime = table.Column<DateTime>(type: "datetime(6)", nullable: false),
-                    EndTime = table.Column<DateTime>(type: "datetime(6)", nullable: true),
-                    Duration = table.Column<TimeSpan>(type: "time(6)", nullable: true),
-                    Location = table.Column<string>(type: "varchar(200)", maxLength: 200, nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    Latitude = table.Column<double>(type: "double", precision: 10, scale: 8, nullable: true),
-                    Longitude = table.Column<double>(type: "double", precision: 11, scale: 8, nullable: true),
-                    TimeZone = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: true)
+                    BreakStartTime = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    BreakEndTime = table.Column<DateTime>(type: "datetime(6)", nullable: true),
+                    BreakType = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Notes = table.Column<string>(type: "varchar(500)", maxLength: 500, nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    Duration = table.Column<TimeSpan>(type: "time(6)", nullable: true),
+                    IsPaid = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    StartTime = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    EndTime = table.Column<DateTime>(type: "datetime(6)", nullable: true),
+                    Type = table.Column<int>(type: "int", nullable: false),
+                    Location = table.Column<string>(type: "varchar(200)", maxLength: 200, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Latitude = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: true),
+                    Longitude = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: true),
+                    TimeZone = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -5502,7 +5776,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     AcceptedByEmployeeId = table.Column<int>(type: "int", nullable: true),
                     ApprovedByEmployeeId = table.Column<int>(type: "int", nullable: true),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -5566,7 +5840,7 @@ namespace StrideHR.Infrastructure.Migrations
                     IsEmergency = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     ExpiresAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     ApprovedByEmployeeId = table.Column<int>(type: "int", nullable: true),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -5633,7 +5907,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     EscalatedTo = table.Column<int>(type: "int", nullable: true),
                     EscalatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -5687,7 +5961,7 @@ namespace StrideHR.Infrastructure.Migrations
                     Timestamp = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     Metadata = table.Column<string>(type: "json", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -5723,23 +5997,24 @@ namespace StrideHR.Infrastructure.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     DocumentRetentionPolicyId = table.Column<int>(type: "int", nullable: false),
-                    GeneratedDocumentId = table.Column<int>(type: "int", nullable: false),
-                    ScheduledDate = table.Column<DateTime>(type: "datetime(6)", nullable: false),
-                    ExecutedDate = table.Column<DateTime>(type: "datetime(6)", nullable: true),
+                    ExecutionDate = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    DocumentsProcessed = table.Column<int>(type: "int", nullable: false),
+                    DocumentsDeleted = table.Column<int>(type: "int", nullable: false),
+                    DocumentsArchived = table.Column<int>(type: "int", nullable: false),
+                    IsSuccessful = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    ErrorMessage = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Duration = table.Column<TimeSpan>(type: "time(6)", nullable: false),
+                    ExecutionLog = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
                     Status = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    ExecutionNotes = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    ExecutedBy = table.Column<int>(type: "int", nullable: true),
+                    ScheduledDate = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     RequiredApproval = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     IsApproved = table.Column<bool>(type: "tinyint(1)", nullable: false),
-                    ApprovedBy = table.Column<int>(type: "int", nullable: true),
-                    ApprovedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
-                    ApprovalComments = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    ExecutedByEmployeeId = table.Column<int>(type: "int", nullable: true),
+                    GeneratedDocumentId = table.Column<int>(type: "int", nullable: true),
                     ApprovedByEmployeeId = table.Column<int>(type: "int", nullable: true),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -5765,16 +6040,10 @@ namespace StrideHR.Infrastructure.Migrations
                         principalTable: "Employees",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_DocumentRetentionExecutions_Employees_ExecutedByEmployeeId",
-                        column: x => x.ExecutedByEmployeeId,
-                        principalTable: "Employees",
-                        principalColumn: "Id");
-                    table.ForeignKey(
                         name: "FK_DocumentRetentionExecutions_GeneratedDocuments_GeneratedDocu~",
                         column: x => x.GeneratedDocumentId,
                         principalTable: "GeneratedDocuments",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
@@ -5811,7 +6080,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     SignatureOrder = table.Column<int>(type: "int", nullable: false),
                     IsRequired = table.Column<bool>(type: "tinyint(1)", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -5857,7 +6126,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     PreviousStatus = table.Column<int>(type: "int", nullable: false),
                     NewStatus = table.Column<int>(type: "int", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -5901,14 +6170,14 @@ namespace StrideHR.Infrastructure.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     TargetDate = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     Status = table.Column<int>(type: "int", nullable: false),
-                    ProgressPercentage = table.Column<decimal>(type: "decimal(5,2)", precision: 5, scale: 2, nullable: false),
+                    ProgressPercentage = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     EmployeeComments = table.Column<string>(type: "varchar(1000)", maxLength: 1000, nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     ManagerComments = table.Column<string>(type: "varchar(1000)", maxLength: 1000, nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     CompletedDate = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     IsAchieved = table.Column<bool>(type: "tinyint(1)", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -5957,7 +6226,7 @@ namespace StrideHR.Infrastructure.Migrations
                     NextReviewDate = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     RecommendedActions = table.Column<string>(type: "varchar(1000)", maxLength: 1000, nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -6000,7 +6269,7 @@ namespace StrideHR.Infrastructure.Migrations
                     ViolationDescription = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Severity = table.Column<int>(type: "int", nullable: false),
-                    ViolationAmount = table.Column<decimal>(type: "decimal(65,30)", nullable: true),
+                    ViolationAmount = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: true),
                     ViolationDate = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     IsResolved = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     ResolvedDate = table.Column<DateTime>(type: "datetime(6)", nullable: true),
@@ -6014,7 +6283,7 @@ namespace StrideHR.Infrastructure.Migrations
                     WaivedDate = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     ResolvedByEmployeeId = table.Column<int>(type: "int", nullable: true),
                     WaivedByEmployeeId = table.Column<int>(type: "int", nullable: true),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -6080,7 +6349,7 @@ namespace StrideHR.Infrastructure.Migrations
                     UploadedBy = table.Column<int>(type: "int", nullable: false),
                     Description = table.Column<string>(type: "varchar(500)", maxLength: 500, nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -6125,7 +6394,7 @@ namespace StrideHR.Infrastructure.Migrations
                     Date = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     ProjectId = table.Column<int>(type: "int", nullable: true),
                     TaskId = table.Column<int>(type: "int", nullable: true),
-                    HoursWorked = table.Column<decimal>(type: "decimal(4,2)", nullable: false),
+                    HoursWorked = table.Column<decimal>(type: "decimal(4,2)", precision: 18, scale: 2, nullable: false),
                     Description = table.Column<string>(type: "varchar(1000)", maxLength: 1000, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Status = table.Column<int>(type: "int", nullable: false),
@@ -6134,7 +6403,7 @@ namespace StrideHR.Infrastructure.Migrations
                     ReviewedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     ReviewComments = table.Column<string>(type: "varchar(500)", maxLength: 500, nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -6186,7 +6455,7 @@ namespace StrideHR.Infrastructure.Migrations
                     EmployeeId = table.Column<int>(type: "int", nullable: false),
                     Comment = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -6232,7 +6501,7 @@ namespace StrideHR.Infrastructure.Migrations
                     CompletedDate = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     Notes = table.Column<string>(type: "varchar(500)", maxLength: 500, nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -6271,7 +6540,7 @@ namespace StrideHR.Infrastructure.Migrations
                     ExpenseType = table.Column<int>(type: "int", nullable: false),
                     Description = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    Amount = table.Column<decimal>(type: "decimal(65,30)", nullable: false),
+                    Amount = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     Currency = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     ExpenseDate = table.Column<DateTime>(type: "datetime(6)", nullable: false),
@@ -6283,7 +6552,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     RequiresReceipt = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     HasReceipt = table.Column<bool>(type: "tinyint(1)", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -6329,7 +6598,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Themes = table.Column<string>(type: "varchar(2000)", maxLength: 2000, nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -6370,7 +6639,7 @@ namespace StrideHR.Infrastructure.Migrations
                     OrderIndex = table.Column<int>(type: "int", nullable: false),
                     Value = table.Column<int>(type: "int", nullable: true),
                     IsActive = table.Column<bool>(type: "tinyint(1)", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -6408,12 +6677,12 @@ namespace StrideHR.Infrastructure.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     CorrectAnswers = table.Column<string>(type: "TEXT", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    Points = table.Column<decimal>(type: "decimal(5,2)", precision: 5, scale: 2, nullable: false, defaultValue: 1m),
+                    Points = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false, defaultValue: 1m),
                     OrderIndex = table.Column<int>(type: "int", nullable: false),
                     IsActive = table.Column<bool>(type: "tinyint(1)", nullable: false, defaultValue: true),
                     Explanation = table.Column<string>(type: "TEXT", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -6445,7 +6714,7 @@ namespace StrideHR.Infrastructure.Migrations
                     TrainingAssignmentId = table.Column<int>(type: "int", nullable: false),
                     EmployeeId = table.Column<int>(type: "int", nullable: false),
                     TrainingModuleId = table.Column<int>(type: "int", nullable: false),
-                    ProgressPercentage = table.Column<decimal>(type: "decimal(5,2)", precision: 5, scale: 2, nullable: false),
+                    ProgressPercentage = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     TimeSpentMinutes = table.Column<int>(type: "int", nullable: false),
                     LastAccessedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     StartedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
@@ -6454,7 +6723,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     ProgressData = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -6530,7 +6799,7 @@ namespace StrideHR.Infrastructure.Migrations
                     Metadata = table.Column<string>(type: "JSON", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     CampaignId = table.Column<int>(type: "int", maxLength: 100, nullable: true),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -6583,7 +6852,7 @@ namespace StrideHR.Infrastructure.Migrations
                     Notes = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     RespondedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -6625,7 +6894,7 @@ namespace StrideHR.Infrastructure.Migrations
                     Notes = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     RespondedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -6670,7 +6939,7 @@ namespace StrideHR.Infrastructure.Migrations
                     EmployeeId = table.Column<int>(type: "int", nullable: false),
                     Reply = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -6719,7 +6988,7 @@ namespace StrideHR.Infrastructure.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     RatingValue = table.Column<int>(type: "int", nullable: true),
                     IsSkipped = table.Column<bool>(type: "tinyint(1)", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -6766,14 +7035,14 @@ namespace StrideHR.Infrastructure.Migrations
                     AttemptNumber = table.Column<int>(type: "int", nullable: false),
                     StartedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     CompletedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
-                    Score = table.Column<decimal>(type: "decimal(65,30)", nullable: true),
-                    MaxScore = table.Column<decimal>(type: "decimal(65,30)", nullable: true),
+                    Score = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: true),
+                    MaxScore = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: true),
                     IsPassed = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     Status = table.Column<int>(type: "int", nullable: false),
                     TimeSpentMinutes = table.Column<int>(type: "int", nullable: false),
                     Notes = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -6809,7 +7078,7 @@ namespace StrideHR.Infrastructure.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "AssessmentAnswers",
+                name: "AssessmentAnswer",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -6821,9 +7090,9 @@ namespace StrideHR.Infrastructure.Migrations
                     TextAnswer = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     IsCorrect = table.Column<bool>(type: "tinyint(1)", nullable: false),
-                    PointsEarned = table.Column<decimal>(type: "decimal(65,30)", nullable: false),
+                    PointsEarned = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     AnsweredAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -6836,15 +7105,15 @@ namespace StrideHR.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_AssessmentAnswers", x => x.Id);
+                    table.PrimaryKey("PK_AssessmentAnswer", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_AssessmentAnswers_AssessmentAttempts_AssessmentAttemptId",
+                        name: "FK_AssessmentAnswer_AssessmentAttempts_AssessmentAttemptId",
                         column: x => x.AssessmentAttemptId,
                         principalTable: "AssessmentAttempts",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_AssessmentAnswers_AssessmentQuestions_AssessmentQuestionId",
+                        name: "FK_AssessmentAnswer_AssessmentQuestions_AssessmentQuestionId",
                         column: x => x.AssessmentQuestionId,
                         principalTable: "AssessmentQuestions",
                         principalColumn: "Id",
@@ -6853,13 +7122,13 @@ namespace StrideHR.Infrastructure.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateIndex(
-                name: "IX_AssessmentAnswers_AssessmentAttemptId",
-                table: "AssessmentAnswers",
+                name: "IX_AssessmentAnswer_AssessmentAttemptId",
+                table: "AssessmentAnswer",
                 column: "AssessmentAttemptId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_AssessmentAnswers_AssessmentQuestionId",
-                table: "AssessmentAnswers",
+                name: "IX_AssessmentAnswer_AssessmentQuestionId",
+                table: "AssessmentAnswer",
                 column: "AssessmentQuestionId");
 
             migrationBuilder.CreateIndex(
@@ -7084,24 +7353,24 @@ namespace StrideHR.Infrastructure.Migrations
                 column: "Type");
 
             migrationBuilder.CreateIndex(
-                name: "IX_AttendancePolicies_BranchId",
-                table: "AttendancePolicies",
+                name: "IX_AttendanceAlerts_BranchId",
+                table: "AttendanceAlerts",
                 column: "BranchId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Attendance_Date_Status",
-                table: "AttendanceRecords",
-                columns: new[] { "Date", "Status" });
+                name: "IX_AttendanceAlerts_EmployeeId",
+                table: "AttendanceAlerts",
+                column: "EmployeeId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Attendance_Employee_Created",
-                table: "AttendanceRecords",
-                columns: new[] { "EmployeeId", "CreatedAt" });
+                name: "IX_AttendanceAlerts_ResolvedById",
+                table: "AttendanceAlerts",
+                column: "ResolvedById");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Attendance_Employee_Date_Status",
-                table: "AttendanceRecords",
-                columns: new[] { "EmployeeId", "Date", "Status" });
+                name: "IX_AttendancePolicy_BranchId",
+                table: "AttendancePolicy",
+                column: "BranchId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_AttendanceRecords_CorrectedBy",
@@ -7120,19 +7389,9 @@ namespace StrideHR.Infrastructure.Migrations
                 column: "ShiftId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_AuditLog_EventType_Timestamp",
+                name: "IX_AuditLogs_UserId",
                 table: "AuditLogs",
-                columns: new[] { "EventType", "Timestamp" });
-
-            migrationBuilder.CreateIndex(
-                name: "IX_AuditLog_Timestamp",
-                table: "AuditLogs",
-                column: "Timestamp");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_AuditLog_User_Timestamp",
-                table: "AuditLogs",
-                columns: new[] { "UserId", "Timestamp" });
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Branches_OrganizationId",
@@ -7140,9 +7399,9 @@ namespace StrideHR.Infrastructure.Migrations
                 column: "OrganizationId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_BreakRecord_Attendance_Start",
+                name: "IX_BreakRecords_AttendanceRecordId",
                 table: "BreakRecords",
-                columns: new[] { "AttendanceRecordId", "StartTime" });
+                column: "AttendanceRecordId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Budgets_ApprovedByEmployeeId",
@@ -7397,11 +7656,6 @@ namespace StrideHR.Infrastructure.Migrations
                 column: "DocumentRetentionPolicyId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_DocumentRetentionExecutions_ExecutedByEmployeeId",
-                table: "DocumentRetentionExecutions",
-                column: "ExecutedByEmployeeId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_DocumentRetentionExecutions_GeneratedDocumentId",
                 table: "DocumentRetentionExecutions",
                 column: "GeneratedDocumentId");
@@ -7489,24 +7743,14 @@ namespace StrideHR.Infrastructure.Migrations
                 column: "Type");
 
             migrationBuilder.CreateIndex(
-                name: "IX_DocumentTemplateVersions_CreatedByEmployeeId",
-                table: "DocumentTemplateVersions",
+                name: "IX_DocumentTemplateVersion_CreatedByEmployeeId",
+                table: "DocumentTemplateVersion",
                 column: "CreatedByEmployeeId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_DocumentTemplateVersions_DocumentTemplateId",
-                table: "DocumentTemplateVersions",
+                name: "IX_DocumentTemplateVersion_DocumentTemplateId",
+                table: "DocumentTemplateVersion",
                 column: "DocumentTemplateId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_DSR_Employee_Date",
-                table: "DSRs",
-                columns: new[] { "EmployeeId", "Date" });
-
-            migrationBuilder.CreateIndex(
-                name: "IX_DSR_Project_Date",
-                table: "DSRs",
-                columns: new[] { "ProjectId", "Date" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_DSRs_Date",
@@ -7517,6 +7761,11 @@ namespace StrideHR.Infrastructure.Migrations
                 name: "IX_DSRs_EmployeeId",
                 table: "DSRs",
                 column: "EmployeeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_DSRs_EmployeeId_Date",
+                table: "DSRs",
+                columns: new[] { "EmployeeId", "Date" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_DSRs_ProjectId",
@@ -7650,19 +7899,29 @@ namespace StrideHR.Infrastructure.Migrations
                 column: "Type");
 
             migrationBuilder.CreateIndex(
-                name: "IX_EmployeeExit_EmployeeId",
-                table: "EmployeeExit",
+                name: "IX_EmployeeExits_EmployeeId",
+                table: "EmployeeExits",
                 column: "EmployeeId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_EmployeeExitTask_EmployeeExitId",
-                table: "EmployeeExitTask",
+                name: "IX_EmployeeExitTasks_EmployeeExitId",
+                table: "EmployeeExitTasks",
                 column: "EmployeeExitId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_EmployeeRole_Employee_Active",
+                name: "IX_EmployeeOnboardings_EmployeeId",
+                table: "EmployeeOnboardings",
+                column: "EmployeeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EmployeeOnboardingTasks_EmployeeOnboardingId",
+                table: "EmployeeOnboardingTasks",
+                column: "EmployeeOnboardingId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EmployeeRoles_EmployeeId",
                 table: "EmployeeRoles",
-                columns: new[] { "EmployeeId", "IsActive" });
+                column: "EmployeeId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_EmployeeRoles_RoleId",
@@ -7670,29 +7929,9 @@ namespace StrideHR.Infrastructure.Migrations
                 column: "RoleId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Employee_Branch_Status",
+                name: "IX_Employees_BranchId",
                 table: "Employees",
-                columns: new[] { "BranchId", "Status" });
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Employee_Department_Status",
-                table: "Employees",
-                columns: new[] { "Department", "Status" });
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Employee_FullName",
-                table: "Employees",
-                columns: new[] { "FirstName", "LastName" });
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Employee_JoiningDate",
-                table: "Employees",
-                column: "JoiningDate");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Employee_Manager_Status",
-                table: "Employees",
-                columns: new[] { "ReportingManagerId", "Status" });
+                column: "BranchId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Employees_Email",
@@ -7707,7 +7946,12 @@ namespace StrideHR.Infrastructure.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_ExchangeRate_Currencies_EffectiveDate",
+                name: "IX_Employees_ReportingManagerId",
+                table: "Employees",
+                column: "ReportingManagerId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ExchangeRate_Currencies_Date",
                 table: "ExchangeRates",
                 columns: new[] { "FromCurrency", "ToCurrency", "EffectiveDate" });
 
@@ -7732,13 +7976,13 @@ namespace StrideHR.Infrastructure.Migrations
                 column: "ExpenseClaimId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ExpenseBudgetAlerts_ExpenseBudgetId",
-                table: "ExpenseBudgetAlerts",
+                name: "IX_ExpenseBudgetAlert_ExpenseBudgetId",
+                table: "ExpenseBudgetAlert",
                 column: "ExpenseBudgetId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ExpenseBudgetAlerts_ResolvedByEmployeeId",
-                table: "ExpenseBudgetAlerts",
+                name: "IX_ExpenseBudgetAlert_ResolvedByEmployeeId",
+                table: "ExpenseBudgetAlert",
                 column: "ResolvedByEmployeeId");
 
             migrationBuilder.CreateIndex(
@@ -7976,8 +8220,8 @@ namespace StrideHR.Infrastructure.Migrations
                 column: "GrievanceId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Holidays_BranchId_Date",
-                table: "Holidays",
+                name: "IX_Holiday_BranchId_Date",
+                table: "Holiday",
                 columns: new[] { "BranchId", "Date" });
 
             migrationBuilder.CreateIndex(
@@ -8168,11 +8412,6 @@ namespace StrideHR.Infrastructure.Migrations
                 column: "LeavePolicyId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_LeaveApproval_Request_Level",
-                table: "LeaveApprovalHistories",
-                columns: new[] { "LeaveRequestId", "Level" });
-
-            migrationBuilder.CreateIndex(
                 name: "IX_LeaveApprovalHistories_ActionDate",
                 table: "LeaveApprovalHistories",
                 column: "ActionDate");
@@ -8193,7 +8432,7 @@ namespace StrideHR.Infrastructure.Migrations
                 column: "LeaveRequestId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_LeaveBalance_Employee_Policy_Year",
+                name: "IX_LeaveBalances_EmployeeId_LeavePolicyId_Year",
                 table: "LeaveBalances",
                 columns: new[] { "EmployeeId", "LeavePolicyId", "Year" },
                 unique: true);
@@ -8250,16 +8489,6 @@ namespace StrideHR.Infrastructure.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_LeaveRequest_DateRange",
-                table: "LeaveRequests",
-                columns: new[] { "StartDate", "EndDate" });
-
-            migrationBuilder.CreateIndex(
-                name: "IX_LeaveRequest_Employee_Status",
-                table: "LeaveRequests",
-                columns: new[] { "EmployeeId", "Status" });
-
-            migrationBuilder.CreateIndex(
                 name: "IX_LeaveRequests_ApprovedBy",
                 table: "LeaveRequests",
                 column: "ApprovedBy");
@@ -8275,24 +8504,14 @@ namespace StrideHR.Infrastructure.Migrations
                 column: "LeavePolicyId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_LeaveRequests_StartDate_EndDate",
+                table: "LeaveRequests",
+                columns: new[] { "StartDate", "EndDate" });
+
+            migrationBuilder.CreateIndex(
                 name: "IX_LeaveRequests_Status",
                 table: "LeaveRequests",
                 column: "Status");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Notification_Read_Created",
-                table: "Notifications",
-                columns: new[] { "IsRead", "CreatedAt" });
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Notification_Type_Created",
-                table: "Notifications",
-                columns: new[] { "Type", "CreatedAt" });
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Notification_User_Read",
-                table: "Notifications",
-                columns: new[] { "UserId", "IsRead" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Notifications_BranchId",
@@ -8325,6 +8544,11 @@ namespace StrideHR.Infrastructure.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Notifications_UserId_IsRead",
+                table: "Notifications",
+                columns: new[] { "UserId", "IsRead" });
+
+            migrationBuilder.CreateIndex(
                 name: "IX_NotificationTemplates_IsActive",
                 table: "NotificationTemplates",
                 column: "IsActive");
@@ -8351,11 +8575,6 @@ namespace StrideHR.Infrastructure.Migrations
                 column: "PayrollRecordId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_PayrollAdjustment_Record_Type",
-                table: "PayrollAdjustments",
-                columns: new[] { "PayrollRecordId", "Type" });
-
-            migrationBuilder.CreateIndex(
                 name: "IX_PayrollAdjustment_Type",
                 table: "PayrollAdjustments",
                 column: "Type");
@@ -8369,6 +8588,41 @@ namespace StrideHR.Infrastructure.Migrations
                 name: "IX_PayrollAdjustments_ApprovedBy",
                 table: "PayrollAdjustments",
                 column: "ApprovedBy");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PayrollAuditTrails_EmployeeId",
+                table: "PayrollAuditTrails",
+                column: "EmployeeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PayrollAuditTrails_PayrollRecordId",
+                table: "PayrollAuditTrails",
+                column: "PayrollRecordId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PayrollAuditTrails_UserId",
+                table: "PayrollAuditTrails",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PayrollErrorCorrections_ApprovedByUserId",
+                table: "PayrollErrorCorrections",
+                column: "ApprovedByUserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PayrollErrorCorrections_PayrollRecordId",
+                table: "PayrollErrorCorrections",
+                column: "PayrollRecordId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PayrollErrorCorrections_ProcessedByUserId",
+                table: "PayrollErrorCorrections",
+                column: "ProcessedByUserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PayrollErrorCorrections_RequestedByUserId",
+                table: "PayrollErrorCorrections",
+                column: "RequestedByUserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_PayrollFormula_IsActive",
@@ -8400,21 +8654,6 @@ namespace StrideHR.Infrastructure.Migrations
                 name: "IX_PayrollFormulas_OrganizationId",
                 table: "PayrollFormulas",
                 column: "OrganizationId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Payroll_Employee_Status",
-                table: "PayrollRecords",
-                columns: new[] { "EmployeeId", "Status" });
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Payroll_Period_Status",
-                table: "PayrollRecords",
-                columns: new[] { "PayrollYear", "PayrollMonth", "Status" });
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Payroll_ProcessedAt",
-                table: "PayrollRecords",
-                column: "ProcessedAt");
 
             migrationBuilder.CreateIndex(
                 name: "IX_PayrollRecord_Employee_Period",
@@ -8570,14 +8809,19 @@ namespace StrideHR.Infrastructure.Migrations
                 column: "PerformanceGoalId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_PerformanceGoal_Employee_Status",
+                name: "IX_PerformanceGoals_EmployeeId",
                 table: "PerformanceGoals",
-                columns: new[] { "EmployeeId", "Status" });
+                column: "EmployeeId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_PerformanceGoals_ManagerId",
                 table: "PerformanceGoals",
                 column: "ManagerId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PerformanceImprovementPlans_EmployeeId",
+                table: "PerformanceImprovementPlans",
+                column: "EmployeeId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_PerformanceImprovementPlans_HRId",
@@ -8595,24 +8839,19 @@ namespace StrideHR.Infrastructure.Migrations
                 column: "PerformanceReviewId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_PIP_Employee_Status",
-                table: "PerformanceImprovementPlans",
-                columns: new[] { "EmployeeId", "Status" });
-
-            migrationBuilder.CreateIndex(
                 name: "IX_PerformanceReviewGoals_PerformanceReviewId",
                 table: "PerformanceReviewGoals",
                 column: "PerformanceReviewId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_PerformanceReview_Employee_Period",
-                table: "PerformanceReviews",
-                columns: new[] { "EmployeeId", "ReviewPeriod" });
-
-            migrationBuilder.CreateIndex(
                 name: "IX_PerformanceReviews_ApprovedBy",
                 table: "PerformanceReviews",
                 column: "ApprovedBy");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PerformanceReviews_EmployeeId",
+                table: "PerformanceReviews",
+                column: "EmployeeId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_PerformanceReviews_ManagerId",
@@ -8681,11 +8920,6 @@ namespace StrideHR.Infrastructure.Migrations
                 column: "Severity");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ProjectAssignment_Employee_Unassigned",
-                table: "ProjectAssignments",
-                columns: new[] { "EmployeeId", "UnassignedDate" });
-
-            migrationBuilder.CreateIndex(
                 name: "IX_ProjectAssignments_EmployeeId",
                 table: "ProjectAssignments",
                 column: "EmployeeId");
@@ -8741,16 +8975,6 @@ namespace StrideHR.Infrastructure.Migrations
                 column: "ProjectId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Project_DateRange",
-                table: "Projects",
-                columns: new[] { "StartDate", "EndDate" });
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Project_Status_Priority",
-                table: "Projects",
-                columns: new[] { "Status", "Priority" });
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Projects_BranchId",
                 table: "Projects",
                 column: "BranchId");
@@ -8766,19 +8990,14 @@ namespace StrideHR.Infrastructure.Migrations
                 column: "Name");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Projects_StartDate_EndDate",
+                table: "Projects",
+                columns: new[] { "StartDate", "EndDate" });
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Projects_Status",
                 table: "Projects",
                 column: "Status");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ProjectTask_Assignee_Status",
-                table: "ProjectTasks",
-                columns: new[] { "AssignedToEmployeeId", "Status" });
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ProjectTask_Project_Status",
-                table: "ProjectTasks",
-                columns: new[] { "ProjectId", "Status" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_ProjectTasks_AssignedToEmployeeId",
@@ -8943,11 +9162,6 @@ namespace StrideHR.Infrastructure.Migrations
                 column: "Type");
 
             migrationBuilder.CreateIndex(
-                name: "IX_RolePermission_Role_Granted",
-                table: "RolePermissions",
-                columns: new[] { "RoleId", "IsGranted" });
-
-            migrationBuilder.CreateIndex(
                 name: "IX_RolePermissions_PermissionId",
                 table: "RolePermissions",
                 column: "PermissionId");
@@ -8963,11 +9177,6 @@ namespace StrideHR.Infrastructure.Migrations
                 table: "Roles",
                 column: "Name",
                 unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ShiftAssignment_Employee_StartDate",
-                table: "ShiftAssignments",
-                columns: new[] { "EmployeeId", "StartDate" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_ShiftAssignments_EmployeeId_ShiftId_StartDate",
@@ -9021,14 +9230,14 @@ namespace StrideHR.Infrastructure.Migrations
                 column: "OrganizationId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ShiftSwap_Employee_Status",
-                table: "ShiftSwapRequests",
-                columns: new[] { "RequesterId", "Status" });
-
-            migrationBuilder.CreateIndex(
                 name: "IX_ShiftSwapRequests_ApprovedByEmployeeId",
                 table: "ShiftSwapRequests",
                 column: "ApprovedByEmployeeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ShiftSwapRequests_RequesterId",
+                table: "ShiftSwapRequests",
+                column: "RequesterId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ShiftSwapRequests_RequesterShiftAssignmentId",
@@ -9467,16 +9676,6 @@ namespace StrideHR.Infrastructure.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_User_Email_Active",
-                table: "Users",
-                columns: new[] { "Email", "IsActive" });
-
-            migrationBuilder.CreateIndex(
-                name: "IX_User_LastLogin",
-                table: "Users",
-                column: "LastLoginAt");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Users_Email",
                 table: "Users",
                 column: "Email",
@@ -9530,7 +9729,7 @@ namespace StrideHR.Infrastructure.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "AssessmentAnswers");
+                name: "AssessmentAnswer");
 
             migrationBuilder.DropTable(
                 name: "AssetAssignments");
@@ -9542,7 +9741,10 @@ namespace StrideHR.Infrastructure.Migrations
                 name: "AssetMaintenances");
 
             migrationBuilder.DropTable(
-                name: "AttendancePolicies");
+                name: "AttendanceAlerts");
+
+            migrationBuilder.DropTable(
+                name: "AttendancePolicy");
 
             migrationBuilder.DropTable(
                 name: "AuditLogs");
@@ -9581,7 +9783,7 @@ namespace StrideHR.Infrastructure.Migrations
                 name: "DocumentSignatures");
 
             migrationBuilder.DropTable(
-                name: "DocumentTemplateVersions");
+                name: "DocumentTemplateVersion");
 
             migrationBuilder.DropTable(
                 name: "DSRs");
@@ -9590,7 +9792,10 @@ namespace StrideHR.Infrastructure.Migrations
                 name: "EmailLogs");
 
             migrationBuilder.DropTable(
-                name: "EmployeeExitTask");
+                name: "EmployeeExitTasks");
+
+            migrationBuilder.DropTable(
+                name: "EmployeeOnboardingTasks");
 
             migrationBuilder.DropTable(
                 name: "EmployeeRoles");
@@ -9602,7 +9807,7 @@ namespace StrideHR.Infrastructure.Migrations
                 name: "ExpenseApprovalHistories");
 
             migrationBuilder.DropTable(
-                name: "ExpenseBudgetAlerts");
+                name: "ExpenseBudgetAlert");
 
             migrationBuilder.DropTable(
                 name: "ExpenseComplianceViolations");
@@ -9623,7 +9828,7 @@ namespace StrideHR.Infrastructure.Migrations
                 name: "GrievanceStatusHistories");
 
             migrationBuilder.DropTable(
-                name: "Holidays");
+                name: "Holiday");
 
             migrationBuilder.DropTable(
                 name: "IntegrationLogs");
@@ -9666,6 +9871,12 @@ namespace StrideHR.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "PayrollAdjustments");
+
+            migrationBuilder.DropTable(
+                name: "PayrollAuditTrails");
+
+            migrationBuilder.DropTable(
+                name: "PayrollErrorCorrections");
 
             migrationBuilder.DropTable(
                 name: "PayrollFormulas");
@@ -9788,7 +9999,10 @@ namespace StrideHR.Infrastructure.Migrations
                 name: "EmailCampaigns");
 
             migrationBuilder.DropTable(
-                name: "EmployeeExit");
+                name: "EmployeeExits");
+
+            migrationBuilder.DropTable(
+                name: "EmployeeOnboardings");
 
             migrationBuilder.DropTable(
                 name: "ExpenseBudgets");

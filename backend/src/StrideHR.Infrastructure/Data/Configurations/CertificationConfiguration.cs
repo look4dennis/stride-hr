@@ -26,8 +26,7 @@ public class CertificationConfiguration : IEntityTypeConfiguration<Certification
             .IsRequired()
             .HasMaxLength(100);
 
-        builder.Property(c => c.IssuedDate)
-            .HasDefaultValueSql("CURRENT_TIMESTAMP");
+        builder.Property(c => c.IssuedDate);
 
         builder.Property(c => c.Status)
             .HasConversion<string>()

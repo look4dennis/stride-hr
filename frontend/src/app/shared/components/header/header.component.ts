@@ -68,7 +68,7 @@ import { AuthService, User } from '../../../core/auth/auth.service';
                   class="rounded-circle me-2"
                   width="32" 
                   height="32">
-                {{ currentUser.firstName }} {{ currentUser.lastName }}
+                {{ currentUser.fullName }}
               </a>
               <ul class="dropdown-menu dropdown-menu-end">
                 <li>

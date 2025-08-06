@@ -21,8 +21,7 @@ public class TrainingAssignmentConfiguration : IEntityTypeConfiguration<Training
         builder.Property(ta => ta.AssignedBy)
             .IsRequired();
 
-        builder.Property(ta => ta.AssignedAt)
-            .HasDefaultValueSql("CURRENT_TIMESTAMP");
+        builder.Property(ta => ta.AssignedAt);
 
         builder.Property(ta => ta.Status)
             .HasConversion<string>()

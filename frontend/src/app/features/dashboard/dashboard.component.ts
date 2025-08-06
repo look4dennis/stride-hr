@@ -22,7 +22,7 @@ import { QuickActionsComponent } from '../../shared/components/quick-actions/qui
             <div class="welcome-content">
               <div class="welcome-text">
                 <h1 class="welcome-title">
-                  Welcome back, {{ currentUser?.firstName }}!
+                  Welcome back, {{ currentUser?.fullName }}!
                 </h1>
                 <p class="welcome-subtitle">
                   {{ getRoleBasedWelcomeMessage() }}
@@ -33,7 +33,7 @@ import { QuickActionsComponent } from '../../shared/components/quick-actions/qui
                 </div>
               </div>
               <div class="welcome-avatar" *ngIf="currentUser?.profilePhoto">
-                <img [src]="currentUser?.profilePhoto" [alt]="currentUser?.firstName" class="avatar-img">
+                <img [src]="currentUser?.profilePhoto" [alt]="currentUser?.fullName" class="avatar-img">
               </div>
             </div>
           </div>

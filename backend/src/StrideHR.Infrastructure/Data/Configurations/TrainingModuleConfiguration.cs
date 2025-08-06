@@ -40,8 +40,7 @@ public class TrainingModuleConfiguration : IEntityTypeConfiguration<TrainingModu
         builder.Property(tm => tm.IsActive)
             .HasDefaultValue(true);
 
-        builder.Property(tm => tm.CreatedAt)
-            .HasDefaultValueSql("CURRENT_TIMESTAMP");
+        builder.Property(tm => tm.CreatedAt);
 
         // JSON conversion for lists
         builder.Property(tm => tm.PrerequisiteModuleIds)
