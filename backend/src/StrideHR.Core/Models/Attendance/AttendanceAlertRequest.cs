@@ -24,7 +24,7 @@ public class AttendanceAlertResponse
     public string? BranchName { get; set; }
     public DateTime CreatedAt { get; set; }
     public bool IsRead { get; set; }
-    public string Severity { get; set; } = "Medium"; // Low, Medium, High, Critical
+    public AlertSeverity Severity { get; set; } = AlertSeverity.Medium;
     public Dictionary<string, object> Metadata { get; set; } = new();
 }
 

@@ -1,6 +1,8 @@
+using StrideHR.Core.Interfaces;
+
 namespace StrideHR.Core.Entities;
 
-public abstract class BaseEntity
+public abstract class BaseEntity : IAuditable, ISoftDeletable
 {
     public int Id { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;

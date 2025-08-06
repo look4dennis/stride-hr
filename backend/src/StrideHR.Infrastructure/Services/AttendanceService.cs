@@ -195,8 +195,8 @@ public class AttendanceService : IAttendanceService
             Type = breakType,
             StartTime = DateTime.Now,
             Location = location,
-            Latitude = latitude,
-            Longitude = longitude,
+            Latitude = latitude.HasValue ? (decimal?)latitude.Value : null,
+            Longitude = longitude.HasValue ? (decimal?)longitude.Value : null,
             TimeZone = TimeZoneInfo.Local.Id
         };
 
@@ -765,7 +765,7 @@ public class AttendanceService : IAttendanceService
         {
             AlertType = request.AlertType,
             AlertMessage = GenerateAlertMessage(request.AlertType, request.EmployeeId),
-            EmployeeId = request.EmployeeId,
+            EmployeeId = request.EmployeeId ?? 0,
             BranchId = request.BranchId,
             CreatedAt = DateTime.Now,
             IsRead = false,
@@ -853,16 +853,16 @@ public class AttendanceService : IAttendanceService
         };
     }
 
-    private string DetermineAlertSeverity(AttendanceAlertType alertType)
+    private AlertSeverity DetermineAlertSeverity(AttendanceAlertType alertType)
     {
         return alertType switch
         {
-            AttendanceAlertType.MissedCheckIn or AttendanceAlertType.MissedCheckOut => "High",
-            AttendanceAlertType.ConsecutiveAbsences or AttendanceAlertType.LowAttendancePercentage => "Critical",
-            AttendanceAlertType.LateArrival or AttendanceAlertType.EarlyDeparture => "Medium",
-            AttendanceAlertType.ExcessiveBreakTime or AttendanceAlertType.UnusualWorkingHours => "Medium",
-            AttendanceAlertType.OvertimeThreshold => "Low",
-            _ => "Medium"
+            AttendanceAlertType.MissedCheckIn or AttendanceAlertType.MissedCheckOut => AlertSeverity.High,
+            AttendanceAlertType.ConsecutiveAbsences or AttendanceAlertType.LowAttendancePercentage => AlertSeverity.Critical,
+            AttendanceAlertType.LateArrival or AttendanceAlertType.EarlyDeparture => AlertSeverity.Medium,
+            AttendanceAlertType.ExcessiveBreakTime or AttendanceAlertType.UnusualWorkingHours => AlertSeverity.Medium,
+            AttendanceAlertType.OvertimeThreshold => AlertSeverity.Low,
+            _ => AlertSeverity.Medium
         };
     }
 }

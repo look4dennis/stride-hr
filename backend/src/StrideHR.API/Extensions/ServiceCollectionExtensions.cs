@@ -375,6 +375,9 @@ public static class ServiceCollectionExtensions
                 {
                     mysqlOptions.EnableRetryOnFailure();
                     mysqlOptions.CommandTimeout(60);
+                    // Configure MySQL to handle datetime defaults
+                    mysqlOptions.EnableStringComparisonTranslations();
+                    mysqlOptions.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
                 }));
 
         // Add JWT Authentication
