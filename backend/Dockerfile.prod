@@ -20,29 +20,50 @@ RUN dotnet publish "StrideHR.API.csproj" -c Release -o /app/publish /p:UseAppHos
 # Runtime stage
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
 
-# Install curl for health checks
-RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
+# Security: Update packages and install minimal dependencies
+RUN apt-get update && \
+    apt-get upgrade -y && \
+    apt-get install -y --no-install-recommends curl ca-certificates && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-# Create non-root user
-RUN groupadd -r stridehr && useradd -r -g stridehr stridehr
+# Security: Create non-root user with specific UID/GID
+RUN groupadd -r -g 1001 stridehr && \
+    useradd -r -u 1001 -g stridehr -d /app -s /sbin/nologin stridehr
 
 WORKDIR /app
 
-# Create necessary directories
-RUN mkdir -p /app/logs /app/uploads && \
+# Security: Set proper permissions and create necessary directories
+RUN mkdir -p /app/logs /app/uploads /app/temp && \
+    chmod 755 /app && \
+    chmod 750 /app/logs /app/uploads /app/temp && \
     chown -R stridehr:stridehr /app
 
 # Copy published application
 COPY --from=publish /app/publish .
-RUN chown -R stridehr:stridehr /app
 
-# Switch to non-root user
+# Security: Set file permissions
+RUN find /app -type f -name "*.dll" -exec chmod 644 {} \; && \
+    find /app -type f -name "*.json" -exec chmod 644 {} \; && \
+    find /app -type f -name "*.xml" -exec chmod 644 {} \; && \
+    chown -R stridehr:stridehr /app
+
+# Security: Switch to non-root user
 USER stridehr
 
+# Security: Use non-privileged port
 EXPOSE 8080
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
-    CMD curl -f http://localhost:8080/health || exit 1
+# Environment variables for production
+ENV ASPNETCORE_ENVIRONMENT=Production \
+    ASPNETCORE_URLS=http://+:8080 \
+    DOTNET_RUNNING_IN_CONTAINER=true \
+    DOTNET_USE_POLLING_FILE_WATCHER=true \
+    DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false
 
+# Health check with timeout and proper error handling
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+    CMD curl -f -s -o /dev/null -w "%{http_code}" http://localhost:8080/health | grep -q "200" || exit 1
+
+# Security: Use exec form and specific entry point
 ENTRYPOINT ["dotnet", "StrideHR.API.dll"]

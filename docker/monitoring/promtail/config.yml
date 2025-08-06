@@ -1,0 +1,156 @@
+server:
+  http_listen_port: 9080
+  grpc_listen_port: 0
+
+positions:
+  filename: /tmp/positions.yaml
+
+clients:
+  - url: http://loki:3100/loki/api/v1/push
+
+scrape_configs:
+  # StrideHR API logs
+  - job_name: stridehr-api
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: stridehr-api
+          service: api
+          environment: production
+          __path__: /var/log/stridehr/stride-hr-*.log
+    pipeline_stages:
+      - regex:
+          expression: '^\[(?P<timestamp>\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{3} [+-]\d{2}:\d{2}) (?P<level>\w+)\] (?P<source>\S+) (?P<message>.*)'
+      - timestamp:
+          source: timestamp
+          format: '2006-01-02 15:04:05.000 -07:00'
+      - labels:
+          level:
+          source:
+
+  # Nginx access logs
+  - job_name: nginx-access
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: nginx
+          service: nginx
+          log_type: access
+          environment: production
+          __path__: /var/log/nginx/access.log
+    pipeline_stages:
+      - regex:
+          expression: '^(?P<remote_addr>\S+) - (?P<remote_user>\S+) \[(?P<time_local>[^\]]+)\] "(?P<method>\S+) (?P<request_uri>\S+) (?P<server_protocol>\S+)" (?P<status>\d+) (?P<body_bytes_sent>\d+) "(?P<http_referer>[^"]*)" "(?P<http_user_agent>[^"]*)" "(?P<http_x_forwarded_for>[^"]*)" (?P<request_time>\S+) (?P<upstream_response_time>\S+)'
+      - timestamp:
+          source: time_local
+          format: '02/Jan/2006:15:04:05 -0700'
+      - labels:
+          method:
+          status:
+          remote_addr:
+
+  # Nginx error logs
+  - job_name: nginx-error
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: nginx
+          service: nginx
+          log_type: error
+          environment: production
+          __path__: /var/log/nginx/error.log
+    pipeline_stages:
+      - regex:
+          expression: '^(?P<timestamp>\d{4}/\d{2}/\d{2} \d{2}:\d{2}:\d{2}) \[(?P<level>\w+)\] (?P<pid>\d+)#(?P<tid>\d+): (?P<message>.*)'
+      - timestamp:
+          source: timestamp
+          format: '2006/01/02 15:04:05'
+      - labels:
+          level:
+          pid:
+
+  # Docker container logs
+  - job_name: docker-containers
+    docker_sd_configs:
+      - host: unix:///var/run/docker.sock
+        refresh_interval: 5s
+        filters:
+          - name: label
+            values: ["logging=promtail"]
+    relabel_configs:
+      - source_labels: ['__meta_docker_container_name']
+        regex: '/(.*)'
+        target_label: 'container'
+      - source_labels: ['__meta_docker_container_log_stream']
+        target_label: 'logstream'
+      - source_labels: ['__meta_docker_container_label_logging_jobname']
+        target_label: 'job'
+
+  # System logs
+  - job_name: syslog
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: syslog
+          service: system
+          environment: production
+          __path__: /var/log/syslog
+    pipeline_stages:
+      - regex:
+          expression: '^(?P<timestamp>\w{3} \d{1,2} \d{2}:\d{2}:\d{2}) (?P<hostname>\S+) (?P<service>\S+): (?P<message>.*)'
+      - timestamp:
+          source: timestamp
+          format: 'Jan 2 15:04:05'
+      - labels:
+          hostname:
+          service:
+
+  # Authentication logs
+  - job_name: auth-logs
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: auth
+          service: authentication
+          environment: production
+          __path__: /var/log/nginx/auth.log
+    pipeline_stages:
+      - regex:
+          expression: '^(?P<remote_addr>\S+) - (?P<remote_user>\S+) \[(?P<time_local>[^\]]+)\] "(?P<method>\S+) (?P<request_uri>\S+) (?P<server_protocol>\S+)" (?P<status>\d+) "(?P<http_user_agent>[^"]*)" "(?P<http_x_forwarded_for>[^"]*)" (?P<request_length>\d+) (?P<request_time>\S+)'
+      - timestamp:
+          source: time_local
+          format: '02/Jan/2006:15:04:05 -0700'
+      - labels:
+          method:
+          status:
+          remote_addr:
+          request_uri:
+
+  # Security blocked requests
+  - job_name: security-blocked
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: security
+          service: nginx
+          log_type: blocked
+          environment: production
+          __path__: /var/log/nginx/blocked.log
+    pipeline_stages:
+      - regex:
+          expression: '^(?P<remote_addr>\S+) - (?P<remote_user>\S+) \[(?P<time_local>[^\]]+)\] "(?P<method>\S+) (?P<request_uri>\S+) (?P<server_protocol>\S+)" (?P<status>\d+) "(?P<http_user_agent>[^"]*)" "(?P<http_x_forwarded_for>[^"]*)" (?P<request_length>\d+) (?P<request_time>\S+)'
+      - timestamp:
+          source: time_local
+          format: '02/Jan/2006:15:04:05 -0700'
+      - labels:
+          method:
+          status:
+          remote_addr:
+          request_uri:
+          blocked: "true"
