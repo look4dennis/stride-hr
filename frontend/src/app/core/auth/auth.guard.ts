@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { CanActivate, CanActivateChild, Router, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 import { Observable } from 'rxjs';
 import { AuthService } from './auth.service';
+import { NotificationService } from '../services/notification.service';
 
 @Injectable({
   providedIn: 'root'
@@ -9,7 +10,8 @@ import { AuthService } from './auth.service';
 export class AuthGuard implements CanActivate, CanActivateChild {
   constructor(
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private notificationService: NotificationService
   ) {}
 
   canActivate(
@@ -27,48 +29,26 @@ export class AuthGuard implements CanActivate, CanActivateChild {
   }
 
   private checkAuth(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean {
-    if (this.authService.isAuthenticated) {
-      // Check for required roles if specified in route data
-      const requiredRoles = route.data?.['roles'] as string[];
-      if (requiredRoles && requiredRoles.length > 0) {
-        if (!this.authService.hasAnyRole(requiredRoles)) {
-          this.router.navigate(['/unauthorized']);
-          return false;
-        }
-      }
-      return true;
+    // Check if user is authenticated
+    if (!this.authService.isAuthenticated) {
+      console.log('AuthGuard: User not authenticated, redirecting to login');
+      
+      // Store the attempted URL for redirecting after login
+      this.router.navigate(['/login'], { 
+        queryParams: { returnUrl: state.url }
+      });
+      return false;
     }
 
-    // Store the attempted URL for redirecting after login
-    this.router.navigate(['/login'], { queryParams: { returnUrl: state.url } });
-    return false;
-  }
-}
-
-@Injectable({
-  providedIn: 'root'
-})
-export class RoleGuard implements CanActivate {
-  constructor(
-    private authService: AuthService,
-    private router: Router
-  ) {}
-
-  canActivate(
-    route: ActivatedRouteSnapshot,
-    state: RouterStateSnapshot
-  ): boolean {
-    const requiredRoles = route.data?.['roles'] as string[];
-    
-    if (!requiredRoles || requiredRoles.length === 0) {
-      return true;
+    // Check if token is still valid
+    if (!this.authService.isTokenValid()) {
+      console.log('AuthGuard: Token expired, redirecting to login');
+      this.notificationService.showError('Your session has expired. Please log in again.');
+      this.authService.logout();
+      return false;
     }
 
-    if (this.authService.hasAnyRole(requiredRoles)) {
-      return true;
-    }
-
-    this.router.navigate(['/unauthorized']);
-    return false;
+    // Authentication successful
+    return true;
   }
 }

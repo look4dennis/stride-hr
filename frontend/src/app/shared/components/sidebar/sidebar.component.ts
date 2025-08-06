@@ -253,7 +253,13 @@ export class SidebarComponent implements OnInit, OnDestroy {
       label: 'Settings',
       icon: 'fas fa-cog',
       route: '/settings',
-      roles: ['Admin']
+      roles: ['Admin', 'SuperAdmin']
+    },
+    {
+      label: 'Navigation Test',
+      icon: 'fas fa-route',
+      route: '/navigation-test',
+      roles: ['Admin', 'SuperAdmin']
     }
   ];
 

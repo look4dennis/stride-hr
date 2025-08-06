@@ -102,6 +102,35 @@ export class AuthService {
     return roles.some(role => this.hasRole(role));
   }
 
+  hasPermission(permission: string): boolean {
+    return this.currentUser?.permissions.includes(permission) ?? false;
+  }
+
+  hasAnyPermission(permissions: string[]): boolean {
+    return permissions.some(permission => this.hasPermission(permission));
+  }
+
+  getCurrentUser(): User | null {
+    return this.currentUser;
+  }
+
+  getToken(): string | null {
+    return this.token;
+  }
+
+  isTokenValid(): boolean {
+    const expiry = localStorage.getItem('tokenExpiry');
+    if (!expiry) return false;
+    
+    const expiryDate = new Date(expiry);
+    return expiryDate > new Date();
+  }
+
+  getTokenExpiry(): Date | null {
+    const expiry = localStorage.getItem('tokenExpiry');
+    return expiry ? new Date(expiry) : null;
+  }
+
   private setAuthData(authResponse: AuthResponse): void {
     localStorage.setItem('token', authResponse.data.token);
     localStorage.setItem('refreshToken', authResponse.data.refreshToken);
