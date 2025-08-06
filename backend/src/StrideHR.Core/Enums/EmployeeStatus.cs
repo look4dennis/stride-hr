@@ -24,7 +24,8 @@ public enum BreakType
     Tea = 1,
     Lunch = 2,
     Personal = 3,
-    Meeting = 4
+    Meeting = 4,
+    Coffee = 5
 }
 
 public enum HolidayType

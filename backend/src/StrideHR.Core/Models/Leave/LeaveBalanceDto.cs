@@ -15,4 +15,6 @@ public class LeaveBalanceDto
     public decimal CarriedForwardDays { get; set; }
     public decimal EncashedDays { get; set; }
     public decimal RemainingDays { get; set; }
+    public decimal SickLeaveUsed { get; set; }
+    public decimal EmergencyLeaveUsed { get; set; }
 }
