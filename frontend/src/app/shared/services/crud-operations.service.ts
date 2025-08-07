@@ -42,7 +42,7 @@ export interface CRUDValidationResult {
   providedIn: 'root'
 })
 export class CRUDOperationsService {
-  private readonly API_URL = 'http://localhost:5000/api';
+  private readonly API_URL = 'https://localhost:5001/api';
   private crudConfigs = new Map<string, CRUDConfig>();
   private crudOperations = new Map<string, CRUDOperation>();
   private entityData = new Map<string, BehaviorSubject<any[]>>();

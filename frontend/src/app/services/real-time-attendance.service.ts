@@ -33,7 +33,7 @@ export class RealTimeAttendanceService {
   public personalStatusUpdates$ = this.personalStatusUpdates.asObservable();
   public teamOverviewUpdates$ = this.teamOverviewUpdates.asObservable();
 
-  private readonly hubUrl = 'http://localhost:5000/hubs/notification';
+  private readonly hubUrl = 'https://localhost:5001/hubs/notification';
   private reconnectAttempts = 0;
   private maxReconnectAttempts = 5;
 

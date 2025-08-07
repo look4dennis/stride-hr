@@ -48,7 +48,7 @@ export interface SearchValidationResult {
   providedIn: 'root'
 })
 export class SearchService {
-  private readonly API_URL = 'http://localhost:5000/api';
+  private readonly API_URL = 'https://localhost:5001/api';
   private searchConfigs = new Map<string, SearchConfig>();
   private searchSubjects = new Map<string, Subject<string>>();
   private searchResults = new Map<string, BehaviorSubject<SearchResponse>>();

@@ -27,7 +27,7 @@ import {
   providedIn: 'root'
 })
 export class AttendanceService {
-  private readonly API_URL = 'http://localhost:5000/api';
+  private readonly API_URL = 'https://localhost:5001/api';
   
   private attendanceStatusSubject = new BehaviorSubject<AttendanceStatus | null>(null);
   public attendanceStatus$ = this.attendanceStatusSubject.asObservable();

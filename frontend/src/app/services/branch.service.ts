@@ -8,7 +8,7 @@ import { Branch, CreateBranchDto, UpdateBranchDto, ApiResponse } from '../models
   providedIn: 'root'
 })
 export class BranchService {
-  private readonly API_URL = 'http://localhost:5000/api';
+  private readonly API_URL = 'https://localhost:5001/api';
 
   constructor(private http: HttpClient) {}
 

@@ -94,17 +94,52 @@ public class EmployeeRoleConfiguration : IEntityTypeConfiguration<EmployeeRole>
 {
     public void Configure(EntityTypeBuilder<EmployeeRole> builder)
     {
+        builder.ToTable("EmployeeRoles");
+        
         builder.HasKey(er => er.Id);
+        
+        // Configure properties
+        builder.Property(er => er.AssignedDate)
+            .IsRequired();
+            
+        builder.Property(er => er.IsActive)
+            .IsRequired()
+            .HasDefaultValue(true);
+            
+        builder.Property(er => er.Notes)
+            .HasMaxLength(1000);
 
-        // Relationships
+        // Configure relationships
+        
+        // Employee relationship (the employee who has the role)
         builder.HasOne(er => er.Employee)
             .WithMany(e => e.EmployeeRoles)
             .HasForeignKey(er => er.EmployeeId)
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.Restrict);
 
+        // Role relationship
         builder.HasOne(er => er.Role)
             .WithMany(r => r.EmployeeRoles)
             .HasForeignKey(er => er.RoleId)
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.Restrict);
+
+        // AssignedBy relationship (the employee who assigned the role)
+        builder.HasOne(er => er.AssignedByEmployee)
+            .WithMany()
+            .HasForeignKey(er => er.AssignedBy)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        // RevokedBy relationship (the employee who revoked the role)
+        builder.HasOne(er => er.RevokedByEmployee)
+            .WithMany()
+            .HasForeignKey(er => er.RevokedBy)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        // Indexes
+        builder.HasIndex(er => er.EmployeeId);
+        builder.HasIndex(er => er.RoleId);
+        builder.HasIndex(er => er.AssignedBy);
+        builder.HasIndex(er => er.RevokedBy);
+        builder.HasIndex(er => new { er.EmployeeId, er.RoleId, er.IsActive });
     }
 }

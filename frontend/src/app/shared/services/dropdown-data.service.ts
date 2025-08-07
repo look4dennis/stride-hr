@@ -39,7 +39,7 @@ export interface DropdownValidationResult {
   providedIn: 'root'
 })
 export class DropdownDataService {
-  private readonly API_URL = 'http://localhost:5000/api';
+  private readonly API_URL = 'https://localhost:5001/api';
   private dropdownConfigs = new Map<string, DropdownConfig>();
   private dropdownData = new Map<string, BehaviorSubject<DropdownOption[]>>();
   private dropdownCache = new Map<string, { data: DropdownOption[]; timestamp: number }>();

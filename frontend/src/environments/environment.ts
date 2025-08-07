@@ -1,10 +1,10 @@
 export const environment = {
   production: false,
-  apiUrl: 'http://localhost:5000/api',
+  apiUrl: 'https://localhost:5001/api',
   weatherApiKey: 'demo-api-key', // Using demo key to prevent console errors
   weatherApiUrl: 'https://api.openweathermap.org/data/2.5',
-  signalRUrl: 'http://localhost:5000/hubs',
-  fileUploadUrl: 'http://localhost:5000/api/files',
+  signalRUrl: 'https://localhost:5001/hubs',
+  fileUploadUrl: 'https://localhost:5001/api/files',
   maxFileSize: 10 * 1024 * 1024, // 10MB
   supportedImageTypes: ['image/jpeg', 'image/png', 'image/gif'],
   supportedDocumentTypes: ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'],

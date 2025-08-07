@@ -20,7 +20,7 @@ import { ApiResponse } from '../models/api.models';
   providedIn: 'root'
 })
 export class EnhancedEmployeeService {
-  private readonly API_URL = 'http://localhost:5000/api';
+  private readonly API_URL = 'https://localhost:5001/api';
 
   private employeesSubject = new BehaviorSubject<Employee[]>([]);
   public employees$ = this.employeesSubject.asObservable();
