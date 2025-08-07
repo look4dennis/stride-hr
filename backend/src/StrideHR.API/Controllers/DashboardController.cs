@@ -62,7 +62,7 @@ public class DashboardController : ControllerBase
             
             // Get employee statistics
             var branchEmployees = await _employeeService.GetByBranchAsync(branchIdInt);
-            var activeEmployees = branchEmployees.Where(e => e.IsActive).ToList();
+            var activeEmployees = branchEmployees.Where(e => e.Status == EmployeeStatus.Active).ToList();
 
             // Calculate productivity metrics (placeholder - implement based on your business logic)
             var productivityMetrics = await CalculateProductivityMetrics(branchIdInt);
@@ -72,10 +72,10 @@ public class DashboardController : ControllerBase
                 TotalEmployees = activeEmployees.Count,
                 PresentToday = presentEmployees.Count(),
                 AbsentToday = Math.Max(0, activeEmployees.Count - presentEmployees.Count()),
-                OnBreak = attendanceStats.OnBreakCount,
-                LateArrivals = attendanceStats.LateCount,
-                EarlyDepartures = attendanceStats.EarlyDepartureCount,
-                Overtime = attendanceStats.OvertimeCount,
+                OnBreak = onBreakEmployees.Count(),
+                LateArrivals = lateEmployees.Count(),
+                EarlyDepartures = 0, // Will be calculated based on shift timings
+                Overtime = 0, // Will be calculated based on working hours
                 Productivity = productivityMetrics.AverageProductivity,
                 LastUpdated = DateTime.UtcNow,
                 BranchId = branchIdInt,
@@ -118,7 +118,7 @@ public class DashboardController : ControllerBase
             var onBreakEmployees = await _attendanceService.GetEmployeesOnBreakAsync(branchIdInt);
             var lateEmployees = await _attendanceService.GetLateEmployeesTodayAsync(branchIdInt);
             var branchEmployees = await _employeeService.GetByBranchAsync(branchIdInt);
-            var activeEmployees = branchEmployees.Where(e => e.IsActive).ToList();
+            var activeEmployees = branchEmployees.Where(e => e.Status == EmployeeStatus.Active).ToList();
             var productivityMetrics = await CalculateProductivityMetrics(branchIdInt);
 
             var statistics = new
@@ -127,9 +127,9 @@ public class DashboardController : ControllerBase
                 PresentToday = presentEmployees.Count(),
                 AbsentToday = Math.Max(0, activeEmployees.Count - presentEmployees.Count()),
                 OnBreak = onBreakEmployees.Count(),
-                LateArrivals = attendanceStats.LateCount,
-                EarlyDepartures = attendanceStats.EarlyDepartureCount,
-                Overtime = attendanceStats.OvertimeCount,
+                LateArrivals = lateEmployees.Count(),
+                EarlyDepartures = 0, // Will be calculated based on shift timings
+                Overtime = 0, // Will be calculated based on working hours
                 Productivity = productivityMetrics.AverageProductivity,
                 LastUpdated = DateTime.UtcNow,
                 BranchId = branchIdInt,

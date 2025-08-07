@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.SignalR;
 using StrideHR.API.Hubs;
 using StrideHR.Core.Interfaces.Services;
 using StrideHR.Core.Interfaces.Repositories;
+using StrideHR.Core.Enums;
 
 namespace StrideHR.API.Services;
 
@@ -66,7 +67,7 @@ public class DashboardUpdateService : BackgroundService
                     
                     // Get employee statistics for the branch
                     var branchEmployees = await employeeService.GetByBranchAsync(branch.Id);
-                    var activeEmployees = branchEmployees.Where(e => e.IsActive).ToList();
+                    var activeEmployees = branchEmployees.Where(e => e.Status == EmployeeStatus.Active).ToList();
 
                     // Calculate productivity metrics
                     var productivityMetrics = await CalculateProductivityMetrics(branch.Id, serviceProvider);
@@ -142,18 +143,25 @@ public class DashboardUpdateService : BackgroundService
                 var projects = await projectRepository.GetProjectsByBranchAsync(branchId);
                 var activeProjects = projects.Where(p => p.Status.ToString() == "Active").ToList();
 
-                metrics.ProjectsOnTrack = activeProjects.Count(p => p.Progress >= 80);
+                // Calculate progress based on completed tasks
+                metrics.ProjectsOnTrack = activeProjects.Count(p => 
+                {
+                    var totalTasks = p.Tasks.Count;
+                    if (totalTasks == 0) return false;
+                    var completedTasks = p.Tasks.Count(t => t.Status == ProjectTaskStatus.Done);
+                    return (completedTasks * 100.0 / totalTasks) >= 80;
+                });
 
                 // Get tasks for the branch (get all overdue tasks as a proxy)
                 var overdueTasks = await taskRepository.GetOverdueTasksAsync();
-                var todayTasks = overdueTasks.Where(t => t.CompletedAt?.Date == DateTime.Today).ToList();
+                var todayTasks = overdueTasks.Where(t => t.UpdatedAt?.Date == DateTime.Today && t.Status == ProjectTaskStatus.Done).ToList();
 
                 metrics.TasksCompleted = todayTasks.Count();
                 metrics.OverdueTasks = overdueTasks.Count();
 
                 // Calculate productivity based on task completion rate
                 var totalTasks = overdueTasks.Count();
-                var completedTasks = overdueTasks.Count(t => t.Status == ProjectTaskStatus.Completed);
+                var completedTasks = overdueTasks.Count(t => t.Status == ProjectTaskStatus.Done);
                 
                 if (totalTasks > 0)
                 {
@@ -162,12 +170,12 @@ public class DashboardUpdateService : BackgroundService
 
                 // Calculate top and low performers (simplified)
                 var employeePerformance = overdueTasks
-                    .Where(t => t.AssignedToId.HasValue)
-                    .GroupBy(t => t.AssignedToId.Value)
+                    .Where(t => t.AssignedToEmployeeId.HasValue)
+                    .GroupBy(t => t.AssignedToEmployeeId.Value)
                     .Select(g => new
                     {
                         EmployeeId = g.Key,
-                        CompletionRate = g.Count(t => t.Status == ProjectTaskStatus.Completed) * 100.0 / g.Count()
+                        CompletionRate = g.Count(t => t.Status == ProjectTaskStatus.Done) * 100.0 / g.Count()
                     })
                     .ToList();
 
