@@ -37,15 +37,3 @@ public class RolePermission : BaseEntity
     public virtual Permission Permission { get; set; } = null!;
 }
 
-public class EmployeeRole : BaseEntity
-{
-    public int EmployeeId { get; set; }
-    public int RoleId { get; set; }
-    public DateTime AssignedDate { get; set; } = DateTime.UtcNow;
-    public DateTime? ExpiryDate { get; set; }
-    public bool IsActive { get; set; } = true;
-    
-    // Navigation Properties
-    public virtual Employee Employee { get; set; } = null!;
-    public virtual Role Role { get; set; } = null!;
-}

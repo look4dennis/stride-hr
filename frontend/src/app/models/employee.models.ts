@@ -176,3 +176,39 @@ export enum ExitStatus {
   Completed = 'Completed',
   Cancelled = 'Cancelled'
 }
+
+export interface EmployeeRole {
+  id: number;
+  employeeId: number;
+  employeeName: string;
+  roleId: number;
+  roleName: string;
+  roleDescription: string;
+  assignedDate: string;
+  revokedDate?: string;
+  assignedBy: number;
+  assignedByName: string;
+  revokedBy?: number;
+  revokedByName?: string;
+  isActive: boolean;
+  notes?: string;
+}
+
+export interface Role {
+  id: number;
+  name: string;
+  description: string;
+  permissions: string[];
+}
+
+export interface AssignRoleDto {
+  employeeId: number;
+  roleId: number;
+  notes?: string;
+}
+
+export interface RevokeRoleDto {
+  employeeId: number;
+  roleId: number;
+  notes?: string;
+}

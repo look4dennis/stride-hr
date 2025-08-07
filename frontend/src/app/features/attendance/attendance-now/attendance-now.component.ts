@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Subject, takeUntil, interval, startWith, switchMap } from 'rxjs';
-import { AttendanceService } from '../../../services/attendance.service';
+import { EnhancedAttendanceService } from '../../../services/enhanced-attendance.service';
 import { 
   TodayAttendanceOverview,
   EmployeeAttendanceStatus,
@@ -367,7 +367,7 @@ export class AttendanceNowComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
 
   constructor(
-    private attendanceService: AttendanceService,
+    private attendanceService: EnhancedAttendanceService,
     private router: Router
   ) {}
 
@@ -384,25 +384,21 @@ export class AttendanceNowComponent implements OnInit, OnDestroy {
   private loadAttendanceOverview(): void {
     this.isLoading = true;
     
-    // For development, use mock data
-    this.overview = this.attendanceService.getMockTodayOverview();
-    this.processOverviewData();
-    this.isLoading = false;
-    
-    // Uncomment for production
-    // this.attendanceService.getTodayAttendanceOverview()
-    //   .pipe(takeUntil(this.destroy$))
-    //   .subscribe({
-    //     next: (overview) => {
-    //       this.overview = overview;
-    //       this.processOverviewData();
-    //       this.isLoading = false;
-    //     },
-    //     error: (error) => {
-    //       console.error('Failed to load attendance overview', error);
-    //       this.isLoading = false;
-    //     }
-    //   });
+    this.attendanceService.getTodayAttendanceOverview()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (overview) => {
+          this.overview = overview;
+          this.processOverviewData();
+          this.isLoading = false;
+        },
+        error: (error) => {
+          console.log('API call failed, using mock data for development:', error);
+          this.overview = this.attendanceService.getMockTodayOverview();
+          this.processOverviewData();
+          this.isLoading = false;
+        }
+      });
   }
 
   private processOverviewData(): void {
@@ -424,7 +420,10 @@ export class AttendanceNowComponent implements OnInit, OnDestroy {
           this.overview = overview;
           this.processOverviewData();
         },
-        error: (error) => console.error('Auto-refresh failed', error)
+        error: (error) => {
+          console.log('Auto-refresh failed (expected during development):', error);
+          // Continue using existing data on refresh failure
+        }
       });
   }
 

@@ -19,12 +19,13 @@ public class EmployeeOnboardingTask : BaseEntity
     public int EmployeeOnboardingId { get; set; }
     public string TaskName { get; set; } = string.Empty;
     public string? Description { get; set; }
-    public DateTime DueDate { get; set; }
+    public DateTime? DueDate { get; set; }
     public bool IsCompleted { get; set; } = false;
     public DateTime? CompletedDate { get; set; }
-    public string? AssignedTo { get; set; }
+    public int? AssignedTo { get; set; }
     public string? CompletionNotes { get; set; }
     
     // Navigation Properties
     public virtual EmployeeOnboarding EmployeeOnboarding { get; set; } = null!;
+    public virtual Employee? AssignedToEmployee { get; set; }
 }

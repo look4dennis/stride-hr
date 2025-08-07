@@ -1,19 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { Subject, takeUntil } from 'rxjs';
 import { AuthService, User } from '../../../core/auth/auth.service';
+import { DashboardService, QuickAction } from '../../services/dashboard.service';
 
-export interface QuickAction {
-  id: string;
-  title: string;
-  description: string;
-  icon: string;
-  route: string;
-  color: string;
-  roles: string[];
-  badge?: string;
-  disabled?: boolean;
-}
+// QuickAction interface is now imported from DashboardService
 
 @Component({
     selector: 'app-quick-actions',
@@ -31,10 +23,9 @@ export interface QuickAction {
         <div class="action-item" 
              *ngFor="let action of availableActions"
              (click)="executeAction(action)"
-             [class.disabled]="action.disabled">
+             [class.disabled]="!action.isEnabled">
           <div class="action-icon" [ngClass]="'bg-' + action.color">
             <i [class]="action.icon"></i>
-            <span class="action-badge" *ngIf="action.badge">{{ action.badge }}</span>
           </div>
           <div class="action-content">
             <div class="action-title">{{ action.title }}</div>
@@ -53,10 +44,9 @@ export interface QuickAction {
           <div class="action-item" 
                *ngFor="let action of managerActions"
                (click)="executeAction(action)"
-               [class.disabled]="action.disabled">
+               [class.disabled]="!action.isEnabled">
             <div class="action-icon" [ngClass]="'bg-' + action.color">
               <i [class]="action.icon"></i>
-              <span class="action-badge" *ngIf="action.badge">{{ action.badge }}</span>
             </div>
             <div class="action-content">
               <div class="action-title">{{ action.title }}</div>
@@ -239,11 +229,13 @@ export interface QuickAction {
     }
   `]
 })
-export class QuickActionsComponent implements OnInit {
+export class QuickActionsComponent implements OnInit, OnDestroy {
   currentUser: User | null = null;
   availableActions: QuickAction[] = [];
   managerActions: QuickAction[] = [];
   hasManagerActions: boolean = false;
+  
+  private destroy$ = new Subject<void>();
 
   private allActions: QuickAction[] = [
     // Employee Actions
@@ -254,7 +246,8 @@ export class QuickActionsComponent implements OnInit {
       icon: 'fas fa-clock',
       route: '/attendance/check-in',
       color: 'success',
-      roles: ['Employee', 'Manager', 'HR', 'Admin']
+      roles: ['Employee', 'Manager', 'HR', 'Admin'],
+      isEnabled: true
     },
     {
       id: 'request-leave',
@@ -263,7 +256,8 @@ export class QuickActionsComponent implements OnInit {
       icon: 'fas fa-calendar-plus',
       route: '/leave/request',
       color: 'primary',
-      roles: ['Employee', 'Manager', 'HR', 'Admin']
+      roles: ['Employee', 'Manager', 'HR', 'Admin'],
+      isEnabled: true
     },
     {
       id: 'submit-dsr',
@@ -272,7 +266,8 @@ export class QuickActionsComponent implements OnInit {
       icon: 'fas fa-file-alt',
       route: '/projects/dsr',
       color: 'info',
-      roles: ['Employee', 'Manager', 'HR', 'Admin']
+      roles: ['Employee', 'Manager', 'HR', 'Admin'],
+      isEnabled: true
     },
     {
       id: 'view-payslip',
@@ -281,7 +276,8 @@ export class QuickActionsComponent implements OnInit {
       icon: 'fas fa-money-bill-wave',
       route: '/payroll/payslip',
       color: 'warning',
-      roles: ['Employee', 'Manager', 'HR', 'Admin']
+      roles: ['Employee', 'Manager', 'HR', 'Admin'],
+      isEnabled: true
     },
     {
       id: 'my-profile',
@@ -290,7 +286,8 @@ export class QuickActionsComponent implements OnInit {
       icon: 'fas fa-user-edit',
       route: '/profile',
       color: 'purple',
-      roles: ['Employee', 'Manager', 'HR', 'Admin']
+      roles: ['Employee', 'Manager', 'HR', 'Admin'],
+      isEnabled: true
     },
     {
       id: 'attendance-now',
@@ -299,7 +296,8 @@ export class QuickActionsComponent implements OnInit {
       icon: 'fas fa-users',
       route: '/attendance/now',
       color: 'indigo',
-      roles: ['Employee', 'Manager', 'HR', 'Admin']
+      roles: ['Employee', 'Manager', 'HR', 'Admin'],
+      isEnabled: true
     },
 
     // Manager Actions
@@ -311,7 +309,7 @@ export class QuickActionsComponent implements OnInit {
       route: '/leave/approvals',
       color: 'success',
       roles: ['Manager', 'HR', 'Admin'],
-      badge: '3'
+      isEnabled: true
     },
     {
       id: 'team-performance',
@@ -320,7 +318,8 @@ export class QuickActionsComponent implements OnInit {
       icon: 'fas fa-chart-line',
       route: '/performance/team',
       color: 'primary',
-      roles: ['Manager', 'HR', 'Admin']
+      roles: ['Manager', 'HR', 'Admin'],
+      isEnabled: true
     },
     {
       id: 'project-management',
@@ -329,7 +328,8 @@ export class QuickActionsComponent implements OnInit {
       icon: 'fas fa-project-diagram',
       route: '/projects/manage',
       color: 'info',
-      roles: ['Manager', 'HR', 'Admin']
+      roles: ['Manager', 'HR', 'Admin'],
+      isEnabled: true
     },
 
     // HR Actions
@@ -340,7 +340,8 @@ export class QuickActionsComponent implements OnInit {
       icon: 'fas fa-users-cog',
       route: '/employees',
       color: 'primary',
-      roles: ['HR', 'Admin']
+      roles: ['HR', 'Admin'],
+      isEnabled: true
     },
     {
       id: 'payroll-processing',
@@ -350,7 +351,7 @@ export class QuickActionsComponent implements OnInit {
       route: '/payroll/process',
       color: 'warning',
       roles: ['HR', 'Admin'],
-      badge: '2'
+      isEnabled: true
     },
     {
       id: 'reports',
@@ -359,7 +360,8 @@ export class QuickActionsComponent implements OnInit {
       icon: 'fas fa-chart-bar',
       route: '/reports',
       color: 'info',
-      roles: ['HR', 'Admin']
+      roles: ['HR', 'Admin'],
+      isEnabled: true
     },
 
     // Admin Actions
@@ -370,7 +372,8 @@ export class QuickActionsComponent implements OnInit {
       icon: 'fas fa-cogs',
       route: '/settings',
       color: 'danger',
-      roles: ['Admin']
+      roles: ['Admin'],
+      isEnabled: true
     },
     {
       id: 'user-management',
@@ -379,13 +382,15 @@ export class QuickActionsComponent implements OnInit {
       icon: 'fas fa-user-shield',
       route: '/users',
       color: 'purple',
-      roles: ['Admin']
+      roles: ['Admin'],
+      isEnabled: true
     }
   ];
 
   constructor(
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private dashboardService: DashboardService
   ) {}
 
   ngOnInit(): void {
@@ -393,25 +398,29 @@ export class QuickActionsComponent implements OnInit {
     this.loadAvailableActions();
   }
 
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
   private loadAvailableActions(): void {
     if (!this.currentUser) return;
 
-    // Filter actions based on user roles
-    const userRoles = this.currentUser.roles;
-    
-    // Get employee-level actions
-    this.availableActions = this.allActions.filter(action => 
-      action.roles.some(role => userRoles.includes(role)) &&
-      !this.isManagerAction(action)
-    );
+    // Load quick actions from dashboard service
+    this.dashboardService.quickActions$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(actions => {
+        // Separate actions into categories
+        this.availableActions = actions.filter(action => 
+          !this.isManagerAction(action)
+        );
 
-    // Get manager-level actions
-    this.managerActions = this.allActions.filter(action => 
-      action.roles.some(role => userRoles.includes(role)) &&
-      this.isManagerAction(action)
-    );
+        this.managerActions = actions.filter(action => 
+          this.isManagerAction(action)
+        );
 
-    this.hasManagerActions = this.managerActions.length > 0;
+        this.hasManagerActions = this.managerActions.length > 0;
+      });
   }
 
   private isManagerAction(action: QuickAction): boolean {
@@ -424,7 +433,7 @@ export class QuickActionsComponent implements OnInit {
   }
 
   executeAction(action: QuickAction): void {
-    if (action.disabled) return;
+    if (!action.isEnabled) return;
 
     // Handle special actions
     switch (action.id) {

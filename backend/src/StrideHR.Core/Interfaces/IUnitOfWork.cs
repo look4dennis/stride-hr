@@ -15,13 +15,13 @@ public interface IUnitOfWork : IDisposable
     IRepository<Role> Roles { get; }
     IRepository<Permission> Permissions { get; }
     IRepository<RolePermission> RolePermissions { get; }
-    IRepository<EmployeeRole> EmployeeRoles { get; }
+    IEmployeeRoleRepository EmployeeRoles { get; }
     IRepository<Shift> Shifts { get; }
     IRepository<ShiftAssignment> ShiftAssignments { get; }
-    IRepository<EmployeeOnboarding> EmployeeOnboardings { get; }
-    IRepository<EmployeeOnboardingTask> EmployeeOnboardingTasks { get; }
-    IRepository<EmployeeExit> EmployeeExits { get; }
-    IRepository<EmployeeExitTask> EmployeeExitTasks { get; }
+    IEmployeeOnboardingRepository EmployeeOnboardings { get; }
+    IEmployeeOnboardingTaskRepository EmployeeOnboardingTasks { get; }
+    IEmployeeExitRepository EmployeeExits { get; }
+    IEmployeeExitTaskRepository EmployeeExitTasks { get; }
     
     // Leave Management Repositories
     ILeaveRequestRepository LeaveRequests { get; }

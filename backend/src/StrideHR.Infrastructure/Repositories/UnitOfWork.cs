@@ -23,13 +23,13 @@ public class UnitOfWork : IUnitOfWork
     private IRepository<Role>? _roles;
     private IRepository<Permission>? _permissions;
     private IRepository<RolePermission>? _rolePermissions;
-    private IRepository<EmployeeRole>? _employeeRoles;
+    private IEmployeeRoleRepository? _employeeRoles;
     private IRepository<Shift>? _shifts;
     private IRepository<ShiftAssignment>? _shiftAssignments;
-    private IRepository<EmployeeOnboarding>? _employeeOnboardings;
-    private IRepository<EmployeeOnboardingTask>? _employeeOnboardingTasks;
-    private IRepository<EmployeeExit>? _employeeExits;
-    private IRepository<EmployeeExitTask>? _employeeExitTasks;
+    private IEmployeeOnboardingRepository? _employeeOnboardings;
+    private IEmployeeOnboardingTaskRepository? _employeeOnboardingTasks;
+    private IEmployeeExitRepository? _employeeExits;
+    private IEmployeeExitTaskRepository? _employeeExitTasks;
     
     // Leave Management Repositories
     private ILeaveRequestRepository? _leaveRequests;
@@ -99,8 +99,8 @@ public class UnitOfWork : IUnitOfWork
     public IRepository<RolePermission> RolePermissions =>
         _rolePermissions ??= new Repository<RolePermission>(_context);
 
-    public IRepository<EmployeeRole> EmployeeRoles =>
-        _employeeRoles ??= new Repository<EmployeeRole>(_context);
+    public IEmployeeRoleRepository EmployeeRoles =>
+        _employeeRoles ??= new EmployeeRoleRepository(_context);
 
     public IRepository<Shift> Shifts =>
         _shifts ??= new Repository<Shift>(_context);
@@ -108,17 +108,17 @@ public class UnitOfWork : IUnitOfWork
     public IRepository<ShiftAssignment> ShiftAssignments =>
         _shiftAssignments ??= new Repository<ShiftAssignment>(_context);
 
-    public IRepository<EmployeeOnboarding> EmployeeOnboardings =>
-        _employeeOnboardings ??= new Repository<EmployeeOnboarding>(_context);
+    public IEmployeeOnboardingRepository EmployeeOnboardings =>
+        _employeeOnboardings ??= new EmployeeOnboardingRepository(_context);
 
-    public IRepository<EmployeeOnboardingTask> EmployeeOnboardingTasks =>
-        _employeeOnboardingTasks ??= new Repository<EmployeeOnboardingTask>(_context);
+    public IEmployeeOnboardingTaskRepository EmployeeOnboardingTasks =>
+        _employeeOnboardingTasks ??= new EmployeeOnboardingTaskRepository(_context);
 
-    public IRepository<EmployeeExit> EmployeeExits =>
-        _employeeExits ??= new Repository<EmployeeExit>(_context);
+    public IEmployeeExitRepository EmployeeExits =>
+        _employeeExits ??= new EmployeeExitRepository(_context);
 
-    public IRepository<EmployeeExitTask> EmployeeExitTasks =>
-        _employeeExitTasks ??= new Repository<EmployeeExitTask>(_context);
+    public IEmployeeExitTaskRepository EmployeeExitTasks =>
+        _employeeExitTasks ??= new EmployeeExitTaskRepository(_context);
 
     // Leave Management Repositories
     public ILeaveRequestRepository LeaveRequests =>

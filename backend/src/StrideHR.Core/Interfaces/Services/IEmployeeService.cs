@@ -163,6 +163,13 @@ public interface IEmployeeService
     // Validation
     Task<bool> ValidateEmployeeDataAsync(CreateEmployeeDto dto);
     Task<bool> ValidateEmployeeUpdateAsync(int id, UpdateEmployeeDto dto);
+
+    // Role Assignment
+    Task<bool> AssignRoleAsync(AssignRoleDto dto, int assignedBy);
+    Task<bool> RevokeRoleAsync(RevokeRoleDto dto, int revokedBy);
+    Task<IEnumerable<EmployeeRoleDto>> GetEmployeeRolesAsync(int employeeId);
+    Task<IEnumerable<EmployeeRoleDto>> GetActiveEmployeeRolesAsync(int employeeId);
+    Task<bool> HasRoleAsync(int employeeId, int roleId);
     
     #endregion
 }

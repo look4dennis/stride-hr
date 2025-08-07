@@ -1,22 +1,47 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Subject, takeUntil } from 'rxjs';
 import { AuthService, User } from '../../core/auth/auth.service';
+import { DashboardService, DashboardStats, DashboardActivity } from '../../shared/services/dashboard.service';
+import { RealTimeAttendanceService } from '../../services/real-time-attendance.service';
 import { WeatherTimeWidgetComponent } from '../../shared/components/weather-time-widget/weather-time-widget.component';
 import { BirthdayWidgetComponent } from '../../shared/components/birthday-widget/birthday-widget.component';
 import { QuickActionsComponent } from '../../shared/components/quick-actions/quick-actions.component';
+import { AttendanceWidgetComponent } from '../../shared/components/attendance-widget/attendance-widget.component';
 
 @Component({
-    selector: 'app-dashboard',
-    imports: [
-        CommonModule,
-        WeatherTimeWidgetComponent,
-        BirthdayWidgetComponent,
-        QuickActionsComponent
-    ],
-    template: `
+  selector: 'app-dashboard',
+  imports: [
+    CommonModule,
+    WeatherTimeWidgetComponent,
+    BirthdayWidgetComponent,
+    QuickActionsComponent,
+    AttendanceWidgetComponent
+  ],
+  template: `
     <div class="dashboard-container">
-      <!-- Welcome Section with Weather Widget -->
-      <div class="row mb-4">
+      <!-- Loading State -->
+      <div *ngIf="isLoading" class="text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Loading dashboard...</span>
+        </div>
+        <p class="mt-3 text-muted">Loading dashboard data...</p>
+      </div>
+
+      <!-- Error State -->
+      <div *ngIf="error && !isLoading" class="alert alert-danger" role="alert">
+        <i class="fas fa-exclamation-triangle me-2"></i>
+        {{ error }}
+        <button class="btn btn-outline-danger btn-sm ms-3" (click)="refreshDashboard()">
+          <i class="fas fa-refresh me-1"></i>
+          Retry
+        </button>
+      </div>
+
+      <!-- Dashboard Content -->
+      <div *ngIf="!isLoading && !error">
+        <!-- Welcome Section with Weather Widget -->
+        <div class="row mb-4">
         <div class="col-lg-8 mb-3">
           <div class="welcome-card">
             <div class="welcome-content">
@@ -57,17 +82,15 @@ import { QuickActionsComponent } from '../../shared/components/quick-actions/qui
         <ng-container *ngSwitchCase="'Employee'">
           <div class="col-lg-8 mb-4">
             <div class="row">
-              <div class="col-md-6 mb-3">
-                <div class="dashboard-widget">
-                  <div class="widget-icon bg-success">
-                    <i class="fas fa-clock"></i>
-                  </div>
-                  <div class="widget-content">
-                    <h3 class="widget-value">{{ employeeStats.todayHours || '0.0' }}</h3>
-                    <p class="widget-label">Hours Today</p>
-                  </div>
-                </div>
+              <!-- Attendance Widget for Employee -->
+              <div class="col-12 mb-3">
+                <app-attendance-widget 
+                  [showPersonalStatus]="true"
+                  [showTeamOverview]="false"
+                  [showQuickActions]="true">
+                </app-attendance-widget>
               </div>
+              
               <div class="col-md-6 mb-3">
                 <div class="dashboard-widget">
                   <div class="widget-icon bg-primary">
@@ -112,6 +135,16 @@ import { QuickActionsComponent } from '../../shared/components/quick-actions/qui
         <ng-container *ngSwitchCase="'Manager'">
           <div class="col-lg-8 mb-4">
             <div class="row">
+              <!-- Attendance Widget for Manager -->
+              <div class="col-12 mb-3">
+                <app-attendance-widget 
+                  [showPersonalStatus]="true"
+                  [showTeamOverview]="true"
+                  [showQuickActions]="true"
+                  [branchId]="currentUser?.branchId">
+                </app-attendance-widget>
+              </div>
+              
               <div class="col-md-6 mb-3">
                 <div class="dashboard-widget">
                   <div class="widget-icon bg-primary">
@@ -120,17 +153,6 @@ import { QuickActionsComponent } from '../../shared/components/quick-actions/qui
                   <div class="widget-content">
                     <h3 class="widget-value">{{ managerStats.teamSize || '0' }}</h3>
                     <p class="widget-label">Team Members</p>
-                  </div>
-                </div>
-              </div>
-              <div class="col-md-6 mb-3">
-                <div class="dashboard-widget">
-                  <div class="widget-icon bg-success">
-                    <i class="fas fa-user-check"></i>
-                  </div>
-                  <div class="widget-content">
-                    <h3 class="widget-value">{{ managerStats.presentToday || '0' }}</h3>
-                    <p class="widget-label">Present Today</p>
                   </div>
                 </div>
               </div>
@@ -167,6 +189,16 @@ import { QuickActionsComponent } from '../../shared/components/quick-actions/qui
         <ng-container *ngSwitchCase="'HR'">
           <div class="col-lg-8 mb-4">
             <div class="row">
+              <!-- Attendance Widget for HR -->
+              <div class="col-12 mb-3">
+                <app-attendance-widget 
+                  [showPersonalStatus]="true"
+                  [showTeamOverview]="true"
+                  [showQuickActions]="true"
+                  [branchId]="currentUser?.branchId">
+                </app-attendance-widget>
+              </div>
+              
               <div class="col-md-6 mb-3">
                 <div class="dashboard-widget">
                   <div class="widget-icon bg-primary">
@@ -175,17 +207,6 @@ import { QuickActionsComponent } from '../../shared/components/quick-actions/qui
                   <div class="widget-content">
                     <h3 class="widget-value">{{ hrStats.totalEmployees || '0' }}</h3>
                     <p class="widget-label">Total Employees</p>
-                  </div>
-                </div>
-              </div>
-              <div class="col-md-6 mb-3">
-                <div class="dashboard-widget">
-                  <div class="widget-icon bg-success">
-                    <i class="fas fa-user-check"></i>
-                  </div>
-                  <div class="widget-content">
-                    <h3 class="widget-value">{{ hrStats.presentToday || '0' }}</h3>
-                    <p class="widget-label">Present Today</p>
                   </div>
                 </div>
               </div>
@@ -222,6 +243,16 @@ import { QuickActionsComponent } from '../../shared/components/quick-actions/qui
         <ng-container *ngSwitchCase="'Admin'">
           <div class="col-lg-8 mb-4">
             <div class="row">
+              <!-- Attendance Widget for Admin -->
+              <div class="col-12 mb-3">
+                <app-attendance-widget 
+                  [showPersonalStatus]="true"
+                  [showTeamOverview]="true"
+                  [showQuickActions]="true"
+                  [branchId]="currentUser?.branchId">
+                </app-attendance-widget>
+              </div>
+              
               <div class="col-md-6 mb-3">
                 <div class="dashboard-widget">
                   <div class="widget-icon bg-primary">
@@ -263,6 +294,144 @@ import { QuickActionsComponent } from '../../shared/components/quick-actions/qui
                   <div class="widget-content">
                     <h3 class="widget-value">{{ adminStats.activeUsers || '0' }}</h3>
                     <p class="widget-label">Active Users</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-4 mb-4">
+            <app-quick-actions></app-quick-actions>
+          </div>
+        </ng-container>
+
+        <!-- Super Admin Dashboard -->
+        <ng-container *ngSwitchCase="'SuperAdmin'">
+          <div class="col-lg-8 mb-4">
+            <div class="row">
+              <!-- Role Switching Widget for Super Admin -->
+              <div class="col-12 mb-3">
+                <div class="card">
+                  <div class="card-header">
+                    <h5 class="card-title mb-0">
+                      <i class="fas fa-user-cog me-2"></i>
+                      Role Management
+                    </h5>
+                  </div>
+                  <div class="card-body">
+                    <p class="mb-3">Switch between different role views to access specific dashboards:</p>
+                    <div class="role-switch-buttons">
+                      <button class="btn btn-outline-primary btn-sm me-2 mb-2" (click)="switchToRole('Employee')">
+                        <i class="fas fa-user me-1"></i> Employee View
+                      </button>
+                      <button class="btn btn-outline-success btn-sm me-2 mb-2" (click)="switchToRole('Manager')">
+                        <i class="fas fa-users me-1"></i> Manager View
+                      </button>
+                      <button class="btn btn-outline-info btn-sm me-2 mb-2" (click)="switchToRole('HR')">
+                        <i class="fas fa-user-tie me-1"></i> HR View
+                      </button>
+                      <button class="btn btn-outline-warning btn-sm me-2 mb-2" (click)="switchToRole('Admin')">
+                        <i class="fas fa-cog me-1"></i> Admin View
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Attendance Widget for Super Admin -->
+              <div class="col-12 mb-3">
+                <app-attendance-widget 
+                  [showPersonalStatus]="true"
+                  [showTeamOverview]="true"
+                  [showQuickActions]="true"
+                  [branchId]="currentUser?.branchId">
+                </app-attendance-widget>
+              </div>
+              
+              <div class="col-md-6 mb-3">
+                <div class="dashboard-widget">
+                  <div class="widget-icon bg-primary">
+                    <i class="fas fa-building"></i>
+                  </div>
+                  <div class="widget-content">
+                    <h3 class="widget-value">{{ superAdminStats.totalOrganizations || '0' }}</h3>
+                    <p class="widget-label">Organizations</p>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6 mb-3">
+                <div class="dashboard-widget">
+                  <div class="widget-icon bg-success">
+                    <i class="fas fa-code-branch"></i>
+                  </div>
+                  <div class="widget-content">
+                    <h3 class="widget-value">{{ superAdminStats.totalBranches || '0' }}</h3>
+                    <p class="widget-label">Total Branches</p>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6 mb-3">
+                <div class="dashboard-widget">
+                  <div class="widget-icon bg-info">
+                    <i class="fas fa-users"></i>
+                  </div>
+                  <div class="widget-content">
+                    <h3 class="widget-value">{{ superAdminStats.totalEmployees || '0' }}</h3>
+                    <p class="widget-label">Total Employees</p>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6 mb-3">
+                <div class="dashboard-widget">
+                  <div class="widget-icon bg-warning">
+                    <i class="fas fa-server"></i>
+                  </div>
+                  <div class="widget-content">
+                    <h3 class="widget-value">{{ superAdminStats.systemHealth || 'Good' }}</h3>
+                    <p class="widget-label">System Health</p>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6 mb-3">
+                <div class="dashboard-widget">
+                  <div class="widget-icon bg-danger">
+                    <i class="fas fa-exclamation-triangle"></i>
+                  </div>
+                  <div class="widget-content">
+                    <h3 class="widget-value">{{ superAdminStats.criticalAlerts || '0' }}</h3>
+                    <p class="widget-label">Critical Alerts</p>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6 mb-3">
+                <div class="dashboard-widget">
+                  <div class="widget-icon bg-secondary">
+                    <i class="fas fa-database"></i>
+                  </div>
+                  <div class="widget-content">
+                    <h3 class="widget-value">{{ superAdminStats.databaseHealth || 'Good' }}</h3>
+                    <p class="widget-label">Database Health</p>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6 mb-3">
+                <div class="dashboard-widget">
+                  <div class="widget-icon bg-dark">
+                    <i class="fas fa-tachometer-alt"></i>
+                  </div>
+                  <div class="widget-content">
+                    <h3 class="widget-value">{{ superAdminStats.serverLoad || '0' }}%</h3>
+                    <p class="widget-label">Server Load</p>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6 mb-3">
+                <div class="dashboard-widget">
+                  <div class="widget-icon bg-success">
+                    <i class="fas fa-clock"></i>
+                  </div>
+                  <div class="widget-content">
+                    <h3 class="widget-value">{{ superAdminStats.systemUptime || '0%' }}</h3>
+                    <p class="widget-label">System Uptime</p>
                   </div>
                 </div>
               </div>
@@ -328,9 +497,10 @@ import { QuickActionsComponent } from '../../shared/components/quick-actions/qui
           </div>
         </div>
       </div>
+      </div>
     </div>
   `,
-    styles: [`
+  styles: [`
     .dashboard-container {
       padding: 0;
     }
@@ -629,80 +799,89 @@ import { QuickActionsComponent } from '../../shared/components/quick-actions/qui
     }
   `]
 })
-export class DashboardComponent implements OnInit {
+export class DashboardComponent implements OnInit, OnDestroy {
   currentUser: User | null = null;
-  
-  // Role-based statistics
+  dashboardStats: DashboardStats = {};
+  recentActivities: DashboardActivity[] = [];
+  isLoading = false;
+  error: string | null = null;
+
+  private destroy$ = new Subject<void>();
+
+  // Role-based statistics (fallback)
   employeeStats = {
-    todayHours: '7.5',
-    activeTasks: '5',
-    leaveBalance: '12',
-    productivity: '85'
+    todayHours: '0.0',
+    activeTasks: 0,
+    leaveBalance: 0,
+    productivity: 0
   };
 
   managerStats = {
-    teamSize: '8',
-    presentToday: '7',
-    activeProjects: '3',
-    pendingApprovals: '4'
+    teamSize: 0,
+    presentToday: 0,
+    activeProjects: 0,
+    pendingApprovals: 0
   };
 
   hrStats = {
-    totalEmployees: '150',
-    presentToday: '142',
-    pendingLeaves: '8',
-    payrollStatus: 'In Progress'
+    totalEmployees: 0,
+    presentToday: 0,
+    pendingLeaves: 0,
+    payrollStatus: 'Pending'
   };
 
   adminStats = {
-    totalBranches: '5',
-    totalEmployees: '150',
-    systemHealth: 'Excellent',
-    activeUsers: '98'
+    totalBranches: 0,
+    totalEmployees: 0,
+    systemHealth: 'Unknown',
+    activeUsers: 0
   };
 
-  recentActivities = [
-    {
-      type: 'success',
-      icon: 'fas fa-user-plus',
-      message: '<strong>John Doe</strong> joined the Development team',
-      timestamp: '2 hours ago'
-    },
-    {
-      type: 'primary',
-      icon: 'fas fa-project-diagram',
-      message: 'New project <strong>"Mobile App Redesign"</strong> created',
-      timestamp: '4 hours ago'
-    },
-    {
-      type: 'warning',
-      icon: 'fas fa-calendar-alt',
-      message: '<strong>Jane Smith</strong> requested leave for next week',
-      timestamp: '6 hours ago'
-    },
-    {
-      type: 'info',
-      icon: 'fas fa-clock',
-      message: '<strong>Mike Johnson</strong> checked in at 9:15 AM',
-      timestamp: '8 hours ago'
-    }
-  ];
+  superAdminStats = {
+    totalOrganizations: 0,
+    totalBranches: 0,
+    totalEmployees: 0,
+    systemHealth: 'Unknown',
+    activeUsers: 0,
+    systemUptime: '0%',
+    criticalAlerts: 0,
+    databaseHealth: 'Unknown',
+    serverLoad: 0
+  };
 
-  constructor(private authService: AuthService) {}
+  constructor(
+    private authService: AuthService,
+    private dashboardService: DashboardService,
+    private realTimeService: RealTimeAttendanceService
+  ) { }
 
   ngOnInit(): void {
     this.currentUser = this.authService.currentUser;
-    this.loadDashboardData();
+    this.initializeDashboard();
+    this.setupRealTimeUpdates();
   }
 
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  // Role switching for SuperAdmin
+  private currentViewRole: string | null = null;
+
   getPrimaryRole(): string {
+    // If SuperAdmin has switched to a specific role view, use that
+    if (this.currentViewRole && this.currentUser?.roles.includes('SuperAdmin')) {
+      return this.currentViewRole;
+    }
+
     if (!this.currentUser?.roles || this.currentUser.roles.length === 0) {
       return 'Employee';
     }
 
-    // Priority order: Admin > HR > Manager > Employee
-    const rolePriority = ['Admin', 'HR', 'Manager', 'Employee'];
-    
+    // Priority order: SuperAdmin > Admin > HR > Manager > Employee
+    const rolePriority = ['SuperAdmin', 'Admin', 'HR', 'Manager', 'Employee'];
+
     for (const role of rolePriority) {
       if (this.currentUser.roles.includes(role)) {
         return role;
@@ -712,20 +891,66 @@ export class DashboardComponent implements OnInit {
     return 'Employee';
   }
 
+  /**
+   * Switch to a specific role view (SuperAdmin only)
+   */
+  switchToRole(role: string): void {
+    if (!this.currentUser?.roles.includes('SuperAdmin')) {
+      return;
+    }
+
+    if (!this.currentUser.roles.includes(role) && role !== 'SuperAdmin') {
+      console.warn(`User does not have ${role} role`);
+      return;
+    }
+
+    this.currentViewRole = role;
+
+    // Reload dashboard data for the new role
+    this.initializeDashboard();
+
+    // Show success message
+    this.showSuccess(`Switched to ${role} view`);
+  }
+
+  /**
+   * Reset to default SuperAdmin view
+   */
+  resetToSuperAdminView(): void {
+    this.currentViewRole = null;
+    this.initializeDashboard();
+  }
+
+  /**
+   * Check if currently viewing a specific role
+   */
+  isViewingRole(role: string): boolean {
+    return this.currentViewRole === role;
+  }
+
+  /**
+   * Show success message
+   */
+  private showSuccess(message: string): void {
+    // Implement toast notification or similar
+    console.log('Success:', message);
+  }
+
   getUserRoleDisplay(): string {
     const primaryRole = this.getPrimaryRole();
     const additionalRoles = this.currentUser?.roles?.filter(role => role !== primaryRole) || [];
-    
+
     if (additionalRoles.length > 0) {
       return `${primaryRole} (+${additionalRoles.length} more)`;
     }
-    
+
     return primaryRole;
   }
 
   getRoleBasedWelcomeMessage(): string {
     const role = this.getPrimaryRole();
     const messages = {
+      'SuperAdmin': 'Oversee and manage the entire system across all organizations.',
       'Admin': 'Monitor and manage your organization\'s HR operations across all branches.',
       'HR': 'Manage employee lifecycle, payroll, and organizational policies effectively.',
       'Manager': 'Lead your team to success and track project progress efficiently.',
@@ -735,16 +960,138 @@ export class DashboardComponent implements OnInit {
     return messages[role as keyof typeof messages] || messages['Employee'];
   }
 
-  private loadDashboardData(): void {
-    // In a real application, this would load data from services
-    // For now, we're using mock data defined above
-    
-    // TODO: Implement actual data loading based on user role
-    // Example:
-    // if (this.getPrimaryRole() === 'Manager') {
-    //   this.loadManagerStats();
-    // } else if (this.getPrimaryRole() === 'HR') {
-    //   this.loadHRStats();
-    // }
+  /**
+   * Initialize dashboard with real data
+   */
+  private initializeDashboard(): void {
+    this.isLoading = true;
+    this.error = null;
+
+    // Load dashboard statistics
+    this.dashboardService.dashboardStats$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (stats) => {
+          this.dashboardStats = stats;
+          this.updateLocalStats(stats);
+          this.isLoading = false;
+        },
+        error: (error) => {
+          console.error('Error loading dashboard stats:', error);
+          this.error = 'Failed to load dashboard data';
+          this.isLoading = false;
+        }
+      });
+
+    // Load recent activities
+    this.dashboardService.recentActivities$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (activities) => {
+          this.recentActivities = activities;
+        },
+        error: (error) => {
+          console.error('Error loading recent activities:', error);
+        }
+      });
+
+    // Trigger initial data load
+    this.dashboardService.loadDashboardData().subscribe();
+    this.dashboardService.loadRecentActivities().subscribe();
   }
+
+  /**
+   * Setup real-time updates
+   */
+  private setupRealTimeUpdates(): void {
+    // Connect to SignalR for real-time updates
+    this.realTimeService.connect().catch(error => {
+      console.log('SignalR connection failed, using polling fallback:', error);
+    });
+
+    // Listen for real-time attendance updates
+    this.realTimeService.personalStatusUpdates$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(status => {
+        if (status && this.dashboardStats.employeeStats) {
+          this.dashboardStats.employeeStats.currentStatus = status.currentStatus;
+          this.dashboardStats.employeeStats.checkInTime = status.checkInTime;
+          // Note: checkOutTime is not available in AttendanceStatus interface
+          // this.dashboardStats.employeeStats.checkOutTime = status.checkOutTime;
+        }
+      });
+
+    // Listen for team overview updates (for managers)
+    this.realTimeService.teamOverviewUpdates$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(overview => {
+        if (overview && this.dashboardStats.managerStats) {
+          this.dashboardStats.managerStats.presentToday = overview.summary?.presentCount || 0;
+          this.dashboardStats.managerStats.teamSize = overview.summary?.totalEmployees || 0;
+        }
+      });
+  }
+
+  /**
+   * Update local stats from dashboard service
+   */
+  private updateLocalStats(stats: DashboardStats): void {
+    if (stats.employeeStats) {
+      this.employeeStats = {
+        todayHours: stats.employeeStats.todayHours || '0.0',
+        activeTasks: stats.employeeStats.activeTasks || 0,
+        leaveBalance: stats.employeeStats.leaveBalance || 0,
+        productivity: stats.employeeStats.productivity || 0
+      };
+    }
+
+    if (stats.managerStats) {
+      this.managerStats = {
+        teamSize: stats.managerStats.teamSize || 0,
+        presentToday: stats.managerStats.presentToday || 0,
+        activeProjects: stats.managerStats.activeProjects || 0,
+        pendingApprovals: stats.managerStats.pendingApprovals || 0
+      };
+    }
+
+    if (stats.hrStats) {
+      this.hrStats = {
+        totalEmployees: stats.hrStats.totalEmployees || 0,
+        presentToday: stats.hrStats.presentToday || 0,
+        pendingLeaves: stats.hrStats.pendingLeaves || 0,
+        payrollStatus: stats.hrStats.payrollStatus || 'Pending'
+      };
+    }
+
+    if (stats.adminStats) {
+      this.adminStats = {
+        totalBranches: stats.adminStats.totalBranches || 0,
+        totalEmployees: stats.adminStats.totalEmployees || 0,
+        systemHealth: stats.adminStats.systemHealth || 'Unknown',
+        activeUsers: stats.adminStats.activeUsers || 0
+      };
+    }
+
+    if (stats.superAdminStats) {
+      this.superAdminStats = {
+        totalOrganizations: stats.superAdminStats.totalOrganizations || 0,
+        totalBranches: stats.superAdminStats.totalBranches || 0,
+        totalEmployees: stats.superAdminStats.totalEmployees || 0,
+        systemHealth: stats.superAdminStats.systemHealth || 'Unknown',
+        activeUsers: stats.superAdminStats.activeUsers || 0,
+        systemUptime: stats.superAdminStats.systemUptime || '0%',
+        criticalAlerts: stats.superAdminStats.criticalAlerts || 0,
+        databaseHealth: stats.superAdminStats.databaseHealth || 'Unknown',
+        serverLoad: stats.superAdminStats.serverLoad || 0
+      };
+    }
+  }
+
+  /**
+   * Refresh dashboard data manually
+   */
+  public refreshDashboard(): void {
+    this.initializeDashboard();
+  }
+
 }

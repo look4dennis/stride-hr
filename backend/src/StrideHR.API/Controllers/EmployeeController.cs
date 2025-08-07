@@ -575,4 +575,126 @@ public class EmployeeController : ControllerBase
             });
         }
     }
+
+    [HttpGet("{id}/roles")]
+    public async Task<ActionResult<ApiResponse<IEnumerable<EmployeeRoleDto>>>> GetEmployeeRoles(int id)
+    {
+        try
+        {
+            var roles = await _employeeService.GetEmployeeRolesAsync(id);
+            return Ok(new ApiResponse<IEnumerable<EmployeeRoleDto>>
+            {
+                Success = true,
+                Data = roles,
+                Message = "Employee roles retrieved successfully"
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error retrieving roles for employee {Id}", id);
+            return StatusCode(500, new ApiResponse<IEnumerable<EmployeeRoleDto>>
+            {
+                Success = false,
+                Message = "An error occurred while retrieving employee roles"
+            });
+        }
+    }
+
+    [HttpGet("{id}/roles/active")]
+    public async Task<ActionResult<ApiResponse<IEnumerable<EmployeeRoleDto>>>> GetActiveEmployeeRoles(int id)
+    {
+        try
+        {
+            var roles = await _employeeService.GetActiveEmployeeRolesAsync(id);
+            return Ok(new ApiResponse<IEnumerable<EmployeeRoleDto>>
+            {
+                Success = true,
+                Data = roles,
+                Message = "Active employee roles retrieved successfully"
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error retrieving active roles for employee {Id}", id);
+            return StatusCode(500, new ApiResponse<IEnumerable<EmployeeRoleDto>>
+            {
+                Success = false,
+                Message = "An error occurred while retrieving active employee roles"
+            });
+        }
+    }
+
+    [HttpPost("{id}/roles/assign")]
+    public async Task<ActionResult<ApiResponse<object>>> AssignRole(int id, [FromBody] AssignRoleDto dto)
+    {
+        try
+        {
+            dto.EmployeeId = id;
+            // TODO: Get current user ID from authentication context
+            var currentUserId = 1; // Placeholder
+            
+            var result = await _employeeService.AssignRoleAsync(dto, currentUserId);
+            
+            if (!result)
+            {
+                return BadRequest(new ApiResponse<object>
+                {
+                    Success = false,
+                    Message = "Failed to assign role to employee"
+                });
+            }
+
+            return Ok(new ApiResponse<object>
+            {
+                Success = true,
+                Message = "Role assigned successfully"
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error assigning role to employee {Id}", id);
+            return StatusCode(500, new ApiResponse<object>
+            {
+                Success = false,
+                Message = "An error occurred while assigning the role"
+            });
+        }
+    }
+
+    [HttpPost("{id}/roles/revoke")]
+    public async Task<ActionResult<ApiResponse<object>>> RevokeRole(int id, [FromBody] RevokeRoleDto dto)
+    {
+        try
+        {
+            dto.EmployeeId = id;
+            // TODO: Get current user ID from authentication context
+            var currentUserId = 1; // Placeholder
+            
+            var result = await _employeeService.RevokeRoleAsync(dto, currentUserId);
+            
+            if (!result)
+            {
+                return BadRequest(new ApiResponse<object>
+                {
+                    Success = false,
+                    Message = "Failed to revoke role from employee"
+                });
+            }
+
+            return Ok(new ApiResponse<object>
+            {
+                Success = true,
+                Message = "Role revoked successfully"
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error revoking role from employee {Id}", id);
+            return StatusCode(500, new ApiResponse<object>
+            {
+                Success = false,
+                Message = "An error occurred while revoking the role"
+            });
+        }
+    }
 }

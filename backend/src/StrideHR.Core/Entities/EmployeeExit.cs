@@ -27,9 +27,10 @@ public class EmployeeExitTask : BaseEntity
     public string? Description { get; set; }
     public bool IsCompleted { get; set; } = false;
     public DateTime? CompletedDate { get; set; }
-    public string? CompletedBy { get; set; }
+    public int? CompletedBy { get; set; }
     public string? CompletionNotes { get; set; }
     
     // Navigation Properties
     public virtual EmployeeExit EmployeeExit { get; set; } = null!;
+    public virtual Employee? CompletedByEmployee { get; set; }
 }

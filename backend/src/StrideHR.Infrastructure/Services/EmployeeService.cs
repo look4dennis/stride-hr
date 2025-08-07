@@ -419,7 +419,7 @@ public class EmployeeService : IEmployeeService
                 TaskName = task.TaskName,
                 Description = task.Description,
                 DueDate = task.DueDate,
-                AssignedTo = task.AssignedTo,
+                AssignedTo = !string.IsNullOrEmpty(task.AssignedTo) ? int.Parse(task.AssignedTo) : null,
                 CreatedAt = DateTime.UtcNow
             };
 
@@ -496,7 +496,7 @@ public class EmployeeService : IEmployeeService
                 DueDate = t.DueDate,
                 IsCompleted = t.IsCompleted,
                 CompletedDate = t.CompletedDate,
-                AssignedTo = t.AssignedTo,
+                AssignedTo = t.AssignedTo?.ToString(),
                 CompletionNotes = t.CompletionNotes
             }).ToList()
         };
@@ -609,7 +609,7 @@ public class EmployeeService : IEmployeeService
                 Description = t.Description,
                 IsCompleted = t.IsCompleted,
                 CompletedDate = t.CompletedDate,
-                CompletedBy = t.CompletedBy,
+                CompletedBy = t.CompletedBy?.ToString(),
                 CompletionNotes = t.CompletionNotes
             }).ToList()
         };
@@ -713,6 +713,106 @@ public class EmployeeService : IEmployeeService
 
     #endregion
 
+    #region Role Assignment
+
+    public async Task<bool> AssignRoleAsync(AssignRoleDto dto, int assignedBy)
+    {
+        // Check if employee exists
+        var employee = await GetByIdAsync(dto.EmployeeId);
+        if (employee == null)
+        {
+            return false;
+        }
+
+        // Check if role exists
+        var role = await _unitOfWork.Roles.GetByIdAsync(dto.RoleId);
+        if (role == null)
+        {
+            return false;
+        }
+
+        // Check if role is already assigned and active
+        var existingRole = await _unitOfWork.EmployeeRoles.GetByEmployeeAndRoleIdAsync(dto.EmployeeId, dto.RoleId);
+        if (existingRole != null && existingRole.IsActive)
+        {
+            return false; // Role already assigned
+        }
+
+        // If role was previously assigned but revoked, reactivate it
+        if (existingRole != null && !existingRole.IsActive)
+        {
+            existingRole.IsActive = true;
+            existingRole.RevokedDate = null;
+            existingRole.RevokedBy = null;
+            existingRole.AssignedDate = DateTime.UtcNow;
+            existingRole.AssignedBy = assignedBy;
+            existingRole.Notes = dto.Notes;
+            existingRole.UpdatedAt = DateTime.UtcNow;
+
+            await _unitOfWork.EmployeeRoles.UpdateAsync(existingRole);
+        }
+        else
+        {
+            // Create new role assignment
+            var employeeRole = new EmployeeRole
+            {
+                EmployeeId = dto.EmployeeId,
+                RoleId = dto.RoleId,
+                AssignedDate = DateTime.UtcNow,
+                AssignedBy = assignedBy,
+                IsActive = true,
+                Notes = dto.Notes,
+                CreatedAt = DateTime.UtcNow
+            };
+
+            await _unitOfWork.EmployeeRoles.AddAsync(employeeRole);
+        }
+
+        await _unitOfWork.SaveChangesAsync();
+        _logger.LogInformation("Role {RoleId} assigned to employee {EmployeeId} by {AssignedBy}", dto.RoleId, dto.EmployeeId, assignedBy);
+        return true;
+    }
+
+    public async Task<bool> RevokeRoleAsync(RevokeRoleDto dto, int revokedBy)
+    {
+        var employeeRole = await _unitOfWork.EmployeeRoles.GetByEmployeeAndRoleIdAsync(dto.EmployeeId, dto.RoleId);
+        if (employeeRole == null || !employeeRole.IsActive)
+        {
+            return false;
+        }
+
+        employeeRole.IsActive = false;
+        employeeRole.RevokedDate = DateTime.UtcNow;
+        employeeRole.RevokedBy = revokedBy;
+        employeeRole.Notes = dto.Notes;
+        employeeRole.UpdatedAt = DateTime.UtcNow;
+
+        await _unitOfWork.EmployeeRoles.UpdateAsync(employeeRole);
+        await _unitOfWork.SaveChangesAsync();
+
+        _logger.LogInformation("Role {RoleId} revoked from employee {EmployeeId} by {RevokedBy}", dto.RoleId, dto.EmployeeId, revokedBy);
+        return true;
+    }
+
+    public async Task<IEnumerable<EmployeeRoleDto>> GetEmployeeRolesAsync(int employeeId)
+    {
+        var employeeRoles = await _unitOfWork.EmployeeRoles.GetByEmployeeIdAsync(employeeId);
+        return employeeRoles.Select(MapToEmployeeRoleDto);
+    }
+
+    public async Task<IEnumerable<EmployeeRoleDto>> GetActiveEmployeeRolesAsync(int employeeId)
+    {
+        var employeeRoles = await _unitOfWork.EmployeeRoles.GetActiveRolesByEmployeeIdAsync(employeeId);
+        return employeeRoles.Select(MapToEmployeeRoleDto);
+    }
+
+    public async Task<bool> HasRoleAsync(int employeeId, int roleId)
+    {
+        return await _unitOfWork.EmployeeRoles.HasActiveRoleAsync(employeeId, roleId);
+    }
+
+    #endregion
+
     #region Private Helper Methods
 
     private static IQueryable<Employee> ApplySorting(IQueryable<Employee> query, string? sortBy, bool sortDescending)
@@ -774,6 +874,27 @@ public class EmployeeService : IEmployeeService
             Notes = employee.Notes,
             CreatedAt = employee.CreatedAt,
             UpdatedAt = employee.UpdatedAt
+        };
+    }
+
+    private static EmployeeRoleDto MapToEmployeeRoleDto(EmployeeRole employeeRole)
+    {
+        return new EmployeeRoleDto
+        {
+            Id = employeeRole.Id,
+            EmployeeId = employeeRole.EmployeeId,
+            EmployeeName = employeeRole.Employee?.FullName ?? string.Empty,
+            RoleId = employeeRole.RoleId,
+            RoleName = employeeRole.Role?.Name ?? string.Empty,
+            RoleDescription = employeeRole.Role?.Description ?? string.Empty,
+            AssignedDate = employeeRole.AssignedDate,
+            RevokedDate = employeeRole.RevokedDate,
+            AssignedBy = employeeRole.AssignedBy,
+            AssignedByName = employeeRole.AssignedByEmployee?.FullName ?? string.Empty,
+            RevokedBy = employeeRole.RevokedBy,
+            RevokedByName = employeeRole.RevokedByEmployee?.FullName,
+            IsActive = employeeRole.IsActive,
+            Notes = employeeRole.Notes
         };
     }
 

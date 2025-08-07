@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 import { EnhancedAttendanceService } from '../../../services/enhanced-attendance.service';
+import { BreakManagementComponent } from '../../../shared/components/break-management/break-management.component';
 import { 
   AttendanceStatus, 
   BreakType, 
@@ -14,7 +15,7 @@ import {
 
 @Component({
     selector: 'app-attendance-tracker',
-    imports: [CommonModule, FormsModule],
+    imports: [CommonModule, FormsModule, BreakManagementComponent],
     template: `
     <div class="page-header d-flex justify-content-between align-items-center">
       <div>
@@ -88,49 +89,6 @@ import {
                   </div>
 
                   <div class="mb-3" *ngIf="attendanceStatus?.isCheckedIn">
-                    <!-- Break Management -->
-                    <div class="mb-3" *ngIf="!attendanceStatus?.currentBreak">
-                      <div class="dropdown d-inline-block me-2">
-                        <button 
-                          class="btn btn-warning rounded-pill dropdown-toggle"
-                          type="button"
-                          data-bs-toggle="dropdown"
-                          [disabled]="isLoading">
-                          <i class="fas fa-coffee me-2"></i>
-                          Take Break
-                        </button>
-                        <ul class="dropdown-menu">
-                          <li *ngFor="let breakType of breakTypes">
-                            <a class="dropdown-item" 
-                               href="#" 
-                               (click)="startBreak(breakType); $event.preventDefault()">
-                              <i class="fas" [class]="getBreakIcon(breakType)" class="me-2"></i>
-                              {{ getBreakLabel(breakType) }}
-                            </a>
-                          </li>
-                        </ul>
-                      </div>
-                    </div>
-
-                    <!-- End Break Button -->
-                    <div class="mb-3" *ngIf="attendanceStatus?.currentBreak">
-                      <button 
-                        class="btn btn-info rounded-pill me-2"
-                        (click)="endBreak()"
-                        [disabled]="isLoading">
-                        <i class="fas fa-play me-2"></i>
-                        <span *ngIf="!isLoading">End Break</span>
-                        <span *ngIf="isLoading">
-                          <span class="spinner-border spinner-border-sm me-2"></span>
-                          Ending Break...
-                        </span>
-                      </button>
-                      <small class="text-muted d-block">
-                        On {{ getBreakLabel(attendanceStatus?.currentBreak?.type) }} since 
-                        {{ formatTime(attendanceStatus?.currentBreak?.startTime) }}
-                      </small>
-                    </div>
-
                     <!-- Check-out Button -->
                     <button 
                       class="btn btn-danger rounded-pill px-4"
@@ -152,6 +110,19 @@ import {
             </div>
           </div>
         </div>
+      </div>
+    </div>
+
+    <!-- Break Management Section -->
+    <div class="row mb-4" *ngIf="attendanceStatus?.isCheckedIn">
+      <div class="col-12">
+        <app-break-management
+          [attendanceStatus]="attendanceStatus"
+          [showHistory]="true"
+          [canTakeBreak]="attendanceStatus?.isCheckedIn || false"
+          (breakStarted)="onBreakStarted($event)"
+          (breakEnded)="onBreakEnded($event)">
+        </app-break-management>
       </div>
     </div>
 
@@ -461,42 +432,16 @@ export class AttendanceTrackerComponent implements OnInit, OnDestroy {
       });
   }
 
-  startBreak(type: BreakType): void {
-    this.isLoading = true;
-    this.clearMessages();
-
-    this.attendanceService.startBreak(type)
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (record) => {
-          this.isLoading = false;
-          this.successMessage = `${this.getBreakLabel(type)} started successfully!`;
-          this.loadAttendanceStatus();
-        },
-        error: (error) => {
-          this.isLoading = false;
-          this.handleError('Failed to start break', error);
-        }
-      });
+  onBreakStarted(breakRecord: any): void {
+    this.successMessage = 'Break started successfully!';
+    this.loadAttendanceStatus();
+    this.clearMessageAfterDelay();
   }
 
-  endBreak(): void {
-    this.isLoading = true;
-    this.clearMessages();
-
-    this.attendanceService.endBreak()
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (record) => {
-          this.isLoading = false;
-          this.successMessage = 'Break ended successfully!';
-          this.loadAttendanceStatus();
-        },
-        error: (error) => {
-          this.isLoading = false;
-          this.handleError('Failed to end break', error);
-        }
-      });
+  onBreakEnded(breakRecord: any): void {
+    this.successMessage = 'Break ended successfully!';
+    this.loadAttendanceStatus();
+    this.clearMessageAfterDelay();
   }
 
   navigateToAttendanceNow(): void {
@@ -568,5 +513,13 @@ export class AttendanceTrackerComponent implements OnInit, OnDestroy {
   private handleError(message: string, error: any): void {
     console.error(message, error);
     this.errorMessage = error.error?.message || message;
+    this.clearMessageAfterDelay();
+  }
+
+  private clearMessageAfterDelay(): void {
+    setTimeout(() => {
+      this.successMessage = null;
+      this.errorMessage = null;
+    }, 3000);
   }
 }

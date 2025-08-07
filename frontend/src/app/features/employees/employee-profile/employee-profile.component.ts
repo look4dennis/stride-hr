@@ -1,67 +1,65 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { RouterModule, ActivatedRoute, Router } from '@angular/router';
-import { EmployeeService } from '../../../services/employee.service';
+import { ActivatedRoute, Router } from '@angular/router';
+import { EnhancedEmployeeService } from '../../../services/enhanced-employee.service';
 import { Employee, UpdateEmployeeDto, EmployeeStatus } from '../../../models/employee.models';
 import { NotificationService } from '../../../core/services/notification.service';
+import { EmployeeRolesComponent } from '../employee-roles/employee-roles.component';
 
 @Component({
-    selector: 'app-employee-profile',
-    imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterModule],
-    template: `
+  selector: 'app-employee-profile',
+  standalone: true,
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, EmployeeRolesComponent],
+  template: `
     <div class="page-header d-flex justify-content-between align-items-center">
       <div>
         <nav aria-label="breadcrumb">
           <ol class="breadcrumb">
             <li class="breadcrumb-item">
-              <a routerLink="/employees" class="text-decoration-none">Employees</a>
+              <a (click)="navigateToEmployeeList()" class="text-decoration-none cursor-pointer">
+                <i class="fas fa-users me-1"></i>Employees
+              </a>
             </li>
-            <li class="breadcrumb-item active">{{ employee?.firstName }} {{ employee?.lastName }}</li>
+            <li class="breadcrumb-item active" aria-current="page">
+              {{ employee?.firstName }} {{ employee?.lastName }}
+            </li>
           </ol>
         </nav>
         <h1>Employee Profile</h1>
+        <p class="text-muted" *ngIf="employee">{{ employee.employeeId }} - {{ employee.designation }}</p>
       </div>
-      <div class="btn-group">
-        <button class="btn btn-outline-primary" (click)="toggleEditMode()" *ngIf="!editMode">
-          <i class="fas fa-edit me-2"></i>Edit Profile
+      <div class="d-flex gap-2">
+        <button class="btn btn-outline-primary" (click)="toggleEditMode()" [disabled]="loading">
+          <i class="fas" [class.fa-edit]="!isEditMode" [class.fa-times]="isEditMode" class="me-2"></i>
+          {{ isEditMode ? 'Cancel' : 'Edit' }}
         </button>
-        <button class="btn btn-success" (click)="saveChanges()" *ngIf="editMode" [disabled]="!profileForm?.valid">
-          <i class="fas fa-save me-2"></i>Save Changes
-        </button>
-        <button class="btn btn-outline-secondary" (click)="cancelEdit()" *ngIf="editMode">
-          <i class="fas fa-times me-2"></i>Cancel
+        <button class="btn btn-outline-secondary" (click)="navigateToEmployeeList()">
+          <i class="fas fa-arrow-left me-2"></i>Back to List
         </button>
       </div>
     </div>
 
     <div class="row" *ngIf="employee">
-      <!-- Profile Card -->
+      <!-- Profile Information -->
       <div class="col-lg-4">
-        <div class="card">
+        <div class="card mb-4">
           <div class="card-body text-center">
-            <div class="profile-photo-container mb-3">
+            <div class="profile-photo-section mb-3">
               <img [src]="getProfilePhoto()" 
                    [alt]="employee.firstName + ' ' + employee.lastName"
                    class="profile-photo">
-              <div class="photo-overlay" *ngIf="editMode" (click)="triggerPhotoUpload()">
-                <i class="fas fa-camera"></i>
-                <span>Change Photo</span>
+              <div class="profile-status-badge" [class]="'status-' + employee.status.toLowerCase()">
+                {{ employee.status }}
               </div>
-              <input #photoInput type="file" accept="image/*" 
-                     (change)="onPhotoSelected($event)" style="display: none;">
             </div>
-            
             <h4 class="mb-1">{{ employee.firstName }} {{ employee.lastName }}</h4>
             <p class="text-muted mb-2">{{ employee.designation }}</p>
             <p class="text-muted mb-3">{{ employee.department }}</p>
             
-            <div class="status-badge mb-3">
-              <span class="badge" [class]="'bg-' + getStatusColor(employee.status)">
-                {{ employee.status }}
-              </span>
-            </div>
-
+            <div class="contact-info">
+              <div class="contact-item">
+                <i class="fas fa-envelope text-primary me-2
             <div class="contact-info">
               <div class="contact-item">
                 <i class="fas fa-envelope text-muted me-2"></i>
@@ -116,6 +114,11 @@ import { NotificationService } from '../../../core/services/notification.service
               <li class="nav-item">
                 <a class="nav-link" data-bs-toggle="tab" href="#employment-info" role="tab">
                   Employment Details
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" data-bs-toggle="tab" href="#roles" role="tab">
+                  Roles & Permissions
                 </a>
               </li>
               <li class="nav-item">
@@ -209,6 +212,11 @@ import { NotificationService } from '../../../core/services/notification.service
                     </div>
                   </div>
                 </form>
+              </div>
+
+              <!-- Roles Tab -->
+              <div class="tab-pane fade" id="roles" role="tabpanel">
+                <app-employee-roles [employee]="employee" *ngIf="employee"></app-employee-roles>
               </div>
 
               <!-- Documents Tab -->
@@ -344,7 +352,7 @@ export class EmployeeProfileComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private employeeService: EmployeeService,
+    private employeeService: EnhancedEmployeeService,
     private fb: FormBuilder,
     private notificationService: NotificationService
   ) {}
@@ -399,6 +407,14 @@ export class EmployeeProfileComponent implements OnInit {
 
   toggleEditMode(): void {
     this.editMode = !this.editMode;
+  }
+
+  get isEditMode(): boolean {
+    return this.editMode;
+  }
+
+  navigateToEmployeeList(): void {
+    this.router.navigate(['/employees']);
   }
 
   cancelEdit(): void {

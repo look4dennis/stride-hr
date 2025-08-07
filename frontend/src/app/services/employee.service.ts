@@ -9,7 +9,8 @@ import {
   PagedResult,
   EmployeeOnboarding,
   EmployeeExitProcess,
-  OrganizationalChart
+  OrganizationalChart,
+  EmployeeRole
 } from '../models/employee.models';
 
 @Injectable({
@@ -141,6 +142,29 @@ export class EmployeeService {
     if (branchId) params = params.set('branchId', branchId.toString());
     
     return this.http.get<Employee[]>(`${this.API_URL}/employees/managers`, { params });
+  }
+
+  // Role Assignment
+  getEmployeeRoles(employeeId: number): Observable<EmployeeRole[]> {
+    return this.http.get<EmployeeRole[]>(`${this.API_URL}/employees/${employeeId}/roles`);
+  }
+
+  getActiveEmployeeRoles(employeeId: number): Observable<EmployeeRole[]> {
+    return this.http.get<EmployeeRole[]>(`${this.API_URL}/employees/${employeeId}/roles/active`);
+  }
+
+  assignRole(employeeId: number, roleId: number, notes?: string): Observable<boolean> {
+    return this.http.post<boolean>(`${this.API_URL}/employees/${employeeId}/roles/assign`, {
+      roleId,
+      notes
+    });
+  }
+
+  revokeRole(employeeId: number, roleId: number, notes?: string): Observable<boolean> {
+    return this.http.post<boolean>(`${this.API_URL}/employees/${employeeId}/roles/revoke`, {
+      roleId,
+      notes
+    });
   }
 
   // Mock data for development
