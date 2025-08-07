@@ -1,283 +1,301 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Subscription } from 'rxjs';
-import { RealTimeService, ConnectionState } from '../../../core/services/real-time.service';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
+import { ConnectionService, ConnectionStatus } from '../../../core/services/connection.service';
 
 @Component({
-  selector: 'app-connection-status',
-  standalone: true,
-  imports: [CommonModule],
-  template: `
-    <div class="connection-status" [ngClass]="getStatusClass()">
-      <div class="status-indicator">
-        <i class="status-icon" [ngClass]="getIconClass()"></i>
+    selector: 'app-connection-status',
+    standalone: true,
+    imports: [CommonModule],
+    template: `
+    <div class="connection-status" [class]="getStatusClass()">
+      <div class="connection-indicator">
+        <i [class]="getStatusIcon()"></i>
         <span class="status-text">{{ getStatusText() }}</span>
-      </div>
-      
-      <div class="status-details" *ngIf="showDetails">
-        <div class="detail-item" *ngIf="connectionState.lastConnected">
-          <small>Last connected: {{ formatTime(connectionState.lastConnected) }}</small>
-        </div>
-        <div class="detail-item" *ngIf="connectionState.reconnectAttempts > 0">
-          <small>Reconnect attempts: {{ connectionState.reconnectAttempts }}</small>
-        </div>
-        <div class="detail-item" *ngIf="connectionState.error">
-          <small class="error-text">{{ connectionState.error }}</small>
+        
+        <div class="connection-details" *ngIf="showDetails">
+          <small>
+            {{ getConnectionQuality() }}
+            <span *ngIf="connectionStatus.latency"> - {{ connectionStatus.latency }}ms</span>
+          </small>
         </div>
       </div>
       
+      <!-- Offline actions indicator -->
+      <div class="offline-actions" *ngIf="pendingActionsCount > 0">
+        <i class="fas fa-clock"></i>
+        <span>{{ pendingActionsCount }} pending</span>
+      </div>
+      
+      <!-- Retry button for failed connections -->
       <button 
-        *ngIf="!connectionState.isConnected && !connectionState.isConnecting" 
-        class="btn btn-sm btn-outline-primary reconnect-btn"
-        (click)="reconnect()"
-        [disabled]="isReconnecting">
-        <i class="fas fa-sync-alt" [class.fa-spin]="isReconnecting"></i>
-        {{ isReconnecting ? 'Reconnecting...' : 'Reconnect' }}
+        *ngIf="!connectionStatus.isConnectedToServer && connectionStatus.isOnline"
+        class="btn btn-sm btn-outline-primary retry-btn"
+        (click)="testConnection()"
+        [disabled]="isTestingConnection">
+        <i class="fas fa-redo" *ngIf="!isTestingConnection"></i>
+        <i class="fas fa-spinner fa-spin" *ngIf="isTestingConnection"></i>
+        Retry
       </button>
     </div>
   `,
-  styles: [`
+    styles: [`
     .connection-status {
       display: flex;
       align-items: center;
-      gap: 10px;
-      padding: 8px 12px;
-      border-radius: 6px;
+      padding: 0.5rem 1rem;
+      border-radius: 0.25rem;
       font-size: 0.875rem;
       transition: all 0.3s ease;
-      border: 1px solid transparent;
     }
 
-    .connection-status.connected {
-      background-color: #d1fae5;
-      border-color: #10b981;
-      color: #065f46;
+    .connection-status.online {
+      background-color: #d1edff;
+      color: #0c5460;
+      border: 1px solid #b8daff;
     }
 
-    .connection-status.connecting {
-      background-color: #fef3c7;
-      border-color: #f59e0b;
-      color: #92400e;
+    .connection-status.offline {
+      background-color: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
     }
 
-    .connection-status.reconnecting {
-      background-color: #fef3c7;
-      border-color: #f59e0b;
-      color: #92400e;
+    .connection-status.poor-connection {
+      background-color: #fff3cd;
+      color: #856404;
+      border: 1px solid #ffeaa7;
     }
 
-    .connection-status.disconnected {
-      background-color: #fee2e2;
-      border-color: #ef4444;
-      color: #991b1b;
-    }
-
-    .status-indicator {
+    .connection-indicator {
       display: flex;
       align-items: center;
-      gap: 6px;
+      flex: 1;
     }
 
-    .status-icon {
-      font-size: 0.875rem;
-    }
-
-    .status-icon.connected {
-      color: #10b981;
-    }
-
-    .status-icon.connecting {
-      color: #f59e0b;
-      animation: pulse 1.5s infinite;
-    }
-
-    .status-icon.reconnecting {
-      color: #f59e0b;
-      animation: spin 1s linear infinite;
-    }
-
-    .status-icon.disconnected {
-      color: #ef4444;
+    .connection-indicator i {
+      margin-right: 0.5rem;
+      font-size: 1rem;
     }
 
     .status-text {
       font-weight: 500;
     }
 
-    .status-details {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-    }
-
-    .detail-item {
-      font-size: 0.75rem;
+    .connection-details {
+      margin-left: 0.5rem;
       opacity: 0.8;
     }
 
-    .error-text {
-      color: #dc2626;
-      font-weight: 500;
+    .offline-actions {
+      display: flex;
+      align-items: center;
+      margin-left: 1rem;
+      padding-left: 1rem;
+      border-left: 1px solid rgba(0, 0, 0, 0.1);
     }
 
-    .reconnect-btn {
+    .offline-actions i {
+      margin-right: 0.25rem;
+      font-size: 0.875rem;
+    }
+
+    .retry-btn {
+      margin-left: 1rem;
+      padding: 0.25rem 0.5rem;
       font-size: 0.75rem;
-      padding: 4px 8px;
-      border-radius: 4px;
     }
 
-    @keyframes pulse {
-      0%, 100% {
-        opacity: 1;
-      }
-      50% {
-        opacity: 0.5;
-      }
+    /* Status-specific icon colors */
+    .online .fa-wifi,
+    .online .fa-check-circle {
+      color: #28a745;
     }
 
-    @keyframes spin {
-      from {
-        transform: rotate(0deg);
-      }
-      to {
-        transform: rotate(360deg);
-      }
+    .offline .fa-wifi-slash,
+    .offline .fa-exclamation-triangle {
+      color: #dc3545;
+    }
+
+    .poor-connection .fa-wifi,
+    .poor-connection .fa-exclamation-triangle {
+      color: #ffc107;
     }
 
     /* Responsive design */
     @media (max-width: 768px) {
       .connection-status {
-        padding: 6px 8px;
-        font-size: 0.8rem;
+        padding: 0.25rem 0.5rem;
+        font-size: 0.8125rem;
       }
 
-      .status-details {
+      .connection-details {
         display: none;
       }
 
-      .reconnect-btn {
-        font-size: 0.7rem;
-        padding: 3px 6px;
+      .offline-actions {
+        margin-left: 0.5rem;
+        padding-left: 0.5rem;
+      }
+
+      .retry-btn {
+        margin-left: 0.5rem;
+        padding: 0.125rem 0.25rem;
       }
     }
 
-    /* Compact mode */
-    .connection-status.compact {
-      padding: 4px 8px;
-      font-size: 0.75rem;
+    /* Animation for status changes */
+    .connection-status {
+      animation: statusChange 0.3s ease-in-out;
     }
 
-    .connection-status.compact .status-details {
-      display: none;
+    @keyframes statusChange {
+      0% { opacity: 0.7; transform: scale(0.98); }
+      100% { opacity: 1; transform: scale(1); }
     }
 
-    .connection-status.compact .reconnect-btn {
-      font-size: 0.7rem;
-      padding: 2px 6px;
+    /* Pulse animation for poor connection */
+    .poor-connection {
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0% { opacity: 1; }
+      50% { opacity: 0.8; }
+      100% { opacity: 1; }
     }
   `]
 })
 export class ConnectionStatusComponent implements OnInit, OnDestroy {
-  connectionState: ConnectionState = {
-    isConnected: false,
-    isConnecting: false,
-    isReconnecting: false,
-    reconnectAttempts: 0
-  };
-  
-  showDetails = false;
-  isReconnecting = false;
-  
-  private subscription: Subscription = new Subscription();
+    private readonly connectionService = inject(ConnectionService);
+    private readonly destroy$ = new Subject<void>();
 
-  constructor(private realTimeService: RealTimeService) {}
+    connectionStatus: ConnectionStatus = {
+        isOnline: false,
+        isConnectedToServer: false,
+        lastChecked: new Date()
+    };
 
-  ngOnInit(): void {
-    // Subscribe to connection state changes
-    this.subscription.add(
-      this.realTimeService.connectionState$.subscribe(state => {
-        this.connectionState = state;
-        this.isReconnecting = state.isReconnecting;
-      })
-    );
+    pendingActionsCount = 0;
+    showDetails = false;
+    isTestingConnection = false;
 
-    // Auto-hide details after a delay when connected
-    this.subscription.add(
-      this.realTimeService.connectionState$.subscribe(state => {
-        if (state.isConnected && this.showDetails) {
-          setTimeout(() => {
-            this.showDetails = false;
-          }, 3000);
+    ngOnInit(): void {
+        // Subscribe to connection status changes
+        this.connectionService.connectionStatus$.pipe(
+            takeUntil(this.destroy$)
+        ).subscribe(status => {
+            this.connectionStatus = status;
+        });
+
+        // Subscribe to offline actions count
+        this.connectionService.offlineActions$.pipe(
+            takeUntil(this.destroy$)
+        ).subscribe(actions => {
+            this.pendingActionsCount = actions.length;
+        });
+
+        // Show details on desktop, hide on mobile
+        this.showDetails = window.innerWidth > 768;
+    }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
+
+    /**
+     * Get CSS class based on connection status
+     */
+    getStatusClass(): string {
+        if (!this.connectionStatus.isOnline) {
+            return 'offline';
         }
-      })
-    );
-  }
 
-  ngOnDestroy(): void {
-    this.subscription.unsubscribe();
-  }
+        if (!this.connectionStatus.isConnectedToServer) {
+            return 'poor-connection';
+        }
 
-  getStatusClass(): string {
-    if (this.connectionState.isConnected) {
-      return 'connected';
-    } else if (this.connectionState.isConnecting) {
-      return 'connecting';
-    } else if (this.connectionState.isReconnecting) {
-      return 'reconnecting';
-    } else {
-      return 'disconnected';
+        if (this.connectionStatus.latency && this.connectionStatus.latency > 1000) {
+            return 'poor-connection';
+        }
+
+        return 'online';
     }
-  }
 
-  getIconClass(): string {
-    const baseClass = 'fas';
-    
-    if (this.connectionState.isConnected) {
-      return `${baseClass} fa-wifi connected`;
-    } else if (this.connectionState.isConnecting) {
-      return `${baseClass} fa-circle-notch connecting`;
-    } else if (this.connectionState.isReconnecting) {
-      return `${baseClass} fa-sync-alt reconnecting`;
-    } else {
-      return `${baseClass} fa-wifi-slash disconnected`;
+    /**
+     * Get status icon based on connection status
+     */
+    getStatusIcon(): string {
+        if (!this.connectionStatus.isOnline) {
+            return 'fas fa-wifi-slash';
+        }
+
+        if (!this.connectionStatus.isConnectedToServer) {
+            return 'fas fa-exclamation-triangle';
+        }
+
+        if (this.connectionStatus.latency && this.connectionStatus.latency > 1000) {
+            return 'fas fa-wifi text-warning';
+        }
+
+        return 'fas fa-wifi';
     }
-  }
 
-  getStatusText(): string {
-    if (this.connectionState.isConnected) {
-      return 'Connected';
-    } else if (this.connectionState.isConnecting) {
-      return 'Connecting...';
-    } else if (this.connectionState.isReconnecting) {
-      return 'Reconnecting...';
-    } else {
-      return 'Offline';
+    /**
+     * Get status text based on connection status
+     */
+    getStatusText(): string {
+        if (!this.connectionStatus.isOnline) {
+            return 'Offline';
+        }
+
+        if (!this.connectionStatus.isConnectedToServer) {
+            return 'Server Disconnected';
+        }
+
+        return 'Connected';
     }
-  }
 
-  async reconnect(): Promise<void> {
-    if (this.isReconnecting) return;
-    
-    this.isReconnecting = true;
-    this.showDetails = true;
-    
-    try {
-      await this.realTimeService.reconnect();
-    } catch (error) {
-      console.error('Manual reconnection failed:', error);
-    } finally {
-      // Reset reconnecting state after a delay
-      setTimeout(() => {
-        this.isReconnecting = false;
-      }, 2000);
+    /**
+     * Get connection quality description
+     */
+    getConnectionQuality(): string {
+        return this.connectionService.getConnectionQuality();
     }
-  }
 
-  toggleDetails(): void {
-    this.showDetails = !this.showDetails;
-  }
+    /**
+     * Test connection manually
+     */
+    testConnection(): void {
+        if (this.isTestingConnection) {
+            return;
+        }
 
-  formatTime(date: Date): string {
-    return new Date(date).toLocaleTimeString();
-  }
+        this.isTestingConnection = true;
+
+        this.connectionService.testConnection().subscribe({
+            next: (isConnected) => {
+                this.isTestingConnection = false;
+
+                if (isConnected) {
+                    console.log('Connection test successful');
+                } else {
+                    console.log('Connection test failed');
+                }
+            },
+            error: (error) => {
+                this.isTestingConnection = false;
+                console.error('Connection test error:', error);
+            }
+        });
+    }
+
+    /**
+     * Toggle details visibility
+     */
+    toggleDetails(): void {
+        this.showDetails = !this.showDetails;
+    }
 }

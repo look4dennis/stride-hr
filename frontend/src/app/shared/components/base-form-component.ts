@@ -1,148 +1,95 @@
-import { Component, inject } from '@angular/core';
-import { FormGroup, FormBuilder, AbstractControl, ValidationErrors } from '@angular/forms';
-import { Observable } from 'rxjs';
+import { Component, OnInit, inject } from '@angular/core';
+import { FormGroup, FormBuilder, AbstractControl } from '@angular/forms';
+import { Observable, of } from 'rxjs';
+import { catchError, finalize } from 'rxjs/operators';
 import { BaseComponent } from './base-component';
+import { ValidationError } from './validation-errors/validation-errors.component';
 
-export interface FormValidationError {
-  field: string;
-  message: string;
-  code?: string;
+export interface FormValidationConfig {
+  showInlineErrors?: boolean;
+  showSummaryErrors?: boolean;
+  validateOnSubmit?: boolean;
+  validateOnChange?: boolean;
+  fieldDisplayNames?: { [key: string]: string };
+}
+
+export interface FormSubmissionResult<T = any> {
+  success: boolean;
+  data?: T;
+  errors?: any;
+  message?: string;
 }
 
 @Component({
   template: ''
 })
-export abstract class BaseFormComponent<T = any> extends BaseComponent {
+export abstract class BaseFormComponent<T = any> extends BaseComponent implements OnInit {
   protected readonly formBuilder = inject(FormBuilder);
-  
+
   form!: FormGroup;
-  validationErrors: FormValidationError[] = [];
+  validationErrors: { [key: string]: string } = {};
+  serverErrors: ValidationError[] = [];
   isSubmitting = false;
-  isDirty = false;
+  hasBeenSubmitted = false;
+  
+  protected validationConfig: FormValidationConfig = {
+    showInlineErrors: true,
+    showSummaryErrors: true,
+    validateOnSubmit: true,
+    validateOnChange: false,
+    fieldDisplayNames: {}
+  };
 
-  protected override initializeComponent(): void {
+  override ngOnInit(): void {
+    super.ngOnInit();
     this.form = this.createForm();
-    this.setupFormSubscriptions();
+    this.setupFormValidation();
   }
 
-  // Abstract methods to be implemented by subclasses
+  // Abstract methods to be implemented by derived classes
   protected abstract createForm(): FormGroup;
-  protected abstract submitForm(data: T): Observable<any>;
+  protected abstract submitForm(data: T): Observable<FormSubmissionResult<T>>;
 
-  // Form management
-  protected getFormData(): T {
-    return this.form.value as T;
+  // Optional method for custom form initialization
+  protected initializeFormData(): void {
+    // Override in derived classes if needed
   }
 
-  protected resetForm(data?: Partial<T>): void {
-    this.form.reset(data);
-    this.clearValidationErrors();
-    this.isDirty = false;
-  }
+  // Form validation setup
+  private setupFormValidation(): void {
+    if (this.validationConfig.validateOnChange) {
+      this.form.valueChanges.subscribe(() => {
+        if (this.hasBeenSubmitted) {
+          this.validateForm();
+        }
+      });
+    }
 
-  protected patchForm(data: Partial<T>): void {
-    this.form.patchValue(data);
-  }
-
-  protected markFormGroupTouched(): void {
-    Object.keys(this.form.controls).forEach(key => {
-      const control = this.form.get(key);
-      control?.markAsTouched();
-      
-      if (control instanceof FormGroup) {
-        this.markFormGroupTouchedRecursive(control);
+    // Clear server errors when form values change
+    this.form.valueChanges.subscribe(() => {
+      if (this.serverErrors.length > 0) {
+        this.serverErrors = [];
       }
     });
   }
 
-  private markFormGroupTouchedRecursive(formGroup: FormGroup): void {
-    Object.keys(formGroup.controls).forEach(key => {
-      const control = formGroup.get(key);
-      control?.markAsTouched();
-      
-      if (control instanceof FormGroup) {
-        this.markFormGroupTouchedRecursive(control);
-      }
-    });
-  }
-
-  // Validation
-  protected validateForm(): boolean {
-    this.clearValidationErrors();
-    
-    if (this.form.invalid) {
-      this.markFormGroupTouched();
-      this.extractValidationErrors();
-      return false;
-    }
-    
-    return true;
-  }
-
-  protected isFieldInvalid(fieldName: string): boolean {
-    const field = this.form.get(fieldName);
-    return !!(field && field.invalid && (field.dirty || field.touched));
-  }
-
-  protected getFieldError(fieldName: string): string | null {
-    const field = this.form.get(fieldName);
-    
-    if (field && field.errors && (field.dirty || field.touched)) {
-      const errors = field.errors;
-      
-      if (errors['required']) {
-        return `${this.getFieldDisplayName(fieldName)} is required`;
-      }
-      
-      if (errors['email']) {
-        return 'Please enter a valid email address';
-      }
-      
-      if (errors['minlength']) {
-        return `${this.getFieldDisplayName(fieldName)} must be at least ${errors['minlength'].requiredLength} characters`;
-      }
-      
-      if (errors['maxlength']) {
-        return `${this.getFieldDisplayName(fieldName)} cannot exceed ${errors['maxlength'].requiredLength} characters`;
-      }
-      
-      if (errors['pattern']) {
-        return `${this.getFieldDisplayName(fieldName)} format is invalid`;
-      }
-      
-      if (errors['min']) {
-        return `${this.getFieldDisplayName(fieldName)} must be at least ${errors['min'].min}`;
-      }
-      
-      if (errors['max']) {
-        return `${this.getFieldDisplayName(fieldName)} cannot exceed ${errors['max'].max}`;
-      }
-      
-      // Custom error messages
-      if (errors['custom']) {
-        return errors['custom'];
-      }
-      
-      // Return first error message if available
-      const firstErrorKey = Object.keys(errors)[0];
-      return errors[firstErrorKey]?.message || `${this.getFieldDisplayName(fieldName)} is invalid`;
-    }
-    
-    return null;
-  }
-
-  protected hasFieldError(fieldName: string): boolean {
-    return this.getFieldError(fieldName) !== null;
-  }
-
-  // Form submission
+  // Form submission handling
   onSubmit(): void {
     if (this.isSubmitting) {
       return;
     }
 
-    if (!this.validateForm()) {
-      this.showWarning('Please correct the form errors before submitting');
+    this.hasBeenSubmitted = true;
+    this.clearErrors();
+
+    if (this.validationConfig.validateOnSubmit && !this.validateForm()) {
+      this.showWarning('Please correct the validation errors before submitting.');
+      return;
+    }
+
+    if (!this.isOnline) {
+      this.showWarning('You are currently offline. The form will be submitted when connection is restored.');
+      // In a real implementation, you might queue the form submission
       return;
     }
 
@@ -150,172 +97,228 @@ export abstract class BaseFormComponent<T = any> extends BaseComponent {
     this.showLoading('Submitting form...');
 
     const formData = this.getFormData();
-    
-    this.submitForm(formData).subscribe({
-      next: (result) => {
+
+    this.submitForm(formData).pipe(
+      catchError(error => {
+        this.handleSubmissionError(error);
+        return of({ success: false, errors: error });
+      }),
+      finalize(() => {
         this.isSubmitting = false;
         this.hideLoading();
-        this.onSubmitSuccess(result);
-      },
-      error: (error) => {
-        this.isSubmitting = false;
-        this.hideLoading();
-        this.onSubmitError(error);
+      })
+    ).subscribe(result => {
+      if (result.success) {
+        this.handleSubmissionSuccess(result);
+      } else {
+        this.handleSubmissionError(result.errors);
       }
     });
   }
 
-  // Override these methods in subclasses for custom behavior
-  protected onSubmitSuccess(result: any): void {
-    this.showSuccess('Form submitted successfully');
-    this.resetForm();
-  }
+  // Form validation
+  protected validateForm(): boolean {
+    this.validationErrors = {};
 
-  protected onSubmitError(error: any): void {
-    this.handleError(error, 'Failed to submit form');
-    
-    // Handle server-side validation errors
-    if (error?.error?.errors) {
-      this.handleServerValidationErrors(error.error.errors);
+    if (!this.form.valid) {
+      this.validationErrors = this.extractFormValidationErrors();
+      return false;
     }
+
+    return true;
   }
 
-  // Validation error handling
-  private clearValidationErrors(): void {
-    this.validationErrors = [];
-  }
+  // Extract validation errors from form
+  private extractFormValidationErrors(): { [key: string]: string } {
+    const errors: { [key: string]: string } = {};
 
-  private extractValidationErrors(): void {
-    this.validationErrors = [];
-    
     Object.keys(this.form.controls).forEach(key => {
       const control = this.form.get(key);
-      if (control && control.errors) {
-        const errorMessage = this.getFieldError(key);
-        if (errorMessage) {
-          this.validationErrors.push({
-            field: key,
-            message: errorMessage
-          });
-        }
+      if (control && control.errors && (control.dirty || control.touched || this.hasBeenSubmitted)) {
+        errors[key] = this.getControlErrorMessage(key, control);
       }
     });
+
+    return errors;
   }
 
-  private handleServerValidationErrors(errors: any): void {
-    if (Array.isArray(errors)) {
-      // Handle array of validation errors
-      this.validationErrors = errors.map(error => ({
-        field: error.field || 'general',
-        message: error.message,
-        code: error.code
-      }));
-    } else if (typeof errors === 'object') {
-      // Handle object with field-specific errors
-      this.validationErrors = [];
-      Object.keys(errors).forEach(field => {
-        const fieldErrors = Array.isArray(errors[field]) ? errors[field] : [errors[field]];
-        fieldErrors.forEach((message: string) => {
-          this.validationErrors.push({
-            field,
-            message
-          });
-        });
-        
-        // Set form control errors
-        const control = this.form.get(field);
-        if (control) {
-          control.setErrors({ server: fieldErrors[0] });
-        }
-      });
+  // Get error message for a specific control
+  private getControlErrorMessage(fieldName: string, control: AbstractControl): string {
+    const errors = control.errors;
+    if (!errors) {
+      return '';
     }
+
+    const displayName = this.getFieldDisplayName(fieldName);
+
+    if (errors['required']) {
+      return `${displayName} is required.`;
+    }
+    if (errors['email']) {
+      return `${displayName} must be a valid email address.`;
+    }
+    if (errors['minlength']) {
+      return `${displayName} must be at least ${errors['minlength'].requiredLength} characters long.`;
+    }
+    if (errors['maxlength']) {
+      return `${displayName} cannot exceed ${errors['maxlength'].requiredLength} characters.`;
+    }
+    if (errors['min']) {
+      return `${displayName} must be at least ${errors['min'].min}.`;
+    }
+    if (errors['max']) {
+      return `${displayName} cannot exceed ${errors['max'].max}.`;
+    }
+    if (errors['pattern']) {
+      return `${displayName} format is invalid.`;
+    }
+    if (errors['custom']) {
+      return errors['custom'].message || `${displayName} is invalid.`;
+    }
+
+    // Default error message
+    return `${displayName} is invalid.`;
   }
 
-  // Utility methods
-  private getFieldDisplayName(fieldName: string): string {
-    // Convert camelCase to Title Case
+  // Get display name for field
+  protected getFieldDisplayName(fieldName: string): string {
+    if (this.validationConfig.fieldDisplayNames?.[fieldName]) {
+      return this.validationConfig.fieldDisplayNames[fieldName];
+    }
+
+    // Convert camelCase to readable format
     return fieldName
       .replace(/([A-Z])/g, ' $1')
       .replace(/^./, str => str.toUpperCase())
       .trim();
   }
 
-  private setupFormSubscriptions(): void {
-    // Track form dirty state
-    this.form.valueChanges.subscribe(() => {
-      this.isDirty = this.form.dirty;
-    });
+  // Get form data
+  protected getFormData(): T {
+    return this.form.value as T;
+  }
 
-    // Clear server errors when user starts typing
-    this.form.valueChanges.subscribe(() => {
-      Object.keys(this.form.controls).forEach(key => {
-        const control = this.form.get(key);
-        if (control && control.errors && control.errors['server']) {
-          const errors = { ...control.errors };
-          delete errors['server'];
-          
-          if (Object.keys(errors).length === 0) {
-            control.setErrors(null);
-          } else {
-            control.setErrors(errors);
-          }
-        }
-      });
+  // Reset form
+  protected resetForm(data?: Partial<T>): void {
+    this.form.reset(data);
+    this.clearErrors();
+    this.hasBeenSubmitted = false;
+    this.isSubmitting = false;
+  }
+
+  // Clear all errors
+  protected clearErrors(): void {
+    this.validationErrors = {};
+    this.serverErrors = [];
+    this.clearError();
+  }
+
+  // Handle successful form submission
+  protected handleSubmissionSuccess(result: FormSubmissionResult<T>): void {
+    this.showSuccess(result.message || 'Form submitted successfully!');
+    
+    // Override in derived classes for custom success handling
+    this.onSubmissionSuccess(result);
+  }
+
+  // Handle form submission errors
+  protected handleSubmissionError(error: any): void {
+    if (error?.status === 422 || error?.status === 400) {
+      // Handle validation errors from server
+      const validationErrors = this.handleValidationErrors(error.error || error);
+      this.serverErrors = Object.keys(validationErrors).map(field => ({
+        field,
+        message: validationErrors[field],
+        severity: 'error' as const
+      }));
+      this.showWarning('Please correct the validation errors and try again.');
+    } else {
+      // Handle other errors
+      this.handleError(error, 'Failed to submit form. Please try again.');
+    }
+
+    // Override in derived classes for custom error handling
+    this.onSubmissionError(error);
+  }
+
+  // Check if field has errors
+  hasFieldError(fieldName: string): boolean {
+    return !!(this.validationErrors[fieldName] || 
+             this.serverErrors.find(err => err.field === fieldName));
+  }
+
+  // Get field error message
+  getFieldError(fieldName: string): string {
+    if (this.validationErrors[fieldName]) {
+      return this.validationErrors[fieldName];
+    }
+
+    const serverError = this.serverErrors.find(err => err.field === fieldName);
+    return serverError?.message || '';
+  }
+
+  // Check if form is valid
+  isFormValid(): boolean {
+    return this.form.valid && Object.keys(this.validationErrors).length === 0;
+  }
+
+  // Check if form is dirty
+  isFormDirty(): boolean {
+    return this.form.dirty;
+  }
+
+  // Check if form can be submitted
+  canSubmit(): boolean {
+    return !this.isSubmitting && this.isOnline && this.isFormValid();
+  }
+
+  // Mark all fields as touched (useful for showing validation errors)
+  markAllFieldsAsTouched(): void {
+    Object.keys(this.form.controls).forEach(key => {
+      const control = this.form.get(key);
+      if (control) {
+        control.markAsTouched();
+      }
     });
   }
 
-  // File handling utilities
-  protected handleFileSelect(event: Event, fieldName: string): void {
-    const input = event.target as HTMLInputElement;
-    if (input.files && input.files.length > 0) {
-      const file = input.files[0];
-      this.form.patchValue({ [fieldName]: file });
-      this.form.get(fieldName)?.markAsDirty();
+  // Set field value with validation
+  setFieldValue(fieldName: string, value: any, options?: { emitEvent?: boolean }): void {
+    const control = this.form.get(fieldName);
+    if (control) {
+      control.setValue(value, options);
+      
+      if (this.hasBeenSubmitted && this.validationConfig.validateOnChange) {
+        control.updateValueAndValidity();
+      }
     }
   }
 
-  protected removeFile(fieldName: string): void {
-    this.form.patchValue({ [fieldName]: null });
-    this.form.get(fieldName)?.markAsDirty();
+  // Get field value
+  getFieldValue(fieldName: string): any {
+    return this.form.get(fieldName)?.value;
   }
 
-  // Custom validators
-  protected static emailValidator(control: AbstractControl): ValidationErrors | null {
-    const email = control.value;
-    if (!email) return null;
-    
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email) ? null : { email: true };
-  }
-
-  protected static phoneValidator(control: AbstractControl): ValidationErrors | null {
-    const phone = control.value;
-    if (!phone) return null;
-    
-    const phoneRegex = /^[\+]?[1-9][\d]{0,15}$/;
-    return phoneRegex.test(phone.replace(/[\s\-\(\)]/g, '')) ? null : { phone: true };
-  }
-
-  protected static passwordValidator(control: AbstractControl): ValidationErrors | null {
-    const password = control.value;
-    if (!password) return null;
-    
-    const hasMinLength = password.length >= 8;
-    const hasUpperCase = /[A-Z]/.test(password);
-    const hasLowerCase = /[a-z]/.test(password);
-    const hasNumbers = /\d/.test(password);
-    const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
-    
-    const isValid = hasMinLength && hasUpperCase && hasLowerCase && hasNumbers && hasSpecialChar;
-    
-    if (!isValid) {
-      return {
-        password: {
-          message: 'Password must be at least 8 characters long and contain uppercase, lowercase, number, and special character'
-        }
-      };
+  // Disable/enable form
+  setFormEnabled(enabled: boolean): void {
+    if (enabled) {
+      this.form.enable();
+    } else {
+      this.form.disable();
     }
-    
-    return null;
+  }
+
+  // Override points for derived classes
+  protected onSubmissionSuccess(result: FormSubmissionResult<T>): void {
+    // Override in derived classes
+  }
+
+  protected onSubmissionError(error: any): void {
+    // Override in derived classes
+  }
+
+  // Initialize component (required by BaseComponent)
+  protected initializeComponent(): void {
+    this.initializeFormData();
   }
 }

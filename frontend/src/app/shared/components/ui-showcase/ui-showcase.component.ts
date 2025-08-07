@@ -535,13 +535,13 @@ export class UiShowcaseComponent extends BaseFormComponent implements OnInit, On
         }
     }
 
-    protected override onSubmitSuccess(result: any): void {
-        super.onSubmitSuccess(result);
+    protected override onSubmissionSuccess(result: any): void {
+        super.onSubmissionSuccess(result);
         this.isSubmitting = false;
     }
 
-    protected override onSubmitError(error: any): void {
-        super.onSubmitError(error);
+    protected override onSubmissionError(error: any): void {
+        super.onSubmissionError(error);
         this.isSubmitting = false;
     }
 
