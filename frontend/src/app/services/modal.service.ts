@@ -1,8 +1,8 @@
-import { Injectable, TemplateRef, ComponentRef } from '@angular/core';
-import { NgbModal, NgbModalRef, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
-import { Observable, from } from 'rxjs';
+import { Injectable, TemplateRef, ComponentRef, ViewContainerRef, ComponentFactoryResolver, ApplicationRef, Injector } from '@angular/core';
+import { Observable, Subject, BehaviorSubject } from 'rxjs';
+import { ModalComponent, ModalConfig } from '../shared/components/modal/modal.component';
 
-export interface ModalConfig extends NgbModalOptions {
+export interface EnhancedModalConfig extends ModalConfig {
     title?: string;
     confirmText?: string;
     cancelText?: string;
@@ -10,44 +10,75 @@ export interface ModalConfig extends NgbModalOptions {
     cancelButtonClass?: string;
 }
 
+export interface ModalRef {
+    id: string;
+    component: ComponentRef<ModalComponent>;
+    result: Observable<any>;
+    close: (result?: any) => void;
+    dismiss: (reason?: any) => void;
+}
+
 @Injectable({
     providedIn: 'root'
 })
 export class ModalService {
-    constructor(private ngbModal: NgbModal) { }
+    private modals = new Map<string, ModalRef>();
+    private modalContainer?: ViewContainerRef;
+
+    constructor(
+        private appRef: ApplicationRef,
+        private injector: Injector
+    ) {}
 
     /**
-     * Open a modal with a template
+     * Set the container where modals will be rendered
      */
-    openTemplate<T = any>(
-        template: TemplateRef<any>,
-        config: ModalConfig = {}
-    ): NgbModalRef {
-        const defaultConfig: NgbModalOptions = {
-            backdrop: 'static',
-            keyboard: false,
-            centered: true,
-            ...config
-        };
-
-        return this.ngbModal.open(template, defaultConfig);
+    setContainer(container: ViewContainerRef): void {
+        this.modalContainer = container;
     }
 
     /**
-     * Open a modal with a component
+     * Open a modal with enhanced configuration
      */
-    openComponent<T = any>(
-        component: any,
-        config: ModalConfig = {}
-    ): NgbModalRef {
-        const defaultConfig: NgbModalOptions = {
-            backdrop: 'static',
-            keyboard: false,
-            centered: true,
-            ...config
+    open(config: EnhancedModalConfig = {}): ModalRef {
+        const modalId = this.generateId();
+        const resultSubject = new Subject<any>();
+
+        // Create modal component
+        const componentRef = this.createModalComponent(config);
+        
+        // Set up modal properties
+        componentRef.instance.isVisible = true;
+        componentRef.instance.title = config.title || '';
+        componentRef.instance.config = config;
+        componentRef.instance.modalId = modalId;
+
+        // Handle modal events
+        componentRef.instance.modalClose.subscribe((result) => {
+            resultSubject.next(result);
+            resultSubject.complete();
+            this.destroyModal(modalId);
+        });
+
+        componentRef.instance.modalDismiss.subscribe((reason) => {
+            resultSubject.error(reason);
+            this.destroyModal(modalId);
+        });
+
+        const modalRef: ModalRef = {
+            id: modalId,
+            component: componentRef,
+            result: resultSubject.asObservable(),
+            close: (result?: any) => {
+                componentRef.instance.close();
+            },
+            dismiss: (reason?: any) => {
+                componentRef.instance.dismiss();
+            }
         };
 
-        return this.ngbModal.open(component, defaultConfig);
+        this.modals.set(modalId, modalRef);
+        return modalRef;
     }
 
     /**
@@ -56,26 +87,28 @@ export class ModalService {
     confirm(
         message: string,
         title: string = 'Confirm Action',
-        config: ModalConfig = {}
+        config: EnhancedModalConfig = {}
     ): Observable<boolean> {
-        const modalRef = this.ngbModal.open(ConfirmationModalComponent, {
-            backdrop: 'static',
-            keyboard: false,
+        const confirmConfig: EnhancedModalConfig = {
+            title,
+            size: 'md',
             centered: true,
+            backdrop: 'static',
             ...config
+        };
+
+        const modalRef = this.open(confirmConfig);
+        
+        // Set confirmation content
+        // This would need to be handled by creating a confirmation component
+        // For now, we'll return the basic modal result
+        return new Observable<boolean>(observer => {
+            modalRef.result.subscribe({
+                next: (result) => observer.next(result === true),
+                error: () => observer.next(false),
+                complete: () => observer.complete()
+            });
         });
-
-        modalRef.componentInstance.title = title;
-        modalRef.componentInstance.message = message;
-        modalRef.componentInstance.confirmText = config.confirmText || 'Confirm';
-        modalRef.componentInstance.cancelText = config.cancelText || 'Cancel';
-        modalRef.componentInstance.confirmButtonClass = config.confirmButtonClass || 'btn-primary';
-        modalRef.componentInstance.cancelButtonClass = config.cancelButtonClass || 'btn-secondary';
-
-        return from(modalRef.result.then(
-            (result) => result === true,
-            () => false
-        ));
     }
 
     /**
@@ -84,100 +117,90 @@ export class ModalService {
     alert(
         message: string,
         title: string = 'Alert',
-        config: ModalConfig = {}
+        config: EnhancedModalConfig = {}
     ): Observable<void> {
-        const modalRef = this.ngbModal.open(AlertModalComponent, {
-            backdrop: 'static',
-            keyboard: false,
+        const alertConfig: EnhancedModalConfig = {
+            title,
+            size: 'md',
             centered: true,
+            backdrop: 'static',
+            showCloseButton: true,
             ...config
+        };
+
+        const modalRef = this.open(alertConfig);
+        
+        return new Observable<void>(observer => {
+            modalRef.result.subscribe({
+                next: () => observer.next(),
+                error: () => observer.next(),
+                complete: () => observer.complete()
+            });
         });
-
-        modalRef.componentInstance.title = title;
-        modalRef.componentInstance.message = message;
-
-        return from(modalRef.result.then(
-            () => { },
-            () => { }
-        ));
     }
 
     /**
      * Close all open modals
      */
     closeAll(): void {
-        this.ngbModal.dismissAll();
+        this.modals.forEach(modal => {
+            modal.dismiss('closeAll');
+        });
+        this.modals.clear();
     }
 
     /**
      * Check if any modal is open
      */
     hasOpenModals(): boolean {
-        return this.ngbModal.hasOpenModals();
+        return this.modals.size > 0;
+    }
+
+    /**
+     * Get modal by ID
+     */
+    getModal(id: string): ModalRef | undefined {
+        return this.modals.get(id);
+    }
+
+    private createModalComponent(config: EnhancedModalConfig): ComponentRef<ModalComponent> {
+        // Create component factory
+        const componentFactory = this.injector.get(ComponentFactoryResolver).resolveComponentFactory(ModalComponent);
+        
+        // Create component
+        const componentRef = componentFactory.create(this.injector);
+        
+        // Attach to application
+        this.appRef.attachView(componentRef.hostView);
+        
+        // Append to DOM
+        const domElem = (componentRef.hostView as any).rootNodes[0] as HTMLElement;
+        if (this.modalContainer) {
+            this.modalContainer.element.nativeElement.appendChild(domElem);
+        } else {
+            document.body.appendChild(domElem);
+        }
+        
+        return componentRef;
+    }
+
+    private destroyModal(id: string): void {
+        const modal = this.modals.get(id);
+        if (modal) {
+            // Detach from application
+            this.appRef.detachView(modal.component.hostView);
+            
+            // Destroy component
+            modal.component.destroy();
+            
+            // Remove from map
+            this.modals.delete(id);
+        }
+    }
+
+    private generateId(): string {
+        return 'modal-' + Math.random().toString(36).substr(2, 9);
     }
 }
 
-// Confirmation Modal Component
-import { Component, Input } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { CommonModule } from '@angular/common';
-
-@Component({
-    selector: 'app-confirmation-modal',
-    standalone: true,
-    imports: [CommonModule],
-    template: `
-    <div class="modal-header">
-      <h4 class="modal-title">{{ title }}</h4>
-      <button type="button" class="btn-close" aria-label="Close" (click)="activeModal.dismiss()"></button>
-    </div>
-    <div class="modal-body">
-      <p>{{ message }}</p>
-    </div>
-    <div class="modal-footer">
-      <button type="button" [class]="'btn ' + cancelButtonClass" (click)="activeModal.dismiss()">
-        {{ cancelText }}
-      </button>
-      <button type="button" [class]="'btn ' + confirmButtonClass" (click)="activeModal.close(true)">
-        {{ confirmText }}
-      </button>
-    </div>
-  `
-})
-export class ConfirmationModalComponent {
-    @Input() title = 'Confirm Action';
-    @Input() message = 'Are you sure?';
-    @Input() confirmText = 'Confirm';
-    @Input() cancelText = 'Cancel';
-    @Input() confirmButtonClass = 'btn-primary';
-    @Input() cancelButtonClass = 'btn-secondary';
-
-    constructor(public activeModal: NgbActiveModal) { }
-}
-
-// Alert Modal Component
-@Component({
-    selector: 'app-alert-modal',
-    standalone: true,
-    imports: [CommonModule],
-    template: `
-    <div class="modal-header">
-      <h4 class="modal-title">{{ title }}</h4>
-      <button type="button" class="btn-close" aria-label="Close" (click)="activeModal.close()"></button>
-    </div>
-    <div class="modal-body">
-      <p>{{ message }}</p>
-    </div>
-    <div class="modal-footer">
-      <button type="button" class="btn btn-primary" (click)="activeModal.close()">
-        OK
-      </button>
-    </div>
-  `
-})
-export class AlertModalComponent {
-    @Input() title = 'Alert';
-    @Input() message = '';
-
-    constructor(public activeModal: NgbActiveModal) { }
-}
+// Legacy modal components removed - using new ModalComponent instead

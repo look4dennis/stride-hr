@@ -1,196 +1,365 @@
 import { Injectable } from '@angular/core';
-import { FormGroup, FormControl, AbstractControl } from '@angular/forms';
+import { AbstractControl, FormGroup, ValidationErrors } from '@angular/forms';
 
 @Injectable({
   providedIn: 'root'
 })
 export class FormValidationService {
 
-  constructor() {}
+  constructor() { }
 
+  /**
+   * Get validation message for a form control
+   */
+  getValidationMessage(control: AbstractControl): string | null {
+    if (!control || !control.errors || !control.touched) {
+      return null;
+    }
+
+    const errors = control.errors;
+
+    // Required validation
+    if (errors['required']) {
+      return 'This field is required';
+    }
+
+    // Email validation
+    if (errors['email']) {
+      return 'Please enter a valid email address';
+    }
+
+    // Pattern validation
+    if (errors['pattern']) {
+      return 'Please enter a valid format';
+    }
+
+    // Min length validation
+    if (errors['minlength']) {
+      const requiredLength = errors['minlength'].requiredLength;
+      const actualLength = errors['minlength'].actualLength;
+      return `Minimum length is ${requiredLength} characters (current: ${actualLength})`;
+    }
+
+    // Max length validation
+    if (errors['maxlength']) {
+      const requiredLength = errors['maxlength'].requiredLength;
+      const actualLength = errors['maxlength'].actualLength;
+      return `Maximum length is ${requiredLength} characters (current: ${actualLength})`;
+    }
+
+    // Min value validation
+    if (errors['min']) {
+      return `Minimum value is ${errors['min'].min}`;
+    }
+
+    // Max value validation
+    if (errors['max']) {
+      return `Maximum value is ${errors['max'].max}`;
+    }
+
+    // Custom validation messages
+    if (errors['custom']) {
+      return errors['custom'];
+    }
+
+    // Phone validation
+    if (errors['phone']) {
+      return 'Please enter a valid phone number';
+    }
+
+    // Password validation
+    if (errors['password']) {
+      return errors['password'].message || 'Password does not meet requirements';
+    }
+
+    // Confirm password validation
+    if (errors['confirmPassword']) {
+      return 'Passwords do not match';
+    }
+
+    // URL validation
+    if (errors['url']) {
+      return 'Please enter a valid URL';
+    }
+
+    // Date validation
+    if (errors['date']) {
+      return 'Please enter a valid date';
+    }
+
+    // Number validation
+    if (errors['number']) {
+      return 'Please enter a valid number';
+    }
+
+    // File validation
+    if (errors['fileSize']) {
+      return `File size must be less than ${errors['fileSize'].maxSize}`;
+    }
+
+    if (errors['fileType']) {
+      return `File type must be one of: ${errors['fileType'].allowedTypes.join(', ')}`;
+    }
+
+    // Return first error message if available
+    const firstErrorKey = Object.keys(errors)[0];
+    const firstError = errors[firstErrorKey];
+    
+    if (typeof firstError === 'string') {
+      return firstError;
+    }
+    
+    if (firstError && firstError.message) {
+      return firstError.message;
+    }
+
+    return 'This field is invalid';
+  }
+
+  /**
+   * Check if a field is invalid and should show error
+   */
   isFieldInvalid(form: FormGroup, fieldName: string): boolean {
     const field = form.get(fieldName);
     return !!(field && field.invalid && (field.dirty || field.touched));
   }
 
-  getValidationMessage(control: AbstractControl, fieldName: string): string | null {
-    if (!control || !control.errors) {
-      return null;
-    }
-
-    const errors = control.errors;
-    const fieldDisplayName = this.getFieldDisplayName(fieldName);
-
-    if (errors['required']) {
-      return `${fieldDisplayName} is required`;
-    }
-
-    if (errors['email']) {
-      return 'Please enter a valid email address';
-    }
-
-    if (errors['minlength']) {
-      const requiredLength = errors['minlength'].requiredLength;
-      return `${fieldDisplayName} must be at least ${requiredLength} characters long`;
-    }
-
-    if (errors['maxlength']) {
-      const requiredLength = errors['maxlength'].requiredLength;
-      return `${fieldDisplayName} cannot exceed ${requiredLength} characters`;
-    }
-
-    if (errors['min']) {
-      const minValue = errors['min'].min;
-      return `${fieldDisplayName} must be at least ${minValue}`;
-    }
-
-    if (errors['max']) {
-      const maxValue = errors['max'].max;
-      return `${fieldDisplayName} cannot exceed ${maxValue}`;
-    }
-
-    if (errors['pattern']) {
-      return `${fieldDisplayName} format is invalid`;
-    }
-
-    if (errors['phone']) {
-      return 'Please enter a valid phone number';
-    }
-
-    if (errors['date']) {
-      return 'Please enter a valid date';
-    }
-
-    if (errors['passwordMismatch']) {
-      return 'Passwords do not match';
-    }
-
-    if (errors['uniqueEmail']) {
-      return 'This email address is already in use';
-    }
-
-    if (errors['uniqueEmployeeId']) {
-      return 'This employee ID is already in use';
-    }
-
-    // Generic error message for unknown validation errors
-    return `${fieldDisplayName} is invalid`;
+  /**
+   * Check if a field is valid and should show success
+   */
+  isFieldValid(form: FormGroup, fieldName: string): boolean {
+    const field = form.get(fieldName);
+    return !!(field && field.valid && (field.dirty || field.touched) && field.value);
   }
 
-  validateFormAndGetFirstError(form: FormGroup): string | null {
-    if (form.valid) {
-      return null;
-    }
+  /**
+   * Get all validation errors for a form
+   */
+  getFormErrors(form: FormGroup): { [key: string]: string } {
+    const errors: { [key: string]: string } = {};
 
-    // Mark all fields as touched to show validation errors
-    this.markFormGroupTouched(form);
-
-    // Find the first invalid field and return its error message
-    for (const fieldName in form.controls) {
-      const control = form.get(fieldName);
-      if (control && control.invalid) {
-        return this.getValidationMessage(control, fieldName);
-      }
-    }
-
-    return 'Please correct the errors in the form';
-  }
-
-  markFormGroupTouched(formGroup: FormGroup): void {
-    Object.keys(formGroup.controls).forEach(key => {
-      const control = formGroup.get(key);
-      if (control) {
-        control.markAsTouched();
-
-        if (control instanceof FormGroup) {
-          this.markFormGroupTouched(control);
+    Object.keys(form.controls).forEach(key => {
+      const control = form.get(key);
+      if (control && control.invalid && (control.dirty || control.touched)) {
+        const message = this.getValidationMessage(control);
+        if (message) {
+          errors[key] = message;
         }
       }
     });
+
+    return errors;
   }
 
-  resetFormValidation(form: FormGroup): void {
-    form.markAsUntouched();
-    form.markAsPristine();
-    
+  /**
+   * Mark all fields in a form as touched
+   */
+  markAllFieldsAsTouched(form: FormGroup): void {
     Object.keys(form.controls).forEach(key => {
       const control = form.get(key);
       if (control) {
-        control.markAsUntouched();
-        control.markAsPristine();
+        control.markAsTouched();
         
         if (control instanceof FormGroup) {
-          this.resetFormValidation(control);
+          this.markAllFieldsAsTouched(control);
         }
       }
     });
   }
 
-  private getFieldDisplayName(fieldName: string): string {
-    // Convert camelCase to readable format
-    const displayName = fieldName
-      .replace(/([A-Z])/g, ' $1')
-      .replace(/^./, str => str.toUpperCase())
-      .trim();
-
-    // Handle special cases
-    const specialCases: { [key: string]: string } = {
-      'firstName': 'First Name',
-      'lastName': 'Last Name',
-      'dateOfBirth': 'Date of Birth',
-      'joiningDate': 'Joining Date',
-      'basicSalary': 'Basic Salary',
-      'reportingManagerId': 'Reporting Manager',
-      'branchId': 'Branch',
-      'employeeId': 'Employee ID',
-      'profilePhoto': 'Profile Photo'
-    };
-
-    return specialCases[fieldName] || displayName;
+  /**
+   * Clear all validation errors from a form
+   */
+  clearFormErrors(form: FormGroup): void {
+    Object.keys(form.controls).forEach(key => {
+      const control = form.get(key);
+      if (control) {
+        control.setErrors(null);
+        control.markAsUntouched();
+        control.markAsPristine();
+      }
+    });
   }
 
-  // Custom validators
-  static phoneValidator(control: AbstractControl): { [key: string]: any } | null {
-    if (!control.value) {
-      return null;
-    }
+  /**
+   * Set server validation errors on form controls
+   */
+  setServerErrors(form: FormGroup, serverErrors: { [key: string]: string[] | string }): void {
+    Object.keys(serverErrors).forEach(fieldName => {
+      const control = form.get(fieldName);
+      if (control) {
+        const errors = serverErrors[fieldName];
+        const errorMessage = Array.isArray(errors) ? errors[0] : errors;
+        control.setErrors({ server: errorMessage });
+        control.markAsTouched();
+      }
+    });
+  }
 
+  /**
+   * Custom validators
+   */
+  static emailValidator(control: AbstractControl): ValidationErrors | null {
+    if (!control.value) return null;
+    
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(control.value) ? null : { email: true };
+  }
+
+  static phoneValidator(control: AbstractControl): ValidationErrors | null {
+    if (!control.value) return null;
+    
     const phoneRegex = /^[\+]?[1-9][\d]{0,15}$/;
-    const valid = phoneRegex.test(control.value);
-    return valid ? null : { phone: true };
+    const cleanPhone = control.value.replace(/[\s\-\(\)]/g, '');
+    return phoneRegex.test(cleanPhone) ? null : { phone: true };
   }
 
-  static dateValidator(control: AbstractControl): { [key: string]: any } | null {
-    if (!control.value) {
-      return null;
+  static passwordValidator(control: AbstractControl): ValidationErrors | null {
+    if (!control.value) return null;
+    
+    const password = control.value;
+    const hasMinLength = password.length >= 8;
+    const hasUpperCase = /[A-Z]/.test(password);
+    const hasLowerCase = /[a-z]/.test(password);
+    const hasNumbers = /\d/.test(password);
+    const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+    
+    const isValid = hasMinLength && hasUpperCase && hasLowerCase && hasNumbers && hasSpecialChar;
+    
+    if (!isValid) {
+      return {
+        password: {
+          message: 'Password must be at least 8 characters long and contain uppercase, lowercase, number, and special character'
+        }
+      };
     }
+    
+    return null;
+  }
 
+  static confirmPasswordValidator(passwordField: string) {
+    return (control: AbstractControl): ValidationErrors | null => {
+      if (!control.parent) return null;
+      
+      const password = control.parent.get(passwordField);
+      const confirmPassword = control;
+      
+      if (!password || !confirmPassword) return null;
+      
+      if (password.value !== confirmPassword.value) {
+        return { confirmPassword: true };
+      }
+      
+      return null;
+    };
+  }
+
+  static urlValidator(control: AbstractControl): ValidationErrors | null {
+    if (!control.value) return null;
+    
+    try {
+      new URL(control.value);
+      return null;
+    } catch {
+      return { url: true };
+    }
+  }
+
+  static fileSizeValidator(maxSizeInMB: number) {
+    return (control: AbstractControl): ValidationErrors | null => {
+      if (!control.value || !(control.value instanceof File)) return null;
+      
+      const file = control.value as File;
+      const maxSizeInBytes = maxSizeInMB * 1024 * 1024;
+      
+      if (file.size > maxSizeInBytes) {
+        return {
+          fileSize: {
+            maxSize: `${maxSizeInMB}MB`,
+            actualSize: `${(file.size / 1024 / 1024).toFixed(2)}MB`
+          }
+        };
+      }
+      
+      return null;
+    };
+  }
+
+  static fileTypeValidator(allowedTypes: string[]) {
+    return (control: AbstractControl): ValidationErrors | null => {
+      if (!control.value || !(control.value instanceof File)) return null;
+      
+      const file = control.value as File;
+      const fileExtension = file.name.split('.').pop()?.toLowerCase();
+      
+      if (!fileExtension || !allowedTypes.includes(fileExtension)) {
+        return {
+          fileType: {
+            allowedTypes,
+            actualType: fileExtension
+          }
+        };
+      }
+      
+      return null;
+    };
+  }
+
+  static numberValidator(control: AbstractControl): ValidationErrors | null {
+    if (!control.value) return null;
+    
+    const value = parseFloat(control.value);
+    if (isNaN(value)) {
+      return { number: true };
+    }
+    
+    return null;
+  }
+
+  static dateValidator(control: AbstractControl): ValidationErrors | null {
+    if (!control.value) return null;
+    
     const date = new Date(control.value);
-    const valid = date instanceof Date && !isNaN(date.getTime());
-    return valid ? null : { date: true };
+    if (isNaN(date.getTime())) {
+      return { date: true };
+    }
+    
+    return null;
   }
 
-  static futureDateValidator(control: AbstractControl): { [key: string]: any } | null {
-    if (!control.value) {
+  static minDateValidator(minDate: Date) {
+    return (control: AbstractControl): ValidationErrors | null => {
+      if (!control.value) return null;
+      
+      const date = new Date(control.value);
+      if (date < minDate) {
+        return {
+          minDate: {
+            minDate: minDate.toISOString().split('T')[0],
+            actualDate: date.toISOString().split('T')[0]
+          }
+        };
+      }
+      
       return null;
-    }
-
-    const inputDate = new Date(control.value);
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    return inputDate > today ? { futureDate: true } : null;
+    };
   }
 
-  static pastDateValidator(control: AbstractControl): { [key: string]: any } | null {
-    if (!control.value) {
+  static maxDateValidator(maxDate: Date) {
+    return (control: AbstractControl): ValidationErrors | null => {
+      if (!control.value) return null;
+      
+      const date = new Date(control.value);
+      if (date > maxDate) {
+        return {
+          maxDate: {
+            maxDate: maxDate.toISOString().split('T')[0],
+            actualDate: date.toISOString().split('T')[0]
+          }
+        };
+      }
+      
       return null;
-    }
-
-    const inputDate = new Date(control.value);
-    const today = new Date();
-    today.setHours(23, 59, 59, 999);
-
-    return inputDate < today ? null : { pastDate: true };
+    };
   }
 }

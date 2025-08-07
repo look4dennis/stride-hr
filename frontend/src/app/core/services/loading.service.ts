@@ -63,6 +63,26 @@ export class LoadingService {
   }
 
   // Utility methods
+  setLoading(loading: boolean, componentId?: string, message?: string): void {
+    if (componentId) {
+      this.setComponentLoading(componentId, loading);
+    } else {
+      this.setGlobalLoading(loading);
+    }
+  }
+
+  clearLoading(componentId?: string): void {
+    if (componentId) {
+      this.setComponentLoading(componentId, false);
+    } else {
+      this.setGlobalLoading(false);
+    }
+  }
+
+  clearComponentLoading(componentId: string): void {
+    this.setComponentLoading(componentId, false);
+  }
+
   showLoading(id?: string): void {
     if (id) {
       this.setComponentLoading(id, true);

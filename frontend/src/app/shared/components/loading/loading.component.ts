@@ -60,7 +60,7 @@ export class LoadingComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.subscription.add(
-      this.loadingService.loading$.subscribe(
+      this.loadingService.globalLoading$.subscribe(
         loading => this.isLoading = loading
       )
     );
