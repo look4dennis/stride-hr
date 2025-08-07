@@ -520,8 +520,9 @@ export class ModalComponent implements OnInit, OnDestroy {
     }
   }
 
-  onEscapeKey(event: KeyboardEvent): void {
-    if (this.config.keyboard !== false && event.key === 'Escape') {
+  onEscapeKey(event: Event): void {
+    const keyboardEvent = event as KeyboardEvent;
+    if (this.config.keyboard !== false && keyboardEvent.key === 'Escape') {
       this.dismiss();
     }
   }

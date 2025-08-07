@@ -215,7 +215,7 @@ import { Employee } from '../../../models/employee.models';
             <button class="btn btn-outline-primary" 
                     type="button" 
                     (click)="addComment()"
-                    [disabled]="!newComment?.trim()">
+                    [disabled]="!newComment || !newComment.trim()">
               <i class="fas fa-paper-plane"></i>
             </button>
           </div>

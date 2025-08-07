@@ -114,7 +114,7 @@ import { Employee } from '../../../models/employee.models';
                            [style.width.%]="getGoalsProgress(review.goals)"
                            [ngClass]="getProgressBarClass(getGoalsProgress(review.goals))"></div>
                     </div>
-                    <small class="text-muted">{{getCompletedGoals(review.goals)}}/{{review.goals?.length || 0}} goals</small>
+                    <small class="text-muted">{{getCompletedGoals(review.goals)}}/{{review.goals.length || 0}} goals</small>
                   </td>
                   <td>{{review.createdAt | date:'short'}}</td>
                   <td>

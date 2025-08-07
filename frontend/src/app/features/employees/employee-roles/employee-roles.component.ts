@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { EnhancedEmployeeService } from '../../../services/enhanced-employee.service';
 import { RoleService } from '../../../services/role.service';
-import { Employee, EmployeeRole, Role, AssignRoleDto, RevokeRoleDto } from '../../../models/employee.models';
+import { Employee, EmployeeRole, EmployeeRoleModel, AssignRoleDto, RevokeRoleDto } from '../../../models/employee.models';
 import { NotificationService } from '../../../core/services/notification.service';
 
 @Component({
@@ -289,7 +289,7 @@ export class EmployeeRolesComponent implements OnInit {
   @Input() employee!: Employee;
   
   employeeRoles: EmployeeRole[] = [];
-  availableRoles: Role[] = [];
+  availableRoles: EmployeeRoleModel[] = [];
   selectedRole: EmployeeRole | null = null;
   
   assignRoleForm: FormGroup;
@@ -346,7 +346,14 @@ export class EmployeeRolesComponent implements OnInit {
           .filter(er => er.isActive)
           .map(er => er.roleId);
         
-        this.availableRoles = roles.filter(role => !activeRoleIds.includes(role.id));
+        this.availableRoles = roles
+          .filter(role => !activeRoleIds.includes(role.id))
+          .map(role => ({
+            id: role.id,
+            name: role.name,
+            description: role.description,
+            permissions: role.permissions.map(p => p.name)
+          }));
       },
       error: (error) => {
         console.error('Failed to load available roles:', error);

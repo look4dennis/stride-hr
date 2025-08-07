@@ -524,7 +524,7 @@ export class SystemConfigComponent implements OnInit {
     // Save each changed configuration
     Object.keys(this.configChanges).forEach(key => {
       const value = this.configChanges[key];
-      const promise = this.systemConfigService.updateConfiguration(key, { value }).toPromise();
+      const promise = this.systemConfigService.updateConfiguration(key, { configurations: [{ key, value }] }).toPromise();
       savePromises.push(promise);
     });
 

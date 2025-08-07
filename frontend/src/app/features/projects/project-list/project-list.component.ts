@@ -183,11 +183,11 @@ import { ProjectProgressComponent } from '../project-progress/project-progress.c
                 
                 <div class="progress mb-2" style="height: 6px;">
                   <div class="progress-bar bg-success" 
-                       [style.width.%]="project.progress?.completionPercentage || 0">
+                       [style.width.%]="project.progress.completionPercentage || 0">
                   </div>
                 </div>
                 <small class="text-muted">
-                  {{ project.progress?.completionPercentage || 0 }}% Complete
+                  {{ project.progress.completionPercentage || 0 }}% Complete
                 </small>
               </div>
 
@@ -254,10 +254,10 @@ import { ProjectProgressComponent } from '../project-progress/project-progress.c
                 <td>
                   <div class="progress" style="width: 100px; height: 8px;">
                     <div class="progress-bar bg-success" 
-                         [style.width.%]="project.progress?.completionPercentage || 0">
+                         [style.width.%]="project.progress.completionPercentage || 0">
                     </div>
                   </div>
-                  <small class="text-muted">{{ project.progress?.completionPercentage || 0 }}%</small>
+                  <small class="text-muted">{{ project.progress.completionPercentage || 0 }}%</small>
                 </td>
                 <td>
                   <div class="team-avatars">

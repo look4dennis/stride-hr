@@ -498,7 +498,13 @@ export class BranchManagementComponent implements OnInit {
       timeZone: branch.timeZone,
       address: branch.address
     });
-    this.localHolidays = [...branch.localHolidays];
+    this.localHolidays = branch.localHolidays.map((holiday, index) => ({
+      id: index,
+      name: `Holiday ${index + 1}`,
+      date: holiday,
+      isRecurring: false,
+      branchId: branch.id
+    }));
     this.onCountryChange(); // Update available time zones
     this.showModal = true;
   }
@@ -542,10 +548,11 @@ export class BranchManagementComponent implements OnInit {
 
   addHoliday(): void {
     this.localHolidays.push({
+      id: this.localHolidays.length,
       name: '',
-      date: new Date(),
+      date: new Date().toISOString().split('T')[0],
       isRecurring: false,
-      description: ''
+      branchId: 0
     });
   }
 
@@ -554,10 +561,10 @@ export class BranchManagementComponent implements OnInit {
   }
 
   updateHolidayDate(index: number, event: any): void {
-    this.localHolidays[index].date = new Date(event.target.value);
+    this.localHolidays[index].date = event.target.value;
   }
 
-  formatDateForInput(date: Date): string {
+  formatDateForInput(date: string | Date): string {
     return new Date(date).toISOString().split('T')[0];
   }
 

@@ -163,6 +163,19 @@ export class ModalService {
         return this.modals.get(id);
     }
 
+    /**
+     * Open a modal with a template
+     */
+    openTemplate(template: TemplateRef<any>, config: EnhancedModalConfig = {}): ModalRef {
+        const modalRef = this.open(config);
+        
+        // For now, just return the modal ref
+        // Template content would need to be handled differently
+        // This is a placeholder implementation
+        
+        return modalRef;
+    }
+
     private createModalComponent(config: EnhancedModalConfig): ComponentRef<ModalComponent> {
         // Create component factory
         const componentFactory = this.injector.get(ComponentFactoryResolver).resolveComponentFactory(ModalComponent);

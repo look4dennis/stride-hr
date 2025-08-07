@@ -59,9 +59,6 @@ import { EmployeeRolesComponent } from '../employee-roles/employee-roles.compone
             
             <div class="contact-info">
               <div class="contact-item">
-                <i class="fas fa-envelope text-primary me-2
-            <div class="contact-info">
-              <div class="contact-item">
                 <i class="fas fa-envelope text-muted me-2"></i>
                 <span>{{ employee.email }}</span>
               </div>

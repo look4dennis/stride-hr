@@ -448,11 +448,9 @@ export class RoleManagementComponent implements OnInit {
 
   private loadRoles(): void {
     this.roleService.getAllRoles().subscribe({
-      next: (response) => {
-        if (response.success && response.data) {
-          this.roles = response.data.roles;
-          this.filteredRoles = [...this.roles];
-        }
+      next: (roles) => {
+        this.roles = roles;
+        this.filteredRoles = [...this.roles];
       },
       error: (error) => {
         console.error('Error loading roles:', error);
@@ -539,8 +537,8 @@ export class RoleManagementComponent implements OnInit {
   deleteRole(role: Role): void {
     if (confirm(`Are you sure you want to delete the role "${role.name}"?`)) {
       this.roleService.deleteRole(role.id).subscribe({
-        next: (response) => {
-          if (response.success) {
+        next: (success) => {
+          if (success) {
             console.log('Role deleted successfully');
             this.loadRoles();
           }
@@ -606,12 +604,10 @@ export class RoleManagementComponent implements OnInit {
     if (this.isEditMode && this.currentRole) {
       // Update existing role
       this.roleService.updateRole(this.currentRole.id, formData).subscribe({
-        next: (response) => {
-          if (response.success) {
-            console.log('Role updated successfully');
-            this.loadRoles();
-            this.closeModal();
-          }
+        next: (updatedRole) => {
+          console.log('Role updated successfully');
+          this.loadRoles();
+          this.closeModal();
           this.isLoading = false;
         },
         error: (error) => {
@@ -622,8 +618,8 @@ export class RoleManagementComponent implements OnInit {
     } else {
       // Create new role
       this.roleService.createRole(formData).subscribe({
-        next: (response) => {
-          if (response.success) {
+        next: (success) => {
+          if (success) {
             console.log('Role created successfully');
             this.loadRoles();
             this.closeModal();

@@ -12,7 +12,7 @@ import {
   EmployeeExitProcess,
   OrganizationalChart,
   EmployeeRole,
-  Role
+  EmployeeRoleModel
 } from '../models/employee.models';
 import { ApiResponse } from '../models/api.models';
 
@@ -441,7 +441,9 @@ export class EnhancedEmployeeService {
       totalCount: mockEmployees.length,
       page: 1,
       pageSize: 10,
-      totalPages: 1
+      totalPages: 1,
+      hasNext: false,
+      hasPrevious: false
     };
   }
 }

@@ -165,7 +165,7 @@ export abstract class BaseApiService<T, CreateDto = Partial<T>, UpdateDto = Part
       }
       return this.loadingStates.get(operationKey)!.asObservable();
     }
-    return this.loadingService.loading$;
+    return this.loadingService.globalLoading$;
   }
 
   // Protected helper methods

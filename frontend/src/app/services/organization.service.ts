@@ -87,11 +87,11 @@ export class OrganizationService {
       errors.push('Address is required');
     }
 
-    if (dto.overtimeRate < 0) {
+    if (dto.overtimeRate !== undefined && dto.overtimeRate < 0) {
       errors.push('Overtime rate cannot be negative');
     }
 
-    if (dto.productiveHoursThreshold < 0) {
+    if (dto.productiveHoursThreshold !== undefined && dto.productiveHoursThreshold < 0) {
       errors.push('Productive hours threshold cannot be negative');
     }
 

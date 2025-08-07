@@ -1,5 +1,5 @@
 /* Bootstrap Import */
-@import 'bootstrap/scss/bootstrap';
+@use 'bootstrap/scss/bootstrap';
 
 /* Font Awesome (if using CDN, otherwise install and import) */
 @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css');

@@ -15,7 +15,7 @@ import {
 export class SystemConfigService {
   private readonly apiUrl = `${environment.apiUrl}/system-config`;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   // System Configuration Operations
   getAllConfigurations(): Observable<SystemConfiguration[]> {
@@ -37,14 +37,16 @@ export class SystemConfigService {
     // This would be a real API call in production
     return of({
       success: true,
-      message: 'Configuration updated successfully'
+      message: 'Configuration updated successfully',
+      timestamp: new Date().toISOString()
     });
   }
 
   resetConfiguration(key: string): Observable<ApiResponse<void>> {
     return of({
       success: true,
-      message: 'Configuration reset to default value'
+      message: 'Configuration reset to default value',
+      timestamp: new Date().toISOString()
     });
   }
 
@@ -90,8 +92,8 @@ export class SystemConfigService {
         category: 'general',
         dataType: 'string',
         isEditable: true,
-        createdAt: new Date(),
-        updatedAt: new Date()
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
       },
       {
         id: 2,
@@ -101,8 +103,8 @@ export class SystemConfigService {
         category: 'general',
         dataType: 'string',
         isEditable: false,
-        createdAt: new Date(),
-        updatedAt: new Date()
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
       },
       {
         id: 3,
@@ -112,8 +114,8 @@ export class SystemConfigService {
         category: 'general',
         dataType: 'boolean',
         isEditable: true,
-        createdAt: new Date(),
-        updatedAt: new Date()
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
       },
 
       // Security Settings
@@ -125,8 +127,8 @@ export class SystemConfigService {
         category: 'security',
         dataType: 'number',
         isEditable: true,
-        createdAt: new Date(),
-        updatedAt: new Date()
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
       },
       {
         id: 5,
@@ -136,8 +138,8 @@ export class SystemConfigService {
         category: 'security',
         dataType: 'number',
         isEditable: true,
-        createdAt: new Date(),
-        updatedAt: new Date()
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
       },
       {
         id: 6,
@@ -147,8 +149,8 @@ export class SystemConfigService {
         category: 'security',
         dataType: 'boolean',
         isEditable: true,
-        createdAt: new Date(),
-        updatedAt: new Date()
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
       },
 
       // Email Settings
@@ -160,8 +162,8 @@ export class SystemConfigService {
         category: 'email',
         dataType: 'string',
         isEditable: true,
-        createdAt: new Date(),
-        updatedAt: new Date()
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
       },
       {
         id: 8,
@@ -171,8 +173,8 @@ export class SystemConfigService {
         category: 'email',
         dataType: 'number',
         isEditable: true,
-        createdAt: new Date(),
-        updatedAt: new Date()
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
       },
       {
         id: 9,
@@ -182,8 +184,8 @@ export class SystemConfigService {
         category: 'email',
         dataType: 'string',
         isEditable: true,
-        createdAt: new Date(),
-        updatedAt: new Date()
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
       },
 
       // Attendance Settings
@@ -195,8 +197,8 @@ export class SystemConfigService {
         category: 'attendance',
         dataType: 'number',
         isEditable: true,
-        createdAt: new Date(),
-        updatedAt: new Date()
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
       },
       {
         id: 11,
@@ -206,8 +208,8 @@ export class SystemConfigService {
         category: 'attendance',
         dataType: 'number',
         isEditable: true,
-        createdAt: new Date(),
-        updatedAt: new Date()
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
       },
 
       // Payroll Settings
@@ -219,8 +221,8 @@ export class SystemConfigService {
         category: 'payroll',
         dataType: 'string',
         isEditable: true,
-        createdAt: new Date(),
-        updatedAt: new Date()
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
       },
       {
         id: 13,
@@ -230,8 +232,8 @@ export class SystemConfigService {
         category: 'payroll',
         dataType: 'number',
         isEditable: true,
-        createdAt: new Date(),
-        updatedAt: new Date()
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
       }
     ];
   }

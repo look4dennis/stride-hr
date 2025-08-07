@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Subject, takeUntil, forkJoin } from 'rxjs';
-import { NgbTooltip, NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
 import { ModalService } from '../../../services/modal.service';
 
 import { PayrollService } from '../../../services/payroll.service';
@@ -24,7 +24,7 @@ import { Employee, PagedResult } from '../../../models/employee.models';
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
-    NgbTooltip,
+
     NgbDropdownModule
   ],
   template: `

@@ -123,7 +123,7 @@ import { Employee } from '../../../models/employee.models';
                   <div class="mb-3">
                     <small class="text-muted d-block mb-2">Milestones</small>
                     <div class="d-flex justify-content-between">
-                      <small>{{getCompletedMilestones(pip.milestones)}}/{{pip.milestones?.length || 0}} completed</small>
+                      <small>{{getCompletedMilestones(pip.milestones)}}/{{pip.milestones.length || 0}} completed</small>
                       <small class="text-muted">{{getOverdueMilestones(pip.milestones)}} overdue</small>
                     </div>
                   </div>

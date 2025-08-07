@@ -247,7 +247,9 @@ export class EmployeeService {
       totalCount: mockEmployees.length,
       page: 1,
       pageSize: 10,
-      totalPages: 1
+      totalPages: 1,
+      hasNext: false,
+      hasPrevious: false
     };
   }
 }

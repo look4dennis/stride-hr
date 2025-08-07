@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy, TemplateRef, ViewChild } from '@angular/c
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Subject, takeUntil, forkJoin } from 'rxjs';
-import { NgbModal, NgbTooltip, NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal, NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
 
 import { PayrollService } from '../../../services/payroll.service';
 import { EmployeeService } from '../../../services/employee.service';
@@ -22,7 +22,7 @@ import {
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
-    NgbTooltip,
+
     NgbDropdownModule
   ],
   template: `

@@ -197,7 +197,7 @@ export interface EmployeeRole {
   notes?: string;
 }
 
-export interface Role {
+export interface EmployeeRoleModel {
   id: number;
   name: string;
   description: string;

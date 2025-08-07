@@ -642,7 +642,7 @@ export class EmployeeCreateComponent implements OnInit {
 
     getValidationMessage(fieldName: string): string | null {
         const control = this.employeeForm.get(fieldName);
-        return control ? this.formValidationService.getValidationMessage(control, fieldName) : null;
+        return control ? this.formValidationService.getValidationMessage(control) : null;
     }
 
     onSubmit(): void {
