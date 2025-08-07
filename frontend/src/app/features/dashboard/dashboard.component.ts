@@ -8,6 +8,7 @@ import { WeatherTimeWidgetComponent } from '../../shared/components/weather-time
 import { BirthdayWidgetComponent } from '../../shared/components/birthday-widget/birthday-widget.component';
 import { QuickActionsComponent } from '../../shared/components/quick-actions/quick-actions.component';
 import { AttendanceWidgetComponent } from '../../shared/components/attendance-widget/attendance-widget.component';
+import { ProgressiveDashboardComponent } from '../../shared/components/progressive-dashboard/progressive-dashboard.component';
 
 @Component({
   selector: 'app-dashboard',
@@ -16,30 +17,27 @@ import { AttendanceWidgetComponent } from '../../shared/components/attendance-wi
     WeatherTimeWidgetComponent,
     BirthdayWidgetComponent,
     QuickActionsComponent,
-    AttendanceWidgetComponent
+    AttendanceWidgetComponent,
+    ProgressiveDashboardComponent
   ],
   template: `
-    <div class="dashboard-container">
-      <!-- Loading State -->
-      <div *ngIf="isLoading" class="text-center py-5">
-        <div class="spinner-border text-primary" role="status">
-          <span class="visually-hidden">Loading dashboard...</span>
-        </div>
-        <p class="mt-3 text-muted">Loading dashboard data...</p>
-      </div>
-
-      <!-- Error State -->
-      <div *ngIf="error && !isLoading" class="alert alert-danger" role="alert">
-        <i class="fas fa-exclamation-triangle me-2"></i>
-        {{ error }}
-        <button class="btn btn-outline-danger btn-sm ms-3" (click)="refreshDashboard()">
-          <i class="fas fa-refresh me-1"></i>
-          Retry
-        </button>
-      </div>
-
+    <app-progressive-dashboard 
+      [showProgress]="true"
+      [showTaskDetails]="false"
+      [showSkeletons]="true"
+      [userRole]="getPrimaryRole()">
+      
       <!-- Dashboard Content -->
-      <div *ngIf="!isLoading && !error">
+      <div class="dashboard-container">
+        <!-- Error State -->
+        <div *ngIf="error" class="alert alert-danger" role="alert">
+          <i class="fas fa-exclamation-triangle me-2"></i>
+          {{ error }}
+          <button class="btn btn-outline-danger btn-sm ms-3" (click)="refreshDashboard()">
+            <i class="fas fa-refresh me-1"></i>
+            Retry
+          </button>
+        </div>
         <!-- Welcome Section with Weather Widget -->
         <div class="row mb-4">
         <div class="col-lg-8 mb-3">
@@ -498,7 +496,7 @@ import { AttendanceWidgetComponent } from '../../shared/components/attendance-wi
         </div>
       </div>
       </div>
-    </div>
+    </app-progressive-dashboard>
   `,
   styles: [`
     .dashboard-container {

@@ -16,6 +16,7 @@ export interface Employee {
   reportingManagerId?: number;
   reportingManager?: Employee;
   subordinates?: Employee[];
+  roles?: string[];
   createdAt: string;
   updatedAt?: string;
   branch?: Branch;
@@ -81,6 +82,8 @@ export interface PagedResult<T> {
   page: number;
   pageSize: number;
   totalPages: number;
+  hasNext: boolean;
+  hasPrevious: boolean;
 }
 
 export interface EmployeeOnboardingStep {

@@ -493,9 +493,9 @@ public class EmployeeService : IEmployeeService
             {
                 TaskName = t.TaskName,
                 Description = t.Description,
-                DueDate = t.DueDate,
+                DueDate = t.DueDate ?? DateTime.MinValue,
                 IsCompleted = t.IsCompleted,
-                CompletedDate = t.CompletedDate,
+                CompletedDate = t.CompletedDate ?? DateTime.MinValue,
                 AssignedTo = t.AssignedTo?.ToString(),
                 CompletionNotes = t.CompletionNotes
             }).ToList()
@@ -608,7 +608,7 @@ public class EmployeeService : IEmployeeService
                 TaskName = t.TaskName,
                 Description = t.Description,
                 IsCompleted = t.IsCompleted,
-                CompletedDate = t.CompletedDate,
+                CompletedDate = t.CompletedDate ?? DateTime.MinValue,
                 CompletedBy = t.CompletedBy?.ToString(),
                 CompletionNotes = t.CompletionNotes
             }).ToList()

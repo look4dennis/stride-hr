@@ -1,15 +1,18 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
-import { EnhancedEmployeeService } from '../../../services/enhanced-employee.service';
+import { Subject, debounceTime, distinctUntilChanged, takeUntil } from 'rxjs';
+import { OptimizedEmployeeService } from '../../../services/optimized-employee.service';
 import { Employee, EmployeeSearchCriteria, PagedResult, EmployeeStatus } from '../../../models/employee.models';
 import { NotificationService } from '../../../core/services/notification.service';
 import { LoadingService } from '../../../core/services/loading.service';
+import { VirtualScrollDirective } from '../../../shared/directives/virtual-scroll.directive';
+import { LazyImageDirective } from '../../../shared/directives/lazy-image.directive';
 
 @Component({
     selector: 'app-employee-list',
-    imports: [CommonModule, FormsModule, ReactiveFormsModule],
+    imports: [CommonModule, FormsModule, ReactiveFormsModule, VirtualScrollDirective, LazyImageDirective],
     template: `
     <div class="page-header d-flex justify-content-between align-items-center">
       <div>
@@ -120,13 +123,26 @@ import { LoadingService } from '../../../core/services/loading.service';
 
       <!-- Grid View -->
       <div class="card-body" *ngIf="!loading && viewMode === 'grid'">
-        <div class="row g-4" *ngIf="employees.length > 0; else noEmployees">
+        <!-- Virtual Scrolling Grid -->
+        <div *ngIf="virtualScrollEnabled && employees.length > 50" 
+             appVirtualScroll
+             [items]="employees"
+             [itemHeight]="itemHeight"
+             [containerHeight]="containerHeight"
+             [itemTemplate]="gridItemTemplate"
+             (scrollEnd)="onScrollEnd()">
+        </div>
+        
+        <!-- Regular Grid -->
+        <div class="row g-4" *ngIf="!virtualScrollEnabled && employees.length > 0; else noEmployees">
           <div class="col-xl-3 col-lg-4 col-md-6" *ngFor="let employee of employees">
             <div class="employee-card">
               <div class="employee-avatar">
-                <img [src]="getProfilePhoto(employee)" 
+                <img appLazyImage="{{getProfilePhoto(employee)}}" 
                      [alt]="employee.firstName + ' ' + employee.lastName"
-                     class="avatar-img">
+                     class="avatar-img"
+                     [placeholder]="'/assets/images/avatars/placeholder.png'"
+                     [errorImage]="'/assets/images/avatars/error.png'">
                 <div class="status-badge" [class]="'status-' + employee.status.toLowerCase()">
                   {{ employee.status }}
                 </div>
@@ -284,6 +300,59 @@ import { LoadingService } from '../../../core/services/loading.service';
         </nav>
       </div>
     </div>
+
+    <!-- Virtual Scroll Grid Item Template -->
+    <ng-template #gridItemTemplate let-employee let-index="index">
+      <div class="col-xl-3 col-lg-4 col-md-6">
+        <div class="employee-card">
+          <div class="employee-avatar">
+            <img appLazyImage="{{getProfilePhoto(employee)}}" 
+                 [alt]="employee.firstName + ' ' + employee.lastName"
+                 class="avatar-img"
+                 [placeholder]="'/assets/images/avatars/placeholder.png'"
+                 [errorImage]="'/assets/images/avatars/error.png'">
+            <div class="status-badge" [class]="'status-' + employee.status.toLowerCase()">
+              {{ employee.status }}
+            </div>
+          </div>
+          <div class="employee-info">
+            <h6 class="employee-name">{{ employee.firstName }} {{ employee.lastName }}</h6>
+            <p class="employee-id">{{ employee.employeeId }}</p>
+            <p class="employee-designation">{{ employee.designation }}</p>
+            <p class="employee-department">{{ employee.department }}</p>
+            <p class="employee-contact">
+              <i class="fas fa-envelope me-1"></i>{{ employee.email }}
+            </p>
+          </div>
+          <div class="employee-actions">
+            <button class="btn btn-sm btn-outline-primary" (click)="viewEmployee(employee.id)">
+              <i class="fas fa-eye me-1"></i>View
+            </button>
+            <button class="btn btn-sm btn-outline-secondary" (click)="editEmployee(employee.id)">
+              <i class="fas fa-edit me-1"></i>Edit
+            </button>
+            <div class="dropdown d-inline">
+              <button class="btn btn-sm btn-outline-secondary dropdown-toggle" 
+                      type="button" data-bs-toggle="dropdown">
+                <i class="fas fa-ellipsis-v"></i>
+              </button>
+              <ul class="dropdown-menu">
+                <li><a class="dropdown-item" (click)="viewOnboarding(employee.id)">
+                  <i class="fas fa-user-plus me-2"></i>Onboarding
+                </a></li>
+                <li><a class="dropdown-item" (click)="initiateExit(employee.id)">
+                  <i class="fas fa-sign-out-alt me-2"></i>Exit Process
+                </a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item text-danger" (click)="deactivateEmployee(employee.id)">
+                  <i class="fas fa-user-times me-2"></i>Deactivate
+                </a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </ng-template>
   `,
     styles: [`
     .page-header {
@@ -548,8 +617,9 @@ import { LoadingService } from '../../../core/services/loading.service';
     }
   `]
 })
-export class EmployeeListComponent implements OnInit {
+export class EmployeeListComponent implements OnInit, OnDestroy {
   employees: Employee[] = [];
+  allEmployees: Employee[] = []; // For virtual scrolling
   pagedResult: PagedResult<Employee> | null = null;
   searchForm: FormGroup;
   departments: string[] = [];
@@ -557,9 +627,17 @@ export class EmployeeListComponent implements OnInit {
   viewMode: 'grid' | 'list' = 'grid';
   loading = false;
   currentSort = { field: '', direction: 'asc' as 'asc' | 'desc' };
+  
+  // Virtual scrolling properties
+  virtualScrollEnabled = false;
+  itemHeight = 120; // Height of each employee card/row
+  containerHeight = 600; // Height of the scroll container
+  
+  private destroy$ = new Subject<void>();
+  private searchSubject = new Subject<string>();
 
   constructor(
-    private employeeService: EnhancedEmployeeService,
+    private employeeService: OptimizedEmployeeService,
     private fb: FormBuilder,
     private router: Router,
     private notificationService: NotificationService,
@@ -571,11 +649,28 @@ export class EmployeeListComponent implements OnInit {
       designation: [''],
       status: ['']
     });
+    
+    this.setupSearchDebouncing();
   }
 
   ngOnInit(): void {
     this.loadEmployees();
     this.loadFilterOptions();
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  private setupSearchDebouncing(): void {
+    this.searchSubject.pipe(
+      debounceTime(300),
+      distinctUntilChanged(),
+      takeUntil(this.destroy$)
+    ).subscribe(searchTerm => {
+      this.performSearch(searchTerm);
+    });
   }
 
   loadEmployees(criteria?: EmployeeSearchCriteria): void {
@@ -585,46 +680,72 @@ export class EmployeeListComponent implements OnInit {
       next: (result) => {
         this.pagedResult = result;
         this.employees = result.items;
+        this.allEmployees = [...result.items]; // Store all employees for virtual scrolling
+        
+        // Enable virtual scrolling for large datasets
+        this.virtualScrollEnabled = result.items.length > 50;
+        
         this.loading = false;
       },
       error: (error) => {
-        // Fallback to mock data during development
-        console.log('API call failed, using mock data:', error);
-        const mockResult = this.employeeService.getMockEmployees();
-        this.pagedResult = mockResult;
-        this.employees = mockResult.items;
+        console.log('API call failed, using fallback data:', error);
         this.loading = false;
+      }
+    });
+  }
+
+  private performSearch(searchTerm: string): void {
+    if (!searchTerm.trim()) {
+      this.loadEmployees();
+      return;
+    }
+
+    this.employeeService.searchEmployees(searchTerm).subscribe({
+      next: (employees) => {
+        this.employees = employees;
+        this.allEmployees = [...employees];
+        this.virtualScrollEnabled = employees.length > 50;
+      },
+      error: (error) => {
+        console.error('Search failed:', error);
       }
     });
   }
 
   loadFilterOptions(): void {
-    this.employeeService.getDepartments().subscribe({
-      next: (depts) => this.departments = depts,
-      error: () => {
-        // Fallback to mock data during development
-        this.departments = ['Development', 'Human Resources', 'Marketing', 'Sales', 'Finance'];
-      }
-    });
+    // Load departments with caching
+    this.employeeService.getDepartments()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (depts) => this.departments = depts,
+        error: (error) => console.error('Failed to load departments:', error)
+      });
     
-    this.employeeService.getDesignations().subscribe({
-      next: (desigs) => this.designations = desigs,
-      error: () => {
-        // Fallback to mock data during development
-        this.designations = ['Senior Developer', 'Junior Developer', 'Development Manager', 'HR Manager', 'Marketing Manager'];
-      }
-    });
+    // Load designations with caching
+    this.employeeService.getDesignations()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (desigs) => this.designations = desigs,
+        error: (error) => console.error('Failed to load designations:', error)
+      });
   }
 
   onSearch(): void {
     const formValue = this.searchForm.value;
+    
+    // Use debounced search for search term
+    if (formValue.searchTerm) {
+      this.searchSubject.next(formValue.searchTerm);
+      return;
+    }
+    
     const criteria: EmployeeSearchCriteria = {
       searchTerm: formValue.searchTerm || undefined,
       department: formValue.department || undefined,
       designation: formValue.designation || undefined,
       status: formValue.status || undefined,
       page: 1,
-      pageSize: 10,
+      pageSize: this.virtualScrollEnabled ? 100 : 25, // Load more items for virtual scrolling
       sortBy: this.currentSort.field || undefined,
       sortDirection: this.currentSort.direction
     };
@@ -740,14 +861,81 @@ export class EmployeeListComponent implements OnInit {
 
   deactivateEmployee(id: number): void {
     if (confirm('Are you sure you want to deactivate this employee?')) {
-      this.employeeService.deactivateEmployee(id).subscribe({
-        next: () => {
-          this.notificationService.showSuccess('Employee deactivated successfully');
-          this.loadEmployees();
+      this.employeeService.deactivateEmployee(id)
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: (success) => {
+            if (success) {
+              this.loadEmployees(); // Reload to reflect changes
+            }
+          },
+          error: (error) => console.error('Failed to deactivate employee:', error)
+        });
+    }
+  }
+
+  // Virtual scrolling methods
+  onScrollEnd(): void {
+    // Load more data when reaching the end
+    if (this.pagedResult && this.pagedResult.hasNext) {
+      this.loadMoreEmployees();
+    }
+  }
+
+  private loadMoreEmployees(): void {
+    if (!this.pagedResult || this.loading) return;
+
+    const nextPage = this.pagedResult.page + 1;
+    const formValue = this.searchForm.value;
+    
+    const criteria: EmployeeSearchCriteria = {
+      searchTerm: formValue.searchTerm || undefined,
+      department: formValue.department || undefined,
+      designation: formValue.designation || undefined,
+      status: formValue.status || undefined,
+      page: nextPage,
+      pageSize: this.pagedResult.pageSize,
+      sortBy: this.currentSort.field || undefined,
+      sortDirection: this.currentSort.direction
+    };
+
+    this.loading = true;
+    
+    this.employeeService.getEmployees(criteria)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (result) => {
+          // Append new employees to existing list
+          this.employees = [...this.employees, ...result.items];
+          this.allEmployees = [...this.allEmployees, ...result.items];
+          this.pagedResult = result;
+          this.loading = false;
         },
-        error: () => {
-          this.notificationService.showError('Failed to deactivate employee');
+        error: (error) => {
+          console.error('Failed to load more employees:', error);
+          this.loading = false;
         }
+      });
+  }
+
+  // Performance optimization methods
+  trackByEmployeeId(index: number, employee: Employee): number {
+    return employee.id;
+  }
+
+  onVisibleRangeChange(range: {start: number, end: number}): void {
+    // Optional: Preload data for upcoming items
+    console.log('Visible range changed:', range);
+  }
+
+  toggleVirtualScrolling(): void {
+    this.virtualScrollEnabled = !this.virtualScrollEnabled;
+    
+    if (this.virtualScrollEnabled && this.employees.length <= 50) {
+      // Load more data for virtual scrolling demonstration
+      this.loadEmployees({
+        page: 1,
+        pageSize: 100
       });
     }
   }

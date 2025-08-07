@@ -55,19 +55,23 @@ public class DashboardController : ControllerBase
             var organizationIdInt = int.Parse(organizationId ?? "0");
 
             // Get attendance statistics
-            var attendanceStats = await _attendanceService.GetTodayAttendanceOverviewAsync(branchIdInt);
+            var todayAttendance = await _attendanceService.GetTodayBranchAttendanceAsync(branchIdInt);
+            var presentEmployees = await _attendanceService.GetCurrentlyPresentEmployeesAsync(branchIdInt);
+            var onBreakEmployees = await _attendanceService.GetEmployeesOnBreakAsync(branchIdInt);
+            var lateEmployees = await _attendanceService.GetLateEmployeesTodayAsync(branchIdInt);
             
             // Get employee statistics
-            var employeeStats = await _employeeService.GetEmployeeStatisticsAsync(branchIdInt);
+            var branchEmployees = await _employeeService.GetByBranchAsync(branchIdInt);
+            var activeEmployees = branchEmployees.Where(e => e.IsActive).ToList();
 
             // Calculate productivity metrics (placeholder - implement based on your business logic)
             var productivityMetrics = await CalculateProductivityMetrics(branchIdInt);
 
             var statistics = new
             {
-                TotalEmployees = employeeStats.TotalActive,
-                PresentToday = attendanceStats.PresentCount,
-                AbsentToday = attendanceStats.AbsentCount,
+                TotalEmployees = activeEmployees.Count,
+                PresentToday = presentEmployees.Count(),
+                AbsentToday = Math.Max(0, activeEmployees.Count - presentEmployees.Count()),
                 OnBreak = attendanceStats.OnBreakCount,
                 LateArrivals = attendanceStats.LateCount,
                 EarlyDepartures = attendanceStats.EarlyDepartureCount,
@@ -109,16 +113,20 @@ public class DashboardController : ControllerBase
             var organizationIdInt = int.Parse(organizationId ?? "0");
 
             // Get current statistics
-            var attendanceStats = await _attendanceService.GetTodayAttendanceOverviewAsync(branchIdInt);
-            var employeeStats = await _employeeService.GetEmployeeStatisticsAsync(branchIdInt);
+            var todayAttendance = await _attendanceService.GetTodayBranchAttendanceAsync(branchIdInt);
+            var presentEmployees = await _attendanceService.GetCurrentlyPresentEmployeesAsync(branchIdInt);
+            var onBreakEmployees = await _attendanceService.GetEmployeesOnBreakAsync(branchIdInt);
+            var lateEmployees = await _attendanceService.GetLateEmployeesTodayAsync(branchIdInt);
+            var branchEmployees = await _employeeService.GetByBranchAsync(branchIdInt);
+            var activeEmployees = branchEmployees.Where(e => e.IsActive).ToList();
             var productivityMetrics = await CalculateProductivityMetrics(branchIdInt);
 
             var statistics = new
             {
-                TotalEmployees = employeeStats.TotalActive,
-                PresentToday = attendanceStats.PresentCount,
-                AbsentToday = attendanceStats.AbsentCount,
-                OnBreak = attendanceStats.OnBreakCount,
+                TotalEmployees = activeEmployees.Count,
+                PresentToday = presentEmployees.Count(),
+                AbsentToday = Math.Max(0, activeEmployees.Count - presentEmployees.Count()),
+                OnBreak = onBreakEmployees.Count(),
                 LateArrivals = attendanceStats.LateCount,
                 EarlyDepartures = attendanceStats.EarlyDepartureCount,
                 Overtime = attendanceStats.OvertimeCount,
