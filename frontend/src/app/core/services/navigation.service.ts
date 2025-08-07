@@ -275,13 +275,114 @@ export class NavigationService {
      */
     async canAccessRoute(route: string): Promise<boolean> {
         try {
-            // Try to navigate to the route without actually navigating
+            // Check if route exists in router configuration
+            const routeExists = this.router.config.some(routeConfig => {
+                const routePath = route.startsWith('/') ? route.substring(1) : route;
+                return this.matchesRoute(routeConfig, routePath);
+            });
+
+            if (!routeExists) {
+                console.warn(`Route not found in configuration: ${route}`);
+                return false;
+            }
+
+            // Try to parse the URL
             const urlTree = this.router.parseUrl(route);
-            return this.router.isActive(urlTree, false) || true; // Simplified check
+            return urlTree !== null;
         } catch (error) {
             console.error('Route accessibility check failed:', error);
             return false;
         }
+    }
+
+    /**
+     * Check if a route configuration matches a given path
+     */
+    private matchesRoute(routeConfig: any, path: string): boolean {
+        if (!routeConfig.path) return false;
+        
+        // Direct match
+        if (routeConfig.path === path) return true;
+        
+        // Check if path starts with route (for child routes)
+        if (path.startsWith(routeConfig.path + '/')) return true;
+        
+        // Check children routes
+        if (routeConfig.children) {
+            return routeConfig.children.some((child: any) => 
+                this.matchesRoute(child, path.replace(routeConfig.path + '/', ''))
+            );
+        }
+        
+        return false;
+    }
+
+    /**
+     * Validate all navigation routes in the application
+     */
+    validateAllRoutes(): Observable<{ valid: boolean; errors: string[] }> {
+        const errors: string[] = [];
+        const routesToTest = [
+            '/dashboard',
+            '/employees',
+            '/employees/add',
+            '/employees/org-chart',
+            '/attendance',
+            '/attendance/now',
+            '/attendance/calendar',
+            '/attendance/reports',
+            '/attendance/corrections',
+            '/projects',
+            '/projects/kanban',
+            '/projects/monitoring',
+            '/payroll',
+            '/payroll/processing',
+            '/payroll/approval',
+            '/payroll/reports',
+            '/leave',
+            '/leave/request',
+            '/leave/balance',
+            '/leave/calendar',
+            '/performance',
+            '/performance/review',
+            '/performance/pip',
+            '/performance/certifications',
+            '/reports',
+            '/reports/builder',
+            '/reports/analytics',
+            '/settings',
+            '/settings/organization',
+            '/settings/branches',
+            '/settings/roles',
+            '/settings/system',
+            '/settings/admin',
+            '/training',
+            '/profile'
+        ];
+
+        return new Observable(observer => {
+            Promise.all(
+                routesToTest.map(async route => {
+                    const accessible = await this.canAccessRoute(route);
+                    if (!accessible) {
+                        errors.push(`Route not accessible: ${route}`);
+                    }
+                    return { route, accessible };
+                })
+            ).then(() => {
+                observer.next({
+                    valid: errors.length === 0,
+                    errors
+                });
+                observer.complete();
+            }).catch(error => {
+                observer.next({
+                    valid: false,
+                    errors: [`Route validation failed: ${error}`]
+                });
+                observer.complete();
+            });
+        });
     }
 
     /**

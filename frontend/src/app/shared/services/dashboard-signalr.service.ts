@@ -34,7 +34,7 @@ export class DashboardSignalRService {
 
   private reconnectAttempts = 0;
   private maxReconnectAttempts = 5;
-  private hubUrl = `${environment.signalRUrl}/notificationHub`;
+  private hubUrl = `${environment.signalRUrl}/notification`;
 
   constructor(private authService: AuthService) {
     this.initializeConnection();

@@ -607,6 +607,7 @@ public static class ServiceCollectionExtensions
         services.AddHostedService<StrideHR.API.Services.NotificationBackgroundService>();
         services.AddHostedService<StrideHR.API.Services.NotificationProcessingService>();
         services.AddHostedService<StrideHR.API.Services.SignalRConnectionRecoveryService>();
+        services.AddHostedService<StrideHR.API.Services.DashboardUpdateService>();
         
         // Register employee repository (generic)
         services.AddScoped<IRepository<Employee>, Repository<Employee>>();

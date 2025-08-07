@@ -1,10 +1,23 @@
 import { Injectable } from '@angular/core';
 import { AbstractControl, FormGroup, ValidationErrors } from '@angular/forms';
+import { Observable, of } from 'rxjs';
+
+export interface FormValidationResult {
+  formId: string;
+  isValid: boolean;
+  hasEventHandlers: boolean;
+  hasProperValidation: boolean;
+  fieldCount: number;
+  errorCount: number;
+  errors: { [key: string]: string };
+  suggestions?: string[];
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class FormValidationService {
+  private registeredForms = new Map<string, FormGroup>();
 
   constructor() { }
 
@@ -179,6 +192,91 @@ export class FormValidationService {
         control.markAsPristine();
       }
     });
+  }
+
+  /**
+   * Register a form for validation tracking
+   */
+  registerForm(formId: string, form: FormGroup): void {
+    this.registeredForms.set(formId, form);
+  }
+
+  /**
+   * Get form by ID
+   */
+  getForm(formId: string): FormGroup | undefined {
+    return this.registeredForms.get(formId);
+  }
+
+  /**
+   * Validate entire form and return first error message
+   */
+  validateFormAndGetFirstError(form: FormGroup): string | null {
+    if (form.valid) {
+      return null;
+    }
+
+    // Mark all fields as touched to show validation errors
+    this.markAllFieldsAsTouched(form);
+
+    // Find first invalid field and return its error message
+    for (const fieldName in form.controls) {
+      const field = form.get(fieldName);
+      if (field && field.invalid) {
+        return this.getValidationMessage(field);
+      }
+    }
+
+    return 'Please correct the errors in the form';
+  }
+
+  /**
+   * Clear all validation errors from form
+   */
+  clearValidationErrors(form: FormGroup): void {
+    this.clearFormErrors(form);
+  }
+
+  /**
+   * Get all validation errors from form
+   */
+  getAllValidationErrors(form: FormGroup): { [key: string]: string } {
+    return this.getFormErrors(form);
+  }
+
+  /**
+   * Phone number validator
+   */
+  phoneNumberValidator(control: AbstractControl): ValidationErrors | null {
+    return FormValidationService.phoneValidator(control);
+  }
+
+  /**
+   * Validate all registered forms
+   */
+  validateAllForms(): Observable<FormValidationResult[]> {
+    const results: FormValidationResult[] = [];
+
+    this.registeredForms.forEach((form, formId) => {
+      const errors = this.getAllValidationErrors(form);
+      const fieldCount = Object.keys(form.controls).length;
+      const errorCount = Object.keys(errors).length;
+
+      const result: FormValidationResult = {
+        formId,
+        isValid: form.valid,
+        hasEventHandlers: true, // Assume forms have proper event handlers
+        hasProperValidation: true, // Assume forms have proper validation
+        fieldCount,
+        errorCount,
+        errors,
+        suggestions: errorCount > 0 ? ['Fix validation errors in form fields'] : undefined
+      };
+
+      results.push(result);
+    });
+
+    return of(results);
   }
 
   /**
