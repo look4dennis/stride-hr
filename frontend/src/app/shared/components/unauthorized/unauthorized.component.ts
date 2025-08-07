@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { NavigationService } from '../../../core/services/navigation.service';
 
 @Component({
     selector: 'app-unauthorized',
@@ -22,7 +23,7 @@ import { RouterModule } from '@angular/router';
             <i class="fas fa-home me-2"></i>
             Go to Dashboard
           </a>
-          <button class="btn btn-outline-secondary ms-2" onclick="history.back()">
+          <button class="btn btn-outline-secondary ms-2" (click)="goBack()">
             <i class="fas fa-arrow-left me-2"></i>
             Go Back
           </button>
@@ -86,4 +87,10 @@ import { RouterModule } from '@angular/router';
     }
   `]
 })
-export class UnauthorizedComponent {}
+export class UnauthorizedComponent {
+  constructor(private navigationService: NavigationService) {}
+
+  goBack(): void {
+    this.navigationService.goBack();
+  }
+}

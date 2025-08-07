@@ -3,17 +3,14 @@ import { AuthGuard } from './core/auth/auth.guard';
 import { RoleGuard } from './core/guards/role.guard';
 import { LayoutComponent } from './shared/components/layout/layout.component';
 import { LoginComponent } from './features/auth/login/login.component';
-import { DashboardComponent } from './features/dashboard/dashboard.component';
-import { RouteLoadingService } from './core/services/route-loading.service';
-import { inject } from '@angular/core';
 
 // Helper function to create safe lazy loading with error handling
 function createSafeLazyLoad(route: string, importFn: () => Promise<any>) {
   return () => {
-    const routeLoadingService = inject(RouteLoadingService);
     return importFn().catch(error => {
       console.error(`Failed to load route: ${route}`, error);
-      return routeLoadingService.handleLazyLoadError(route, error);
+      // Return a fallback component instead of trying to inject service
+      return import('./shared/components/route-error-page/route-error-page.component').then(m => m.RouteErrorPageComponent);
     });
   };
 }
@@ -24,22 +21,41 @@ export const routes: Routes = [
     path: 'login',
     component: LoginComponent
   },
+  {
+    path: 'change-password',
+    loadComponent: createSafeLazyLoad(
+      'change-password',
+      () => import('./features/auth/change-password/change-password.component').then(m => m.ChangePasswordComponent)
+    ),
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'setup-wizard',
+    loadComponent: createSafeLazyLoad(
+      'setup-wizard',
+      () => import('./features/setup-wizard/setup-wizard.component').then(m => m.SetupWizardComponent)
+    ),
+    canActivate: [() => import('./core/guards/setup-complete.guard').then(m => m.SetupCompleteGuard)]
+  },
 
   // Protected routes with layout
   {
     path: '',
     component: LayoutComponent,
-    canActivate: [AuthGuard],
+    canActivate: [AuthGuard, () => import('./core/guards/setup-wizard.guard').then(m => m.SetupWizardGuard)],
     canActivateChild: [RoleGuard],
     children: [
       {
         path: '',
-        redirectTo: '/dashboard',
+        redirectTo: 'dashboard',
         pathMatch: 'full'
       },
       {
         path: 'dashboard',
-        component: DashboardComponent
+        loadComponent: createSafeLazyLoad(
+          'dashboard',
+          () => import('./features/dashboard/dashboard.component').then(m => m.DashboardComponent)
+        )
       },
       {
         path: 'employees',

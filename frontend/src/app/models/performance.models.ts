@@ -162,6 +162,7 @@ export interface EmployeeTraining {
     firstName: string;
     lastName: string;
     employeeId: string;
+    profilePhoto?: string;
   };
   trainingModule?: TrainingModule;
 }
@@ -181,6 +182,7 @@ export interface Certification {
     firstName: string;
     lastName: string;
     employeeId: string;
+    profilePhoto?: string;
   };
   trainingModule?: {
     id: number;

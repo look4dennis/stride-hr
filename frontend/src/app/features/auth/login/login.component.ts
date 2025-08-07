@@ -5,6 +5,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../../core/auth/auth.service';
 import { NotificationService } from '../../../core/services/notification.service';
 import { LoadingService } from '../../../core/services/loading.service';
+import { SetupWizardService } from '../../../core/services/setup-wizard.service';
 
 @Component({
     selector: 'app-login',
@@ -170,7 +171,8 @@ export class LoginComponent implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
     private notificationService: NotificationService,
-    private loadingService: LoadingService
+    private loadingService: LoadingService,
+    private setupWizardService: SetupWizardService
   ) {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
@@ -201,17 +203,48 @@ export class LoginComponent implements OnInit {
 
       this.authService.login(credentials).subscribe({
         next: (response) => {
-          this.notificationService.showSuccess(
-            `Welcome back, ${response.data.user.fullName}!`,
-            'Login Successful'
-          );
-          this.router.navigate([this.returnUrl]);
+          if (response.success && response.data?.user) {
+            this.notificationService.showSuccess(
+              `Welcome back, ${response.data.user.fullName}!`,
+              'Login Successful'
+            );
+            
+            // Check if this is first login or setup is needed
+            this.handlePostLoginRedirect(response.data.user);
+          } else {
+            this.notificationService.showError(
+              response.message || 'Login failed',
+              'Login Failed'
+            );
+          }
         },
         error: (error) => {
-          this.notificationService.showError(
-            error.message || 'Invalid email or password',
-            'Login Failed'
-          );
+          console.error('Login error:', error);
+          
+          let errorMessage = 'An unexpected error occurred. Please try again.';
+          let errorTitle = 'Login Failed';
+          
+          if (error.message) {
+            errorMessage = error.message;
+          } else if (error.error?.message) {
+            errorMessage = error.error.message;
+          }
+          
+          // Handle specific error cases
+          if (error.errors && error.errors.length > 0) {
+            errorMessage = error.errors.join(', ');
+          }
+          
+          if (error.message?.includes('locked')) {
+            errorTitle = 'Account Locked';
+          } else if (error.message?.includes('connection')) {
+            errorTitle = 'Connection Error';
+          }
+          
+          this.notificationService.showError(errorMessage, errorTitle);
+          
+          // Clear password field on error
+          this.loginForm.patchValue({ password: '' });
         },
         complete: () => {
           this.isSubmitting = false;
@@ -230,6 +263,31 @@ export class LoginComponent implements OnInit {
   isFieldInvalid(fieldName: string): boolean {
     const field = this.loginForm.get(fieldName);
     return !!(field && field.invalid && (field.dirty || field.touched));
+  }
+
+  private handlePostLoginRedirect(user: any): void {
+    // Check if user is first-time login or if setup is required
+    if (user.isFirstLogin) {
+      // Check if organization setup is complete
+      this.setupWizardService.isSetupRequired().subscribe({
+        next: (setupRequired) => {
+          if (setupRequired) {
+            // Redirect to setup wizard
+            this.router.navigate(['/setup-wizard']);
+          } else {
+            // Setup is complete, redirect to dashboard
+            this.router.navigate([this.returnUrl]);
+          }
+        },
+        error: () => {
+          // If we can't check setup status, assume setup is needed for first-time login
+          this.router.navigate(['/setup-wizard']);
+        }
+      });
+    } else {
+      // Not first login, redirect to intended destination
+      this.router.navigate([this.returnUrl]);
+    }
   }
 
   private markFormGroupTouched(): void {

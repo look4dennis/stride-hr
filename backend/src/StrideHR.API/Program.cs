@@ -1,6 +1,7 @@
 using Serilog;
 using StrideHR.API.Extensions;
 using StrideHR.API.Middleware;
+using StrideHR.API.Services;
 
 // Configure Serilog
 Log.Logger = new LoggerConfiguration()
@@ -46,11 +47,46 @@ try
     using (var scope = app.Services.CreateScope())
     {
         var dbInitService = scope.ServiceProvider.GetRequiredService<DatabaseInitializationService>();
+        var dbHealthService = scope.ServiceProvider.GetRequiredService<DatabaseHealthCheckService>();
+        
+        // Test database connection first
+        var connectionTest = await dbInitService.TestDatabaseConnectionAsync();
+        if (!connectionTest)
+        {
+            Log.Fatal("Database connection test failed. Please check your connection string and ensure MySQL is running.");
+            Log.Fatal("Connection String: Server=localhost;Database=StrideHR_Dev;User=root;Password=***;Port=3306;");
+            Log.Fatal("Make sure MySQL service is running and the database 'StrideHR_Dev' exists.");
+            return;
+        }
+        
+        Log.Information("Database connection test successful");
+        
+        // Check current database status
+        var dbStatus = await dbInitService.GetDatabaseStatusAsync();
+        Log.Information("Database Status - Organizations: {OrgCount}, Branches: {BranchCount}, Users: {UserCount}, Employees: {EmpCount}, Roles: {RoleCount}, HasSuperAdmin: {HasSuperAdmin}", 
+            dbStatus.OrganizationCount, dbStatus.BranchCount, dbStatus.UserCount, dbStatus.EmployeeCount, dbStatus.RoleCount, dbStatus.HasSuperAdmin);
+        
         var initResult = await dbInitService.InitializeDatabaseAsync();
         if (!initResult)
         {
             Log.Fatal("Failed to initialize database. Application will not start.");
             return;
+        }
+        
+        // Check final status
+        var finalStatus = await dbInitService.GetDatabaseStatusAsync();
+        Log.Information("Final Database Status - Organizations: {OrgCount}, Branches: {BranchCount}, Users: {UserCount}, Employees: {EmpCount}, Roles: {RoleCount}, HasSuperAdmin: {HasSuperAdmin}", 
+            finalStatus.OrganizationCount, finalStatus.BranchCount, finalStatus.UserCount, finalStatus.EmployeeCount, finalStatus.RoleCount, finalStatus.HasSuperAdmin);
+        
+        // Perform health check
+        var healthStatus = await dbHealthService.CheckHealthAsync();
+        if (healthStatus.IsHealthy)
+        {
+            Log.Information("Database health check passed");
+        }
+        else
+        {
+            Log.Warning("Database health check failed: {ErrorMessage}", healthStatus.ErrorMessage);
         }
     }
 
@@ -75,11 +111,9 @@ try
         c.ShowExtensions();
         c.EnableValidator();
         
-        // Custom CSS for better appearance
-        c.InjectStylesheet("/swagger-ui/custom.css");
-        
-        // Add custom JavaScript for enhanced functionality
-        c.InjectJavascript("/swagger-ui/custom.js");
+        // Custom styling and JavaScript removed to avoid 404 errors
+        // c.InjectStylesheet("/swagger-ui/custom.css");
+        // c.InjectJavascript("/swagger-ui/custom.js");
         
         // OAuth configuration for production
         if (!app.Environment.IsDevelopment())

@@ -209,10 +209,10 @@ import { Employee } from '../../../models/employee.models';
                       </div>
                     </td>
                     <td>
-                      <span *ngIf="training.score !== null; else noScore" 
-                            class="fw-medium" [class.text-success]="training.score >= 70" 
-                            [class.text-warning]="training.score < 70 && training.score >= 50"
-                            [class.text-danger]="training.score < 50">
+                      <span *ngIf="training.score !== null && training.score !== undefined; else noScore" 
+                            class="fw-medium" [class.text-success]="training.score! >= 70" 
+                            [class.text-warning]="training.score! < 70 && training.score! >= 50"
+                            [class.text-danger]="training.score! < 50">
                         {{training.score}}/100
                       </span>
                       <ng-template #noScore>

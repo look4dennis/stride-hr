@@ -134,7 +134,7 @@ interface AIInsight {
                   <i [class]="metric.icon"></i>
                 </div>
                 <div class="metric-trend" *ngIf="metric.trend">
-                  <canvas #trendChart [id]="'trend-' + metric.title.replace(/\s+/g, '-').toLowerCase()"></canvas>
+                  <canvas #trendChart [id]="getTrendChartId(metric.title)"></canvas>
                 </div>
               </div>
               <div class="metric-content">
@@ -1338,5 +1338,9 @@ export class AnalyticsDashboardMainComponent implements OnInit, AfterViewInit {
   configureWidget(widgetId: string) {
     // Implement widget configuration
     console.log('Configure widget:', widgetId);
+  }
+
+  getTrendChartId(title: string): string {
+    return 'trend-' + title.replace(/\s+/g, '-').toLowerCase();
   }
 }

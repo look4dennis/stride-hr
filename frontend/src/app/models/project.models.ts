@@ -174,6 +174,8 @@ export interface ProjectHoursReport {
     projectName: string;
     estimatedHours: number;
     actualHours: number;
+    totalHoursWorked: number;
+    hoursVariance: number;
     remainingHours: number;
     completionPercentage: number;
     isOverBudget: boolean;

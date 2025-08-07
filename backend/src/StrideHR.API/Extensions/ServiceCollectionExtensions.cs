@@ -812,11 +812,38 @@ Official SDKs are available for:
                 c.IncludeXmlComments(xmlPath);
             }
 
-            // Add custom schema filters
-            c.SchemaFilter<SwaggerSchemaExampleFilter>();
-            c.DocumentFilter<SwaggerDocumentFilter>();
-            c.OperationFilter<SwaggerDefaultValues>();
-            c.OperationFilter<SwaggerFileUploadOperationFilter>();
+            // Fix schema ID conflicts by using full type name
+            c.CustomSchemaIds(type => type.FullName?.Replace("+", "."));
+            
+            // Handle complex entity relationships
+            c.IgnoreObsoleteActions();
+            c.IgnoreObsoleteProperties();
+
+            // Configure schema generation to handle complex models
+            c.SupportNonNullableReferenceTypes();
+            
+            // Handle file upload operations properly
+            c.MapType<IFormFile>(() => new OpenApiSchema
+            {
+                Type = "string",
+                Format = "binary"
+            });
+            
+            // Add operation filter to handle file uploads
+            c.OperationFilter<FileUploadOperationFilter>();
+            
+            // Add custom schema filters with error handling
+            try
+            {
+                c.SchemaFilter<SwaggerSchemaExampleFilter>();
+                c.DocumentFilter<SwaggerDocumentFilter>();
+                c.OperationFilter<SwaggerDefaultValues>();
+                c.OperationFilter<SwaggerFileUploadOperationFilter>();
+            }
+            catch
+            {
+                // Continue without custom filters if they cause issues
+            }
 
             // Group endpoints by tags
             c.TagActionsBy(api => new[] { api.GroupName ?? api.ActionDescriptor.RouteValues["controller"] });

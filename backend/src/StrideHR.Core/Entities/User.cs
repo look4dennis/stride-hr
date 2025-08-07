@@ -4,7 +4,7 @@ namespace StrideHR.Core.Entities;
 
 public class User : BaseEntity
 {
-    public int EmployeeId { get; set; }
+    public int? EmployeeId { get; set; }
     public string Username { get; set; } = string.Empty;
     public string Email { get; set; } = string.Empty;
     public string PasswordHash { get; set; } = string.Empty;
@@ -23,7 +23,7 @@ public class User : BaseEntity
     public string? SecurityAnswerHash { get; set; }
     
     // Navigation Properties
-    public virtual Employee Employee { get; set; } = null!;
+    public virtual Employee? Employee { get; set; }
     public virtual ICollection<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
     public virtual ICollection<UserSession> UserSessions { get; set; } = new List<UserSession>();
 }

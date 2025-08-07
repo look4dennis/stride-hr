@@ -163,6 +163,7 @@ public class TrainingController : BaseController
     /// </summary>
     [HttpPost("modules/{moduleId}/content")]
     [Authorize(Policy = "CanManageTraining")]
+    [ApiExplorerSettings(IgnoreApi = true)] // Temporarily exclude from Swagger due to IFormFile issue
     public async Task<IActionResult> UploadTrainingContent(int moduleId, IFormFile file)
     {
         try

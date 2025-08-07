@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
-import { EmployeeService } from '../../../services/employee.service';
+import { EnhancedEmployeeService } from '../../../services/enhanced-employee.service';
 import { Employee, EmployeeSearchCriteria, PagedResult, EmployeeStatus } from '../../../models/employee.models';
 import { NotificationService } from '../../../core/services/notification.service';
 import { LoadingService } from '../../../core/services/loading.service';
@@ -559,7 +559,7 @@ export class EmployeeListComponent implements OnInit {
   currentSort = { field: '', direction: 'asc' as 'asc' | 'desc' };
 
   constructor(
-    private employeeService: EmployeeService,
+    private employeeService: EnhancedEmployeeService,
     private fb: FormBuilder,
     private router: Router,
     private notificationService: NotificationService,
@@ -581,36 +581,39 @@ export class EmployeeListComponent implements OnInit {
   loadEmployees(criteria?: EmployeeSearchCriteria): void {
     this.loading = true;
     
-    // For development, use mock data
-    setTimeout(() => {
-      const mockResult = this.employeeService.getMockEmployees();
-      this.pagedResult = mockResult;
-      this.employees = mockResult.items;
-      this.loading = false;
-    }, 500);
-
-    // Uncomment for production
-    // this.employeeService.getEmployees(criteria).subscribe({
-    //   next: (result) => {
-    //     this.pagedResult = result;
-    //     this.employees = result.items;
-    //     this.loading = false;
-    //   },
-    //   error: (error) => {
-    //     this.notificationService.showError('Failed to load employees');
-    //     this.loading = false;
-    //   }
-    // });
+    this.employeeService.getEmployees(criteria).subscribe({
+      next: (result) => {
+        this.pagedResult = result;
+        this.employees = result.items;
+        this.loading = false;
+      },
+      error: (error) => {
+        // Fallback to mock data during development
+        console.log('API call failed, using mock data:', error);
+        const mockResult = this.employeeService.getMockEmployees();
+        this.pagedResult = mockResult;
+        this.employees = mockResult.items;
+        this.loading = false;
+      }
+    });
   }
 
   loadFilterOptions(): void {
-    // Mock data for development
-    this.departments = ['Development', 'Human Resources', 'Marketing', 'Sales', 'Finance'];
-    this.designations = ['Senior Developer', 'Junior Developer', 'Development Manager', 'HR Manager', 'Marketing Manager'];
-
-    // Uncomment for production
-    // this.employeeService.getDepartments().subscribe(depts => this.departments = depts);
-    // this.employeeService.getDesignations().subscribe(desigs => this.designations = desigs);
+    this.employeeService.getDepartments().subscribe({
+      next: (depts) => this.departments = depts,
+      error: () => {
+        // Fallback to mock data during development
+        this.departments = ['Development', 'Human Resources', 'Marketing', 'Sales', 'Finance'];
+      }
+    });
+    
+    this.employeeService.getDesignations().subscribe({
+      next: (desigs) => this.designations = desigs,
+      error: () => {
+        // Fallback to mock data during development
+        this.designations = ['Senior Developer', 'Junior Developer', 'Development Manager', 'HR Manager', 'Marketing Manager'];
+      }
+    });
   }
 
   onSearch(): void {

@@ -6,6 +6,7 @@ import { SidebarComponent } from '../sidebar/sidebar.component';
 import { NotificationComponent } from '../notification/notification.component';
 import { LoadingComponent } from '../loading/loading.component';
 
+
 @Component({
     selector: 'app-layout',
     imports: [
@@ -14,7 +15,8 @@ import { LoadingComponent } from '../loading/loading.component';
         HeaderComponent,
         SidebarComponent,
         NotificationComponent,
-        LoadingComponent
+        LoadingComponent,
+
     ],
     template: `
     <div class="app-layout">
@@ -29,6 +31,7 @@ import { LoadingComponent } from '../loading/loading.component';
       
       <app-notification></app-notification>
       <app-loading></app-loading>
+
     </div>
   `,
     styles: [`

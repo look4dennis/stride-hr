@@ -306,10 +306,24 @@ public class ExpenseController : BaseController
     }
 
     /// <summary>
-    /// Upload document for expense claim or expense item
+    /// Upload expense receipt or document
     /// </summary>
+    /// <param name="claimId">The expense claim ID</param>
+    /// <param name="file">The file to upload (PDF, JPEG, PNG, DOC, DOCX supported, max 10MB)</param>
+    /// <param name="expenseItemId">Optional expense item ID to associate the document with</param>
+    /// <param name="documentType">Type of document being uploaded</param>
+    /// <param name="description">Optional description of the document</param>
+    /// <returns>Success response with document information</returns>
     [HttpPost("claims/{claimId}/documents")]
     [RequirePermission("expense", "upload")]
+    [Consumes("multipart/form-data")]
+    [ApiExplorerSettings(IgnoreApi = true)] // Temporarily exclude from Swagger due to complex IFormFile handling
+    [ProducesResponseType(200)]
+    [ProducesResponseType(400)]
+    [ProducesResponseType(401)]
+    [ProducesResponseType(403)]
+    [ProducesResponseType(413)]
+    [ProducesResponseType(415)]
     public async Task<IActionResult> UploadDocument(
         int claimId, 
         [FromForm] IFormFile file, 

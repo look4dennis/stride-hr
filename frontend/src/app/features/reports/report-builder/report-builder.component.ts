@@ -251,15 +251,15 @@ interface ReportTemplate {
                   <h6>Export Options</h6>
                   <div class="btn-group w-100 mb-2">
                     <button class="btn btn-outline-secondary btn-sm" 
-                            (click)="exportReport('PDF')">
+                            (click)="exportReport(ReportExportFormat.PDF)">
                       <i class="fas fa-file-pdf"></i> PDF
                     </button>
                     <button class="btn btn-outline-secondary btn-sm" 
-                            (click)="exportReport('Excel')">
+                            (click)="exportReport(ReportExportFormat.Excel)">
                       <i class="fas fa-file-excel"></i> Excel
                     </button>
                     <button class="btn btn-outline-secondary btn-sm" 
-                            (click)="exportReport('CSV')">
+                            (click)="exportReport(ReportExportFormat.CSV)">
                       <i class="fas fa-file-csv"></i> CSV
                     </button>
                   </div>
@@ -1072,6 +1072,9 @@ interface ReportTemplate {
 export class ReportBuilderComponent implements OnInit, AfterViewInit {
   @ViewChild('previewChart') previewChart!: ElementRef<HTMLCanvasElement>;
   @ViewChild('finalChart') finalChart!: ElementRef<HTMLCanvasElement>;
+
+  // Make enum available in template
+  ReportExportFormat = ReportExportFormat;
 
   currentStep: number = 1;
   dataSources: ReportDataSource[] = [];

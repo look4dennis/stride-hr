@@ -1,6 +1,6 @@
 import { HttpInterceptorFn, HttpErrorResponse, HttpRequest } from '@angular/common/http';
 import { inject } from '@angular/core';
-import { catchError, throwError, BehaviorSubject, filter, take, switchMap, Observable } from 'rxjs';
+import { catchError, throwError, BehaviorSubject, filter, take, switchMap, Observable, finalize } from 'rxjs';
 import { AuthService } from '../auth/auth.service';
 
 let isRefreshing = false;
@@ -9,15 +9,20 @@ const refreshTokenSubject: BehaviorSubject<any> = new BehaviorSubject<any>(null)
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const authService = inject(AuthService);
 
-  // Add auth header if user is authenticated
+  // Skip auth header for auth endpoints to avoid circular calls
+  const isAuthEndpoint = req.url.includes('/auth/login') || 
+                        req.url.includes('/auth/refresh') || 
+                        req.url.includes('/auth/validate');
+
+  // Add auth header if user is authenticated and not an auth endpoint
   let authReq = req;
-  if (authService.isAuthenticated && authService.token) {
+  if (!isAuthEndpoint && authService.isAuthenticated && authService.token) {
     authReq = addTokenHeader(req, authService.token);
   }
 
   return next(authReq).pipe(
     catchError(error => {
-      if (error instanceof HttpErrorResponse && error.status === 401) {
+      if (error instanceof HttpErrorResponse && error.status === 401 && !isAuthEndpoint) {
         return handle401Error(authReq, next, authService);
       }
       return throwError(() => error);
@@ -38,18 +43,25 @@ function handle401Error(request: HttpRequest<any>, next: any, authService: AuthS
 
     return authService.refreshToken().pipe(
       switchMap((response: any) => {
-        isRefreshing = false;
-        refreshTokenSubject.next(response.token);
-        return next(addTokenHeader(request, response.token));
+        if (response.success && response.data?.token) {
+          refreshTokenSubject.next(response.data.token);
+          return next(addTokenHeader(request, response.data.token));
+        } else {
+          throw new Error('Invalid refresh response');
+        }
       }),
       catchError((error) => {
-        isRefreshing = false;
+        console.error('Token refresh failed in interceptor:', error);
         authService.logout();
         return throwError(() => error);
+      }),
+      finalize(() => {
+        isRefreshing = false;
       })
     );
   }
 
+  // Wait for the refresh to complete
   return refreshTokenSubject.pipe(
     filter(token => token !== null),
     take(1),

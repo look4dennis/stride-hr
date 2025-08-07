@@ -1,7 +1,7 @@
 export const environment = {
   production: false,
   apiUrl: 'http://localhost:5000/api',
-  weatherApiKey: 'your-weather-api-key',
+  weatherApiKey: 'demo-api-key', // Using demo key to prevent console errors
   weatherApiUrl: 'https://api.openweathermap.org/data/2.5',
   signalRUrl: 'http://localhost:5000/hubs',
   fileUploadUrl: 'http://localhost:5000/api/files',

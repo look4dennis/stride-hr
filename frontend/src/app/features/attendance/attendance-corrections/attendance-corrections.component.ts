@@ -587,7 +587,7 @@ export class AttendanceCorrectionsComponent implements OnInit {
     return new Date(dateTime).toLocaleString();
   }
 
-  formatTimeSpan(timeSpan: string): string {
+  formatTimeSpan(timeSpan: string | undefined): string {
     if (!timeSpan) return '00:00';
     
     const parts = timeSpan.split(':');

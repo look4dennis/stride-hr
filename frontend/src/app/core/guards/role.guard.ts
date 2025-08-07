@@ -3,6 +3,7 @@ import { CanActivate, CanActivateChild, Router, ActivatedRouteSnapshot, RouterSt
 import { Observable } from 'rxjs';
 import { AuthService } from '../auth/auth.service';
 import { NotificationService } from '../services/notification.service';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -81,13 +82,16 @@ export class RoleGuard implements CanActivate, CanActivateChild {
     }
     message += `Your roles: ${userRoles}`;
 
-    console.warn('Role Guard - Access Denied:', {
-      attemptedRoute,
-      requiredRoles,
-      requiredPermissions,
-      userRoles: currentUser?.roles,
-      userId: currentUser?.id
-    });
+    // Only log access denied in development mode for debugging
+    if (!environment.production) {
+      console.warn('Role Guard - Access Denied:', {
+        attemptedRoute,
+        requiredRoles,
+        requiredPermissions,
+        userRoles: currentUser?.roles,
+        userId: currentUser?.id
+      });
+    }
 
     this.notificationService.showError('You do not have permission to access this page.');
     this.router.navigate(['/unauthorized'], { 

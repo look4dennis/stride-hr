@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { AuthService, User } from '../../../core/auth/auth.service';
 
@@ -35,7 +35,8 @@ interface MenuItem {
                 class="nav-link" 
                 [routerLink]="item.route" 
                 routerLinkActive="active"
-                [title]="item.label">
+                [title]="item.label"
+                (click)="onNavigationClick(item, $event)">
                 <i [class]="item.icon + ' me-2'"></i>
                 <span *ngIf="!isCollapsed">{{ item.label }}</span>
               </a>
@@ -263,19 +264,32 @@ export class SidebarComponent implements OnInit, OnDestroy {
     }
   ];
 
-  constructor(private authService: AuthService) {
+  constructor(
+    private authService: AuthService,
+    private router: Router
+  ) {
     this.checkScreenSize();
   }
 
   ngOnInit(): void {
     this.subscription.add(
-      this.authService.currentUser$.subscribe(
-        user => this.currentUser = user
-      )
+      this.authService.currentUser$.subscribe({
+        next: user => {
+          this.currentUser = user;
+          console.log('Sidebar: Current user updated', user);
+        },
+        error: error => {
+          console.error('Sidebar: Error getting current user', error);
+          this.currentUser = null;
+        }
+      })
     );
 
     // Listen for window resize
     window.addEventListener('resize', () => this.checkScreenSize());
+    
+    // Initial screen size check
+    this.checkScreenSize();
   }
 
   ngOnDestroy(): void {
@@ -294,16 +308,44 @@ export class SidebarComponent implements OnInit, OnDestroy {
   }
 
   hasAccess(item: MenuItem): boolean {
-    if (!item.roles || item.roles.length === 0) {
-      return true;
+    try {
+      if (!item.roles || item.roles.length === 0) {
+        return true;
+      }
+      return this.authService.hasAnyRole(item.roles);
+    } catch (error) {
+      console.error('Sidebar: Error checking access for menu item', item.label, error);
+      return false;
     }
-    return this.authService.hasAnyRole(item.roles);
   }
 
   private checkScreenSize(): void {
     this.isMobile = window.innerWidth < 768;
     if (this.isMobile) {
       this.isCollapsed = true;
+    }
+  }
+
+  onNavigationClick(item: MenuItem, event: Event): void {
+    try {
+      console.log('Sidebar: Navigating to', item.route);
+      
+      // Check access before navigation
+      if (!this.hasAccess(item)) {
+        event.preventDefault();
+        console.warn('Sidebar: Access denied to', item.route);
+        return;
+      }
+
+      // Close sidebar on mobile after navigation
+      if (this.isMobile) {
+        setTimeout(() => {
+          this.isCollapsed = true;
+        }, 100);
+      }
+    } catch (error) {
+      console.error('Sidebar: Navigation error for', item.route, error);
+      event.preventDefault();
     }
   }
 }

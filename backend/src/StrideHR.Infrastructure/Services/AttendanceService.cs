@@ -749,9 +749,9 @@ public class AttendanceService : IAttendanceService
             AlertType = a.AlertType,
             AlertMessage = a.AlertMessage,
             EmployeeId = a.EmployeeId,
-            EmployeeName = a.Employee != null ? $"{a.Employee.FirstName} {a.Employee.LastName}" : null,
-            BranchId = a.BranchId,
-            BranchName = a.Branch?.Name,
+            EmployeeName = a.Employee != null ? $"{a.Employee.FirstName} {a.Employee.LastName}" : string.Empty,
+            BranchId = a.BranchId ?? 0,
+            BranchName = a.Branch?.Name ?? string.Empty,
             CreatedAt = a.CreatedAt,
             IsRead = a.IsRead,
             Severity = a.Severity,
@@ -765,7 +765,7 @@ public class AttendanceService : IAttendanceService
         {
             AlertType = request.AlertType,
             AlertMessage = GenerateAlertMessage(request.AlertType, request.EmployeeId),
-            EmployeeId = request.EmployeeId ?? 0,
+            EmployeeId = request.EmployeeId,
             BranchId = request.BranchId,
             CreatedAt = DateTime.Now,
             IsRead = false,
@@ -787,7 +787,7 @@ public class AttendanceService : IAttendanceService
             AlertType = alert.AlertType,
             AlertMessage = alert.AlertMessage,
             EmployeeId = alert.EmployeeId,
-            BranchId = alert.BranchId,
+            BranchId = alert.BranchId ?? 0,
             CreatedAt = alert.CreatedAt,
             IsRead = alert.IsRead,
             Severity = alert.Severity,
@@ -836,7 +836,7 @@ public class AttendanceService : IAttendanceService
         return System.Text.Encoding.UTF8.GetBytes(jsonData);
     }
 
-    private string GenerateAlertMessage(AttendanceAlertType alertType, int? employeeId)
+    private string GenerateAlertMessage(AttendanceAlertType alertType, int employeeId)
     {
         return alertType switch
         {

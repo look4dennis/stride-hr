@@ -1,0 +1,21 @@
+<svg width="192" height="192" viewBox="0 0 192 192" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background circle -->
+  <circle cx="96" cy="96" r="96" fill="#3B82F6"/>
+  
+  <!-- HR Icon - People/Users -->
+  <g transform="translate(48, 48)">
+    <!-- Person 1 -->
+    <circle cx="32" cy="32" r="16" fill="white" opacity="0.9"/>
+    <path d="M16 80 C16 64, 24 56, 32 56 C40 56, 48 64, 48 80 L48 88 L16 88 Z" fill="white" opacity="0.9"/>
+    
+    <!-- Person 2 -->
+    <circle cx="64" cy="32" r="16" fill="white" opacity="0.9"/>
+    <path d="M48 80 C48 64, 56 56, 64 56 C72 56, 80 64, 80 80 L80 88 L48 88 Z" fill="white" opacity="0.9"/>
+    
+    <!-- Connecting element -->
+    <rect x="40" y="72" width="16" height="4" fill="white" opacity="0.7"/>
+  </g>
+  
+  <!-- Letter S for Stride -->
+  <text x="96" y="130" font-family="Arial, sans-serif" font-size="24" font-weight="bold" fill="white" text-anchor="middle">S</text>
+</svg>

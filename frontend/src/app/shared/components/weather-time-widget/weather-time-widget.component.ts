@@ -233,6 +233,11 @@ export class WeatherTimeWidgetComponent implements OnInit, OnDestroy {
     this.updateTime();
     this.startTimeUpdates();
     this.loadWeatherData();
+    
+    // Force refresh weather to ensure it shows correct location
+    setTimeout(() => {
+      this.refreshWeather();
+    }, 1000);
   }
 
   ngOnDestroy(): void {

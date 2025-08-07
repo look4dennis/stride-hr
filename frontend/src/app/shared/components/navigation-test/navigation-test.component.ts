@@ -2,6 +2,8 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../core/auth/auth.service';
+import { NavigationTestRunnerComponent } from './navigation-test-runner.component';
+import { NavigationTestService, NavigationTestResult } from '../../services/navigation-test.service';
 
 interface RouteTest {
   name: string;
@@ -13,24 +15,38 @@ interface RouteTest {
 
 @Component({
   selector: 'app-navigation-test',
-  imports: [CommonModule],
+  imports: [CommonModule, NavigationTestRunnerComponent],
   template: `
     <div class="navigation-test-container">
-      <div class="card">
+      <!-- Quick Navigation Test Runner -->
+      <app-navigation-test-runner></app-navigation-test-runner>
+      
+      <!-- Detailed Route Testing -->
+      <div class="card mt-4">
         <div class="card-header">
           <h5 class="card-title mb-0">
             <i class="fas fa-route me-2"></i>
-            Navigation & Routing Test
+            Detailed Navigation & Routing Test
           </h5>
         </div>
         <div class="card-body">
           <div class="d-flex justify-content-between align-items-center mb-3">
             <p class="mb-0">Test all navigation routes to ensure they load correctly</p>
-            <button class="btn btn-primary" (click)="testAllRoutes()" [disabled]="testing">
-              <span *ngIf="testing" class="spinner-border spinner-border-sm me-2"></span>
-              <i *ngIf="!testing" class="fas fa-play me-2"></i>
-              {{ testing ? 'Testing...' : 'Test All Routes' }}
-            </button>
+            <div class="btn-group">
+              <button class="btn btn-primary" (click)="testAllRoutes()" [disabled]="testing">
+                <span *ngIf="testing" class="spinner-border spinner-border-sm me-2"></span>
+                <i *ngIf="!testing" class="fas fa-play me-2"></i>
+                {{ testing ? 'Testing...' : 'Test All Routes' }}
+              </button>
+              <button class="btn btn-outline-primary" (click)="testComponentImports()" [disabled]="testing">
+                <i class="fas fa-puzzle-piece me-2"></i>
+                Test Imports
+              </button>
+              <button class="btn btn-outline-secondary" (click)="runComprehensiveTest()" [disabled]="testing">
+                <i class="fas fa-cogs me-2"></i>
+                Full Test
+              </button>
+            </div>
           </div>
 
           <div class="route-tests">
@@ -228,7 +244,8 @@ export class NavigationTestComponent {
 
   constructor(
     private router: Router,
-    private authService: AuthService
+    private authService: AuthService,
+    private navigationTestService: NavigationTestService
   ) {}
 
   async testAllRoutes(): Promise<void> {
@@ -285,5 +302,71 @@ export class NavigationTestComponent {
 
   getTestCount(status: 'success' | 'error' | 'pending'): number {
     return this.routeTests.filter(test => test.status === status).length;
+  }
+
+  async testComponentImports(): Promise<void> {
+    this.testing = true;
+    console.log('🔍 Starting component import test...');
+    
+    try {
+      const result = await this.navigationTestService.testComponentImports();
+      
+      if (result.success) {
+        console.log('✅ All components imported successfully!');
+        alert('✅ All components imported successfully!');
+      } else {
+        console.error('❌ Some components failed to import:', result.errors);
+        alert(`❌ ${result.errors.length} components failed to import. Check console for details.`);
+      }
+    } catch (error) {
+      console.error('Error during component import test:', error);
+      alert('❌ Component import test failed. Check console for details.');
+    } finally {
+      this.testing = false;
+    }
+  }
+
+  async runComprehensiveTest(): Promise<void> {
+    this.testing = true;
+    this.testCompleted = false;
+    
+    console.log('🚀 Starting comprehensive navigation test...');
+    
+    try {
+      // First test component imports
+      console.log('Phase 1: Testing component imports...');
+      const importResult = await this.navigationTestService.testComponentImports();
+      
+      if (!importResult.success) {
+        console.warn('⚠️ Some components failed to import, but continuing with navigation test...');
+      }
+      
+      // Then test navigation
+      console.log('Phase 2: Testing navigation routes...');
+      const navigationResults = await this.navigationTestService.testAllRoutes();
+      
+      // Update our local route tests with results
+      this.routeTests.forEach(localTest => {
+        const result = navigationResults.find(r => r.route === localTest.route);
+        if (result) {
+          localTest.status = result.success ? 'success' : 'error';
+          localTest.error = result.error;
+        }
+      });
+      
+      this.testCompleted = true;
+      
+      const successCount = navigationResults.filter(r => r.success).length;
+      const totalCount = navigationResults.length;
+      
+      console.log(`✅ Comprehensive test completed: ${successCount}/${totalCount} routes working`);
+      alert(`Test completed: ${successCount}/${totalCount} routes working. Check console for details.`);
+      
+    } catch (error) {
+      console.error('Error during comprehensive test:', error);
+      alert('❌ Comprehensive test failed. Check console for details.');
+    } finally {
+      this.testing = false;
+    }
   }
 }

@@ -90,6 +90,12 @@ export class PlaceholderComponent {
   @Input() showActions = true;
 
   goBack(): void {
-    window.history.back();
+    // Use the navigation service for consistent back navigation
+    if (typeof window !== 'undefined' && window.history.length > 1) {
+      window.history.back();
+    } else {
+      // Fallback to dashboard if no history
+      window.location.href = '/dashboard';
+    }
   }
 }

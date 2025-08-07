@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable, tap } from 'rxjs';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { BehaviorSubject, Observable, tap, catchError, throwError } from 'rxjs';
 import { Router } from '@angular/router';
 import { environment } from '../../../environments/environment';
 
@@ -71,25 +71,119 @@ export class AuthService {
     return this.http.post<AuthResponse>(`${this.API_URL}/auth/login`, credentials)
       .pipe(
         tap(response => {
-          this.setAuthData(response);
+          if (response.success) {
+            this.setAuthData(response);
+          }
+        }),
+        catchError(error => {
+          console.error('Login error:', error);
+          
+          // Handle specific error cases
+          if (error.status === 401) {
+            return throwError(() => ({
+              success: false,
+              message: error.error?.message || 'Invalid email or password',
+              errors: error.error?.errors || ['Authentication failed']
+            }));
+          } else if (error.status === 429) {
+            return throwError(() => ({
+              success: false,
+              message: 'Too many login attempts. Please try again later.',
+              errors: ['Account temporarily locked']
+            }));
+          } else if (error.status === 0) {
+            return throwError(() => ({
+              success: false,
+              message: 'Unable to connect to server. Please check your connection.',
+              errors: ['Network error']
+            }));
+          }
+          
+          return throwError(() => ({
+            success: false,
+            message: 'An unexpected error occurred. Please try again.',
+            errors: ['Server error']
+          }));
         })
       );
   }
 
   logout(): void {
-    // Call logout endpoint if needed
-    this.http.post(`${this.API_URL}/auth/logout`, {}).subscribe();
-    
-    this.clearAuthData();
-    this.router.navigate(['/login']);
+    // Call logout endpoint to revoke tokens on server
+    this.http.post(`${this.API_URL}/auth/logout`, {}).subscribe({
+      next: () => {
+        console.log('Server logout successful');
+      },
+      error: (error) => {
+        console.warn('Server logout failed:', error);
+        // Continue with client-side logout even if server call fails
+      },
+      complete: () => {
+        this.clearAuthData();
+        this.router.navigate(['/login']);
+      }
+    });
+  }
+
+  logoutAll(): void {
+    // Call logout-all endpoint to revoke all sessions
+    this.http.post(`${this.API_URL}/auth/logout-all`, {}).subscribe({
+      next: () => {
+        console.log('All sessions logged out successfully');
+      },
+      error: (error) => {
+        console.warn('Logout all sessions failed:', error);
+      },
+      complete: () => {
+        this.clearAuthData();
+        this.router.navigate(['/login']);
+      }
+    });
   }
 
   refreshToken(): Observable<AuthResponse> {
     const refreshToken = localStorage.getItem('refreshToken');
-    return this.http.post<AuthResponse>(`${this.API_URL}/auth/refresh`, { refreshToken })
+    const currentToken = localStorage.getItem('token');
+    
+    if (!refreshToken) {
+      return throwError(() => ({
+        success: false,
+        message: 'No refresh token available',
+        errors: ['Authentication required']
+      }));
+    }
+
+    return this.http.post<AuthResponse>(`${this.API_URL}/auth/refresh`, { 
+      refreshToken,
+      token: currentToken 
+    })
       .pipe(
         tap(response => {
-          this.setAuthData(response);
+          if (response.success) {
+            this.setAuthData(response);
+          }
+        }),
+        catchError(error => {
+          console.error('Token refresh error:', error);
+          
+          // Clear auth data on refresh failure
+          this.clearAuthData();
+          
+          if (error.status === 401 || error.status === 403) {
+            // Redirect to login on invalid refresh token
+            this.router.navigate(['/login']);
+            return throwError(() => ({
+              success: false,
+              message: 'Session expired. Please log in again.',
+              errors: ['Invalid refresh token']
+            }));
+          }
+          
+          return throwError(() => ({
+            success: false,
+            message: 'Failed to refresh session. Please log in again.',
+            errors: ['Token refresh failed']
+          }));
         })
       );
   }
@@ -151,6 +245,34 @@ export class AuthService {
     this.currentUserSubject.next(null);
   }
 
+  getActiveSessions(): Observable<any> {
+    return this.http.get(`${this.API_URL}/auth/sessions`);
+  }
+
+  revokeSession(sessionId: string): Observable<any> {
+    return this.http.delete(`${this.API_URL}/auth/sessions/${sessionId}`);
+  }
+
+  changePassword(currentPassword: string, newPassword: string): Observable<any> {
+    return this.http.post(`${this.API_URL}/auth/change-password`, {
+      currentPassword,
+      newPassword
+    });
+  }
+
+  validateToken(token?: string): Observable<any> {
+    const tokenToValidate = token || this.token;
+    if (!tokenToValidate) {
+      return throwError(() => ({ success: false, message: 'No token to validate' }));
+    }
+
+    return this.http.post(`${this.API_URL}/auth/validate`, { token: tokenToValidate });
+  }
+
+  getCurrentUserFromServer(): Observable<any> {
+    return this.http.get(`${this.API_URL}/auth/me`);
+  }
+
   private loadStoredAuth(): void {
     const token = localStorage.getItem('token');
     const userStr = localStorage.getItem('user');
@@ -161,6 +283,20 @@ export class AuthService {
       if (expiryDate > new Date()) {
         this.tokenSubject.next(token);
         this.currentUserSubject.next(JSON.parse(userStr));
+        
+        // Validate token with server on app startup
+        this.validateToken(token).subscribe({
+          next: (response) => {
+            if (!response.success) {
+              console.warn('Stored token is invalid, clearing auth data');
+              this.clearAuthData();
+            }
+          },
+          error: () => {
+            console.warn('Token validation failed, clearing auth data');
+            this.clearAuthData();
+          }
+        });
       } else {
         this.clearAuthData();
       }

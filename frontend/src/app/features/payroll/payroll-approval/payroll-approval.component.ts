@@ -64,7 +64,7 @@ import {
           <div class="card dashboard-widget">
             <div class="card-body text-center">
               <i class="fas fa-money-bill-wave text-info mb-2" style="font-size: 2rem;"></i>
-              <h3 class="widget-value">{{ formatCurrency(totalApprovalAmount) }}</h3>
+              <h3 class="widget-value">{{ formatCurrency(totalApprovalAmount, 'USD') }}</h3>
               <p class="text-muted mb-0">Total Amount</p>
             </div>
           </div>

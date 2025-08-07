@@ -29,6 +29,7 @@
                         "assets": [
                             "src/favicon.ico",
                             "src/assets",
+                            "src/manifest.webmanifest",
                             {
                                 "glob": "**/*",
                                 "input": "public",

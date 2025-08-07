@@ -14,8 +14,8 @@ self.addEventListener('push', event => {
   const data = event.data.json();
   const options = {
     body: data.body,
-    icon: data.icon || '/icons/icon-192x192.png',
-    badge: '/icons/icon-72x72.png',
+    icon: data.icon || '/assets/icons/icon-192x192.png',
+    badge: '/assets/icons/icon-192x192.png',
     vibrate: [200, 100, 200],
     data: data.data,
     actions: data.actions || [],
@@ -100,8 +100,8 @@ async function syncOfflineData() {
     // Show sync completion notification
     await self.registration.showNotification('Data Synchronized', {
       body: `${offlineData.length} offline actions have been synchronized.`,
-      icon: '/icons/icon-192x192.png',
-      badge: '/icons/icon-72x72.png',
+      icon: '/assets/icons/icon-192x192.png',
+      badge: '/assets/icons/icon-192x192.png',
       tag: 'sync-complete'
     });
     
@@ -246,14 +246,14 @@ async function sendAttendanceReminder() {
   if (hour === 9) {
     await self.registration.showNotification('Attendance Reminder', {
       body: 'Don\'t forget to check in for today!',
-      icon: '/icons/icon-192x192.png',
-      badge: '/icons/icon-72x72.png',
+      icon: '/assets/icons/icon-192x192.png',
+      badge: '/assets/icons/icon-192x192.png',
       tag: 'attendance-reminder',
       actions: [
         {
           action: 'checkin',
           title: 'Check In Now',
-          icon: '/icons/icon-72x72.png'
+          icon: '/assets/icons/icon-192x192.png'
         }
       ]
     });
@@ -269,14 +269,14 @@ async function sendDSRReminder() {
   if (hour === 18) {
     await self.registration.showNotification('DSR Reminder', {
       body: 'Please submit your Daily Status Report',
-      icon: '/icons/icon-192x192.png',
-      badge: '/icons/icon-72x72.png',
+      icon: '/assets/icons/icon-192x192.png',
+      badge: '/assets/icons/icon-192x192.png',
       tag: 'dsr-reminder',
       actions: [
         {
           action: 'submit-dsr',
           title: 'Submit DSR',
-          icon: '/icons/icon-72x72.png'
+          icon: '/assets/icons/icon-192x192.png'
         }
       ]
     });

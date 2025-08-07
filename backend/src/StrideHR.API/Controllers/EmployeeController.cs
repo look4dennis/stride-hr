@@ -291,6 +291,7 @@ public class EmployeeController : ControllerBase
     }
 
     [HttpPost("{id}/profile-photo")]
+    [ApiExplorerSettings(IgnoreApi = true)] // Temporarily exclude from Swagger due to IFormFile issue
     public async Task<ActionResult<ApiResponse<string>>> UploadProfilePhoto(int id, IFormFile file)
     {
         try

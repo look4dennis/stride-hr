@@ -205,6 +205,7 @@ public class OrganizationController : ControllerBase
     }
 
     [HttpPost("{id}/logo")]
+    [ApiExplorerSettings(IgnoreApi = true)] // Temporarily exclude from Swagger due to IFormFile issue
     public async Task<ActionResult<ApiResponse<string>>> UploadLogo(int id, IFormFile file)
     {
         try

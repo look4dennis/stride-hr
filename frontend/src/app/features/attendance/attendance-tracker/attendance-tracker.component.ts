@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
-import { AttendanceService } from '../../../services/attendance.service';
+import { EnhancedAttendanceService } from '../../../services/enhanced-attendance.service';
 import { 
   AttendanceStatus, 
   BreakType, 
@@ -386,7 +386,7 @@ export class AttendanceTrackerComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
 
   constructor(
-    private attendanceService: AttendanceService,
+    private attendanceService: EnhancedAttendanceService,
     private router: Router
   ) {}
 
@@ -401,16 +401,16 @@ export class AttendanceTrackerComponent implements OnInit, OnDestroy {
   }
 
   private loadAttendanceStatus(): void {
-    // For development, use mock data
-    this.attendanceStatus = this.attendanceService.getMockAttendanceStatus();
-    
-    // Uncomment for production
-    // this.attendanceService.getCurrentEmployeeStatus()
-    //   .pipe(takeUntil(this.destroy$))
-    //   .subscribe({
-    //     next: (status) => this.attendanceStatus = status,
-    //     error: (error) => this.handleError('Failed to load attendance status', error)
-    //   });
+    this.attendanceService.getCurrentEmployeeStatus()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (status) => this.attendanceStatus = status,
+        error: (error) => {
+          // Fallback to mock data during development
+          console.log('API call failed, using mock data:', error);
+          this.attendanceStatus = this.attendanceService.getMockAttendanceStatus();
+        }
+      });
   }
 
   private subscribeToStatusUpdates(): void {

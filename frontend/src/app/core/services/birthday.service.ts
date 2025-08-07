@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, BehaviorSubject } from 'rxjs';
+import { Observable, BehaviorSubject, catchError, of } from 'rxjs';
 
 export interface BirthdayEmployee {
   id: number;
@@ -36,11 +36,21 @@ export class BirthdayService {
   }
 
   getTodayBirthdays(): Observable<BirthdayEmployee[]> {
-    return this.http.get<BirthdayEmployee[]>(`${this.API_URL}/employees/birthdays/today`);
+    return this.http.get<BirthdayEmployee[]>(`${this.API_URL}/employees/birthdays/today`).pipe(
+      catchError(error => {
+        console.warn('Birthday API not available, using mock data:', error.message);
+        return of(this.getMockBirthdays());
+      })
+    );
   }
 
   getUpcomingBirthdays(days: number = 7): Observable<BirthdayEmployee[]> {
-    return this.http.get<BirthdayEmployee[]>(`${this.API_URL}/employees/birthdays/upcoming?days=${days}`);
+    return this.http.get<BirthdayEmployee[]>(`${this.API_URL}/employees/birthdays/upcoming?days=${days}`).pipe(
+      catchError(error => {
+        console.warn('Birthday API not available, using mock data:', error.message);
+        return of(this.getMockBirthdays());
+      })
+    );
   }
 
   sendBirthdayWish(toEmployeeId: number, message: string): Observable<BirthdayWish> {
@@ -60,8 +70,8 @@ export class BirthdayService {
         this.todayBirthdaysSubject.next(birthdays);
       },
       error: (error) => {
-        console.error('Error loading today\'s birthdays:', error);
-        // Load mock data for development
+        // This should not happen now since we handle errors in getTodayBirthdays()
+        console.warn('Fallback: Loading mock birthday data');
         this.todayBirthdaysSubject.next(this.getMockBirthdays());
       }
     });

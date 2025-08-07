@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { EmployeeService } from '../../../services/employee.service';
+import { EnhancedEmployeeService } from '../../../services/enhanced-employee.service';
 import { BranchService } from '../../../services/branch.service';
 import { CreateEmployeeDto, Employee } from '../../../models/employee.models';
 import { Branch } from '../../../models/admin.models';
@@ -504,7 +504,7 @@ export class EmployeeCreateComponent implements OnInit {
 
     constructor(
         private fb: FormBuilder,
-        private employeeService: EmployeeService,
+        private employeeService: EnhancedEmployeeService,
         private branchService: BranchService,
         private router: Router,
         private notificationService: NotificationService,
@@ -665,18 +665,13 @@ export class EmployeeCreateComponent implements OnInit {
                 profilePhoto: this.selectedFile || undefined
             };
 
-            this.employeeService.createEmployee(createDto).subscribe({
-                next: (employee: Employee) => {
-                    this.notificationService.showSuccess(
-                        `Employee ${employee.firstName} ${employee.lastName} created successfully!`
-                    );
+            this.employeeService.create(createDto).subscribe({
+                next: (response) => {
+                    const employee = response.data!;
                     this.router.navigate(['/employees']);
                 },
                 error: (error) => {
                     console.error('Error creating employee:', error);
-                    this.notificationService.showError(
-                        error.error?.message || 'Failed to create employee. Please try again.'
-                    );
                     this.isSubmitting = false;
                 }
             });

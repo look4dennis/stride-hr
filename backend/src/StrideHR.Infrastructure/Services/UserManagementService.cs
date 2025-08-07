@@ -156,24 +156,24 @@ public class UserManagementService : IUserManagementService
         var result = await _userRepository.SaveChangesAsync();
 
         // Update roles if provided
-        if (request.RoleIds != null)
+        if (request.RoleIds != null && user.EmployeeId.HasValue)
         {
             // Get current roles
-            var currentRoles = await _roleService.GetEmployeeRolesAsync(user.EmployeeId);
+            var currentRoles = await _roleService.GetEmployeeRolesAsync(user.EmployeeId.Value);
             var currentRoleIds = currentRoles.Select(r => r.Id).ToList();
 
             // Remove roles that are not in the new list
             var rolesToRemove = currentRoleIds.Except(request.RoleIds).ToList();
             foreach (var roleId in rolesToRemove)
             {
-                await _roleService.RemoveRoleFromEmployeeAsync(user.EmployeeId, roleId);
+                await _roleService.RemoveRoleFromEmployeeAsync(user.EmployeeId.Value, roleId);
             }
 
             // Add new roles
             var rolesToAdd = request.RoleIds.Except(currentRoleIds).ToList();
             foreach (var roleId in rolesToAdd)
             {
-                await _roleService.AssignRoleToEmployeeAsync(user.EmployeeId, roleId);
+                await _roleService.AssignRoleToEmployeeAsync(user.EmployeeId.Value, roleId);
             }
         }
 
